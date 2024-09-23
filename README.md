@@ -1,2 +1,3 @@
-# CSC423_ReactBackend
+# CSC423 ReactBackend
+
 School Project
