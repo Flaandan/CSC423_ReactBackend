@@ -1,9 +1,13 @@
+# Database Schema
 
+```sql
 CREATE TABLE major (
     name VARCHAR(255) PRIMARY KEY,
     description TEXT NOT NULL
 );
+```
 
+```sql
 CREATE TABLE users (
     username VARCHAR(255) PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -14,7 +18,9 @@ CREATE TABLE users (
     office VARCHAR(255) DEFAULT 'Student Lounge',
     last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
 
+```sql
 CREATE TABLE course (
     discipline VARCHAR(10) NOT NULL,
     course_number INT NOT NULL,
@@ -23,7 +29,9 @@ CREATE TABLE course (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (discipline, course_number)
 );
+```
 
+```sql
 CREATE TABLE major_courses (
     major_name VARCHAR(255),
     course_discipline VARCHAR(10),
@@ -33,7 +41,9 @@ CREATE TABLE major_courses (
     FOREIGN KEY (major_name) REFERENCES major(name),
     FOREIGN KEY (course_discipline, course_number) REFERENCES course(discipline, course_number)
 );
+```
 
+```sql
 CREATE TABLE user_majors (
     username VARCHAR(255),
     major_name VARCHAR(255),
@@ -41,9 +51,11 @@ CREATE TABLE user_majors (
     FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (major_name) REFERENCES major(name)
 );
+```
 
+```sql
 CREATE TABLE registration (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255),
     course_discipline VARCHAR(10),
     course_number INT,
@@ -53,11 +65,13 @@ CREATE TABLE registration (
     FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (course_discipline, course_number) REFERENCES course(discipline, course_number)
 );
+```
 
+```sql
 CREATE TABLE dropped (
-    registration_id BIGINT UNSIGNED, 
+    registration_id BIGINT UNSIGNED,
     date_dropped TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (registration_id),
     FOREIGN KEY (registration_id) REFERENCES registration(id)
 );
-
+```
