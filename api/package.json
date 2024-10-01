@@ -1,23 +1,21 @@
 {
   "name": "react-backend-api",
   "version": "1.0.0",
-  "author": "",
   "description": "",
-  "main": "src/main.js",
   "type": "module",
-  "directories": {
-    "test": "tests"
-  },
+  "main": "src/main.js",
   "scripts": {
     "dev": "NODE_ENV=development node --watch src/main.js",
     "start": "NODE_ENV=production node src/main.js",
     "lint": "eslint 'src/**/*.js' && npx tsc",
     "fmt": "npx prettier . --write",
-    "fmt-check": "npx prettier . --check"
+    "fmt-check": "npx prettier . --check",
+    "test": "jest"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "mysql2": "^3.11.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

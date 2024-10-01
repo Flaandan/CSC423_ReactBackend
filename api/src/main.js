@@ -1,24 +1,25 @@
 import dotenv from "dotenv";
-import getConfig from "./config.js";
-import build from "./server.js";
+import { Config } from "./config.js";
+import { Application } from "./server.js";
 
-function main() {
+async function main() {
   // Detect the running environment. Defaults to `development` if not provided
   const environment = process.env.NODE_ENV;
+
   const filePath = environment === "production" ? ".env.production" : ".env";
 
   // Load the specified .env file
   dotenv.config({ path: filePath });
 
-  const config = getConfig();
+  const config = Config.default();
 
-  const app = build(config);
+  const application = await Application.build(config);
 
-  app.listen(config.port, config.host, () => {
-    console.log(
-      `->> Listening on: ${config.host}:${config.port}\n->> Environment: ${config.nodeEnv}`,
-    );
-  });
+  console.info(
+    `->>\t Listening on: ${config.server.host}:${config.server.port}\n->>\t Environment: ${config.nodeEnv}`,
+  );
+
+  await application.runServer();
 }
 
-main();
+await main();

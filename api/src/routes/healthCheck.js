@@ -3,19 +3,31 @@ import express from "express";
 const router = express.Router();
 
 /**
- * Builds an Express application.
- *
- * @param {{ nodeEnv: string, host: string, port: number, databaseUrl: string }} config - The configuration object for the application
- * @returns {import('express').Router} Express application
+ * @async
+ * @param {import('../lib/types.ts').Config} config
+ * @param {import('mysql2/promise').Pool} pool
+ * @returns {Promise<import('express').Router>}
  */
-export function healthCheckRoutes(config) {
+export async function healthCheck(config, pool) {
+  const connection = await pool.getConnection();
+
+  try {
+    const [results, fields] = await connection.query("SELECT * FROM `users`");
+
+    console.info(results);
+    console.info(fields);
+  } catch (err) {
+    console.info(err);
+  }
+
   router.get("/", (_, response) => {
     const responseBody = {
       status: "available",
       environment: `${config.nodeEnv}`,
+      database_connection: connection ? "connected" : "error",
     };
 
-    response.setHeader("Content-Type", "text/plain");
+    response.setHeader("Content-Type", "application/json");
     response.removeHeader("X-Powered-By");
     response.status(200).json(responseBody);
   });
