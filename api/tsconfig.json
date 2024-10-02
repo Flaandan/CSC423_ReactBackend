@@ -6,7 +6,7 @@
     /* Modules */
     "module": "ES2022",
     "moduleResolution": "node",
-    "typeRoots": ["src/lib/types", "node_modules/@types"],
+    "typeRoots": ["node_modules/@types"],
 
     /* JavaScript Support */
     "allowJs": true,
