@@ -13,7 +13,7 @@ export default [
     ignores: ["node_modules"],
     rules: {
       eqeqeq: "warn",
-      "no-unused-vars": "warn",
+      "no-unused-vars": "off",
       "no-var": "error",
       "prefer-const": "warn",
       "no-undef": "error",
@@ -21,7 +21,7 @@ export default [
       "no-useless-escape": "warn",
       "no-duplicate-imports": "error",
       // TODO: Remove `allow` after implementing custom logging
-      "no-console": ["warn", { allow: ["info"] }],
+      "no-console": ["warn", { allow: ["info", "error"] }],
     },
   },
 ];
