@@ -13,8 +13,8 @@ CREATE TABLE users (
     last_name VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
     role user_role NOT NULL,
-    phone_number VARCHAR(12) NOT NULL,
-    office VARCHAR(255) DEFAULT 'Student Lounge',
+    phone_number VARCHAR(14) NOT NULL,
+    office VARCHAR(255) NOT NULL DEFAULT 'Student Lounge',
     last_login TIMESTAMPTZ DEFAULT NOW()
 );
 

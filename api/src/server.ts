@@ -1,8 +1,8 @@
 import { serve, ServerType } from "@hono/node-server";
 import { Hono } from "hono";
 import { config as Config } from "./config.js";
+import { responseMapperMiddleware } from "./middleware/responseMapper.js";
 import { setupRoutes } from "./routes.js";
-import { responseMapper } from "./middleware/responseMapper.js";
 
 class Application {
   #port;
@@ -48,7 +48,7 @@ function setup(): Hono {
 
   setupRoutes(server);
 
-  responseMapper(server);
+  responseMapperMiddleware(server);
 
   return server;
 }
