@@ -13,6 +13,11 @@ function LoginPage() {
     console.log('Password:', password);
   };
 
+  const handleCreateAccount = () => {
+
+    console.log('Redirect to create account page');
+  };
+
   const handleForgotPassword = () => {
 
     console.log('Redirect to forgot password page');
@@ -41,7 +46,10 @@ function LoginPage() {
           Login
         </button>
 
-      <div className="buttonContainer">
+      <div className="buttonContainer">  
+	<button onClick={handleCreateAccount} className="bottomButtons">
+	  Create Account
+	 </button>
 	 <button onClick={handleForgotPassword} className="bottomButtons">
 	  Forgot Password
 	 </button>
