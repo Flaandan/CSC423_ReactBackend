@@ -37,15 +37,15 @@ class Config {
     this.#serverPort = Number(process.env.SERVER_PORT);
   }
 
-  connectionString() {
-    return `postgres://${this.#pgUser}:${this.#pgPassword}@${this.#pgHost}:5432/${this.#pgDatabase}`;
+  connectionString(environment: string | undefined): string {
+    return `postgres://${this.#pgUser}:${this.#pgPassword}@${this.#pgHost}:5432/${this.#pgDatabase}${environment === "production" ? "?sslmode=require" : ""}`;
   }
 
-  get serverHost() {
+  get serverHost(): string {
     return this.#serverHost;
   }
 
-  get serverPort() {
+  get serverPort(): number {
     return this.#serverPort;
   }
 }

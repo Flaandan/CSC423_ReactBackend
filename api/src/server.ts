@@ -1,7 +1,8 @@
-import { serve } from "@hono/node-server";
+import { serve, ServerType } from "@hono/node-server";
 import { Hono } from "hono";
 import { config as Config } from "./config.js";
 import { setupRoutes } from "./routes.js";
+import { responseMapper } from "./middleware/responseMapper.js";
 
 class Application {
   #port;
@@ -16,7 +17,7 @@ class Application {
     this.#server = server;
   }
 
-  static build(config: typeof Config) {
+  static build(config: typeof Config): Application {
     const port = config.serverPort;
     const host = config.serverHost;
 
@@ -25,15 +26,15 @@ class Application {
     return new Application(port, host, server);
   }
 
-  get port() {
+  get port(): number {
     return this.#port;
   }
 
-  get host() {
+  get host(): string {
     return this.#host;
   }
 
-  runServer() {
+  runServer(): ServerType {
     return serve({
       fetch: this.#server.fetch,
       port: this.port,
@@ -42,10 +43,12 @@ class Application {
   }
 }
 
-function setup() {
+function setup(): Hono {
   const server = new Hono();
 
   setupRoutes(server);
+
+  responseMapper(server);
 
   return server;
 }

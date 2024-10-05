@@ -66,4 +66,4 @@ CREATE TABLE dropped (
 
 
 INSERT INTO users (username, first_name, last_name, password_hash, role, phone_number, office, last_login) VALUES
-('admin_user', 'John', 'Smith', 'hashed_password_3', 'ADMIN', '345-678-9012', 'Admin Office', NOW());
+('admin_user', 'John', 'Smith', '$argon2id$v=19$m=65536,t=3,p=1$8w6DtEReFBwhWgQb4dYiTQ$5FNTfLC7jpzQFYulwY5l/+u4hd/iEy5+6rC1AGWPo04', 'ADMIN', '345-678-9012', 'Admin Office', NOW());
