@@ -1,6 +1,16 @@
 # dependencies
-/node_modules
+node_modules/
 
-# env files
+# build
+dist/
+
+# env
 .env
 .env.production
+
+# logs
+logs/
+*.log
+
+# misc
+.DS_Store

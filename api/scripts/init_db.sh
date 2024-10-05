@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+### Using Docker to setup local PostgreSQL database for testing and development
+
 # set -x 
 # ^ Enable debugging
 set -eo pipefail 
@@ -7,7 +9,7 @@ set -eo pipefail
 # is determined by the last non-zero status
 
 ENV_FILE=".env"
-SCHEMA_FILE="./scripts/db.sql"
+DB_FILE="./scripts/test_db.sql"
 
 if [ -f "$ENV_FILE" ]; then
     # Load environment variables from .env file
@@ -15,51 +17,60 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 if ! [ -x "$(command -v docker)" ]; then
-    echo >&2 "Error: docker is not installed."
+    echo >&2 "Error: docker is not installed"
     exit 1
 fi
 
-# Check if a custom user has been set, otherwise default to 'admin'
-DB_USER=${MARIADB_USER:=admin}
-
-# Check if a custom user has been set, otherwise default to 'password'
-DB_PASSWORD="${MARIADB_PASSWORD:=password}"
-
-# Check if a custom host has been set, otherwise default to '127.0.0.1'
-DB_HOST="${MARIADB_HOST:=127.0.0.1}"
-
-# Check if a custom port has been set, otherwise default to '3306'
-DB_PORT="${MARIADB_PORT:=3306}"
-
-# Check if a custom database name has been set, otherwise default to 'react_backend'
-DB_NAME="${MARIADB_DATABASE:=react_backend}"
-
-# Allow to skip Docker if a dockerized MariaDB database is already running
-if [[ -z "${SKIP}" ]]; then
-    docker run \
-        --name "mariadb-local" \
-        -e MARIADB_USER="${DB_USER}" \
-        -e MARIADB_PASSWORD="${DB_PASSWORD}" \
-        -e MARIADB_DATABASE="${DB_NAME}" \
-        -e MARIADB_ROOT_HOST="localhost" \
-        -e MARIADB_RANDOM_ROOT_PASSWORD=" " \
-        -p ${DB_HOST}:${DB_PORT}:3306 \
-        -d mariadb:11
+if ! [ -x "$(command -v psql)" ]; then
+    echo >&2 "Error: psql is not installed."
+    echo >&2 "Use:"
+    echo >&2 "    brew install libpq for macOS using Homebrew or alternative for preferred OS"
+    echo >&2 "to install it."
+    exit 1
 fi
 
-# Keep pinging MariaDB until it's ready
-until docker exec mariadb-local mariadb -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -P ${DB_PORT} -e 'SELECT 1'; do
-    >&2 echo "MariaDB is still unavailable - sleeping"
-    sleep 2
+# Use the PGUSER environment variable or default to 'postgres'
+: "${PGUSER:=postgres}"
+
+# Use the PGPASSWORD environment variable or default to 'password'
+: "${PGPASSWORD:=password}"
+
+# Use the PGDATABASE environment variable or default to 'react_backend'
+: "${PGDATABASE:=react_backend}"
+
+# Use the PGHOST environment variable or default to '127.0.0.1'
+: "${PGHOST:=127.0.0.1}"
+
+# Allow to skip Docker if a dockerized Postgres database is already running
+if [[ -z "${SKIP}" ]]
+then
+    docker run \
+        --name "postgres-local" \
+        -e POSTGRES_USER=${PGUSER} \
+        -e POSTGRES_PASSWORD=${PGPASSWORD} \
+        -e POSTGRES_DB=${PGDATABASE} \
+        -p 5432:5432 \
+        -d postgres:16-alpine \
+        postgres -N 100 
+        # In Postgres, the default limit is typically 100 open connections, 
+        # minus 3 which are reserved for superusers 
+        # (putting the default limit for unprivileged users at 97 connections)
+fi
+
+# Keep pinging Postgres until it's ready to accept commands
+export PGPASSWORD
+until psql -h ${PGHOST} -U "${PGUSER}" -d "postgres" -c '\q'; do
+    >&2 echo "Postgres is still unavailable - sleeping"
+    sleep 1 
 done
 
-echo "MariaDB is up on ${DB_HOST}:${DB_PORT} - ready for connections"
+echo "Postgres is up on ${PGHOST}:5432 - ready for connections"
 
-# Execute the SQL commands from db.sql
-if [ -f "$SCHEMA_FILE" ]; then
-    docker exec -i mariadb-local mariadb -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" "${DB_NAME}" < "$SCHEMA_FILE"
-    echo "tables created successfully and test data inserted for database: '${DB_NAME}'"
+# Execute the SQL commands from test_db.sql
+if [ -f "$DB_FILE" ]; then
+    psql -h "${PGHOST}" -U "${PGUSER}" -d "${PGDATABASE}" -f "$DB_FILE"
+    echo "migration completed successfully for database: '${PGDATABASE}'"
 else
-    >&2 echo "error: file '$SCHEMA_FILE' not found"
+    >&2 echo "error: file '$DB_FILE' not found"
     exit 1
 fi
