@@ -1,26 +1,16 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
-    "target": "ES2022",
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
 
-    /* Modules */
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "typeRoots": ["src/lib/types", "node_modules/@types"],
-
-    /* JavaScript Support */
-    "allowJs": true,
-    "checkJs": true,
-
-    /* Emit */
-    "noEmit": true,
-
-    /* Interop Constraints */
+    "outDir": "./dist",
+    "noEmit": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "preserveSymlinks": false,
 
-    /* Type Checking */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -28,10 +18,9 @@
     "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-
-    /* Completeness */
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.js"],
+  "include": ["src/**/*.ts", "src/db.ts", "src/config.js"],
   "exclude": ["node_modules"]
 }
