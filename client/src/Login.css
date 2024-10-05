@@ -4,7 +4,7 @@
   justify-content: flex-end;
   align-items: flex-end;
   padding: 20px;
-  background-color: #64a36f;
+  background-color: #303655;
 }
 
 .form {
@@ -13,7 +13,7 @@
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #ffe121;
+  background-color: #84a7ba;
   box-sizing: border-box;
   height: 100vh;
 }
