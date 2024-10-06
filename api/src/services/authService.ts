@@ -1,11 +1,11 @@
 import argon2 from "argon2";
 import { QueryResult } from "pg";
-import { LogInSchema } from "../controllers/login.js";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
 import { User } from "../models/user.js";
+import { LoginSchema } from "../controllers/auth/login.js";
 
-async function validateCredentials(payload: LogInSchema): Promise<void> {
+async function validateCredentials(payload: LoginSchema): Promise<void> {
   // When attempting to validate credentials, passing an incorrect username and password takes
   // and order of magnitude less of time then with a correct username and incorrect password
   //
@@ -43,61 +43,65 @@ async function validateCredentials(payload: LogInSchema): Promise<void> {
 }
 
 async function getCredentials(username: string): Promise<string | null> {
-  try {
-    const row: QueryResult<User> = await pgPool.query(
+  const row: QueryResult<User> = await pgPool
+    .query(
       `
       SELECT password_hash
       FROM users
       WHERE username = $1
       `,
       [username],
-    );
+    )
+    .catch((err) => {
+      throw new ServerError(
+        `Failed to fetch user credentials from database: ${String(err)}`,
+        500,
+        ClientError.SERVICE_ERROR,
+      );
+    });
 
-    if (row.rows.length > 0) {
-      return row.rows[0].password_hash;
-    }
-
-    // Return null if username not found
-    return null;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to fetch user credentials from database: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
+  if (row.rows.length > 0) {
+    return row.rows[0].password_hash;
   }
+
+  // Return null if username not found
+  return null;
 }
 
 async function verifyPasswordHash(
   expectedPasswordHash: string,
   passwordCandidate: string,
 ): Promise<boolean> {
-  // Will throw Error if it internally fails
-  const isVerified = await argon2.verify(
-    expectedPasswordHash,
-    passwordCandidate,
-  );
+  const isVerified = await argon2
+    .verify(expectedPasswordHash, passwordCandidate)
+    .catch((err) => {
+      throw new ServerError(
+        `Failed to verify against password hash: ${String(err)}`,
+        500,
+        ClientError.SERVICE_ERROR,
+      );
+    });
 
   return isVerified;
 }
 
 async function computePasswordHash(password: string): Promise<string> {
-  try {
-    const hashedPassword = await argon2.hash(password, {
+  const hashedPassword = await argon2
+    .hash(password, {
       type: argon2.argon2id,
       memoryCost: 2 ** 16, // (65536 KiB)
       timeCost: 3, // (number of iterations)
       parallelism: 1, // (parallel execution threads)
+    })
+    .catch((err) => {
+      throw new ServerError(
+        `Failed to compute password hash: ${String(err)}`,
+        500,
+        ClientError.SERVICE_ERROR,
+      );
     });
 
-    return hashedPassword;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to compute password hash: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
+  return hashedPassword;
 }
 
 export { computePasswordHash, validateCredentials };
