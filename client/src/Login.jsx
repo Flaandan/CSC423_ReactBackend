@@ -1,54 +1,61 @@
 import React, { useState } from 'react';
 import './Login.css';
 import BrockportLogo from '/BrockportLogo.jpg';
+import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    
-    console.log('Username:', username);
-    console.log('Password:', password);
-  };
+    const handleLogin = (e) => {
+        e.preventDefault();
 
-  const handleForgotPassword = () => {
+        if (username === 'admin' && password === 'admin') {
+            console.log('Login successful');
+            navigate('/adminDash');
+        } else {
+            console.log('Invalid credentials');
+            alert('Invalid username or password');
+        }
+    };
 
-    console.log('Redirect to forgot password page');
-  };
+    const handleForgotPassword = () => {
 
-  return (
-    <div className="container">
-      <form onSubmit={handleLogin} className="form">
-	<img src={BrockportLogo} alt="Brockport Logo" />
-        <h2 class="DarkBlue-text">Sign In:</h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="input"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input"
-        />
-        <button type="submit" className="loginButton">
-          Login
-        </button>
+        console.log('Redirect to forgot password page');
+    };
 
-      <div className="buttonContainer">
-	 <button onClick={handleForgotPassword} className="bottomButtons">
-	  Forgot Password
-	 </button>
-	</div>
-      </form>
-    </div>
-  );
+    return (
+        <div className="container">
+            <form onSubmit={handleLogin} className="form">
+                <img src={BrockportLogo} alt="Brockport Logo" />
+                <h2 class="DarkBlue-text">Sign In:</h2>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="input"
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input"
+                />
+                <button type="submit" className="loginButton">
+                    Login
+                </button>
+
+                <div className="buttonContainer">
+                    <button onClick={handleForgotPassword} className="bottomButtons">
+                        Forgot Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
 }
 
 export default LoginPage;
