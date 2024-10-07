@@ -45,10 +45,6 @@ const AdminDash = () => {
                 <button onClick={handleLogout} className="logout-button">
                     Logout
                 </button>
-
-                <button onClick={handleLogout} className="logout-button">
-                    Logout
-                </button>
             </div>
 
             <div className="main-content">
