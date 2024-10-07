@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './webPaage.css';
+import './webPage.css';
 
 
 const studentDash = () => {
