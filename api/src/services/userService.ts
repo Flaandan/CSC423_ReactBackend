@@ -1,7 +1,7 @@
 import pg from "pg";
-import { CreateUserSchema } from "../controllers/users/createUser.js";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
+import { CreateUserSchema } from "../utils/types.js";
 
 async function insertUser(
   payload: CreateUserSchema,

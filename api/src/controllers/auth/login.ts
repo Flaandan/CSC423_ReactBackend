@@ -1,23 +1,29 @@
 import { Context } from "hono";
-import { z } from "zod";
+import { setCookie } from "hono/cookie";
 import { validateCredentials } from "../../services/authService.js";
+import { COOKIE_KEY, generateToken } from "../../services/jwtService.js";
+import { logInPayload } from "../../utils/types.js";
 
-const requestPayload = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-
-type LoginSchema = z.infer<typeof requestPayload>;
-
-// Propagates errors to the responseMapperMiddleware
+// Propagates errors to responseMapper
 async function login(ctx: Context): Promise<Response> {
-  const body = await ctx.req.json();
+  const payload = await ctx.req.json();
 
-  const parsedBody = requestPayload.parse(body);
+  const parsedPayload = logInPayload.parse(payload);
 
-  await validateCredentials(parsedBody);
+  const user = await validateCredentials(parsedPayload);
 
-  return ctx.json({ success: "login successful" }, 200);
+  const token = await generateToken(user);
+
+  setCookie(ctx, COOKIE_KEY, token, {
+    path: "/",
+    secure: false,
+    httpOnly: true,
+    domain: "localhost",
+    maxAge: 3600, // 1 hour
+    sameSite: "Strict",
+  });
+
+  return ctx.json({ user: user }, 200);
 }
 
-export { login, LoginSchema };
+export { login };

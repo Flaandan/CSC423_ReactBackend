@@ -1,8 +1,12 @@
 import { serve, ServerType } from "@hono/node-server";
 import { Hono } from "hono";
+import { JwtVariables } from "hono/jwt";
 import { config as Config } from "./config.js";
-import { responseMapperMiddleware } from "./middleware/responseMapper.js";
-import { setupRoutes } from "./routes.js";
+import { setupEndpoints } from "./endpoints.js";
+import { jwtMiddleware } from "./middleware/jwtMiddleware.js";
+import { responseMapper } from "./middleware/responseMapper.js";
+
+type HonoServer = Hono<{ Variables: JwtVariables }>;
 
 class Application {
   #port;
@@ -11,7 +15,7 @@ class Application {
 
   #server;
 
-  constructor(port: number, host: string, server: Hono) {
+  constructor(port: number, host: string, server: HonoServer) {
     this.#port = port;
     this.#host = host;
     this.#server = server;
@@ -43,14 +47,19 @@ class Application {
   }
 }
 
-function setup(): Hono {
-  const server = new Hono();
+function setup(): HonoServer {
+  const server = new Hono<{ Variables: JwtVariables }>();
 
-  setupRoutes(server);
+  // MIDDLEWARE //
+  responseMapper(server);
 
-  responseMapperMiddleware(server);
+  // Restricts all users endpoints to only ADMIN users
+  server.use("/users/*", jwtMiddleware(["ADMIN"]));
+
+  // ENDPOINTS //
+  setupEndpoints(server);
 
   return server;
 }
 
-export { Application };
+export { Application, HonoServer };
