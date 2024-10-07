@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import './webPage.css';
 
 
-const studentDash = () => {
+const StudentDash = () => {
+    const handleLogout = () => {
+        navigate('/');
+    };
     return (
         <div>
             <h1>Student Dashboard</h1>
@@ -11,4 +14,4 @@ const studentDash = () => {
     );
 };
 
-export default studentDash;
+export default StudentDash;

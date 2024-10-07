@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './webPage.css';
 
+const TeacherDash = () => {
 
-const studentDash = () => {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        navigate('/');
+    };
     return (
-        <div>
-            <h1>Teacher Dashboard</h1>
-            <p>Welcome to the Teacher Dashboard!</p>
+        <div className="admin-dashboard">
+            <div className="left-column">
+                <h1>Teacher Dashboard</h1>
+                {/*Place Holders*/}
+                <a href="#majors">Manage Majors</a>
+                <a href="#users">Manage Users</a>
+
+                <button onClick={handleLogout} className="logout-button">
+                    Logout
+                </button>
+            </div>
         </div>
     );
 };
 
-export default studentDash;
+export default TeacherDash;

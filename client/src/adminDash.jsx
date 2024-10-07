@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Popup } from 'reactjs-popup';
 import './webPage.css';
 
 
@@ -42,6 +41,10 @@ const AdminDash = () => {
                 {/*Place Holders*/}
                 <a href="#majors">Manage Majors</a>
                 <a href="#users">Manage Users</a>
+
+                <button onClick={handleLogout} className="logout-button">
+                    Logout
+                </button>
 
                 <button onClick={handleLogout} className="logout-button">
                     Logout
