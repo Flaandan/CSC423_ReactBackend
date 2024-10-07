@@ -2,14 +2,22 @@ import { z } from "zod";
 
 const allowedRoles = ["STUDENT", "ADMIN", "INSTRUCTOR"];
 
-const logInPayload = z.object({
+export const logInPayload = z.object({
   username: z.string(),
   password: z.string(),
 });
 
-type LoginSchema = z.infer<typeof logInPayload>;
+export type LoginSchema = z.infer<typeof logInPayload>;
 
-const createUserPayload = z.object({
+export const changePasswordPayload = z.object({
+  username: z.string().optional(),
+  current_password: z.string(),
+  new_password: z.string().min(8).max(128),
+});
+
+export type ChangePasswordSchema = z.infer<typeof changePasswordPayload>;
+
+export const createUserPayload = z.object({
   username: z.string().min(3).max(255),
   first_name: z.string().min(1).max(255),
   last_name: z.string().min(1).max(255),
@@ -21,6 +29,4 @@ const createUserPayload = z.object({
   office: z.string().min(1).max(255).optional(),
 });
 
-type CreateUserSchema = z.infer<typeof createUserPayload>;
-
-export { logInPayload, LoginSchema, createUserPayload, CreateUserSchema };
+export type CreateUserSchema = z.infer<typeof createUserPayload>;

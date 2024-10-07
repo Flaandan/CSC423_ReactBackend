@@ -14,7 +14,7 @@
     "fmt-check": "npx prettier . --check",
     "watch": "npx tsc --watch",
     "clean": "rm -rf dist",
-    "test": "echo \"No tests specified\" && exit 1"
+    "test": ""
   },
   "dependencies": {
     "@hono/node-server": "^1.13.1",
