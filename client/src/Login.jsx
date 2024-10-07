@@ -27,7 +27,7 @@ function LoginPage() {
         <div className="container">
             <form onSubmit={handleLogin} className="form">
                 <img src={BrockportLogo} alt="Brockport Logo" />
-                <h2 class="DarkBlue-text">Sign In:</h2>
+                <h2 className="DarkBlue-text">Sign In:</h2>
                 <input
                     type="text"
                     placeholder="Username"
