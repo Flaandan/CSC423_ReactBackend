@@ -4,7 +4,7 @@ import Login from './Login.jsx';
 import AdminDash from './adminDash.jsx';
 import TeacherDash from './teacherDash.jsx';
 import StudentDash from './studentDash.jsx';
-import Root from "./routes/root";
+//import Root from "./routes/root";
 import {
     createBrowserRouter,
     RouterProvider,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Popup } from 'reactjs-popup';
 import './webPage.css';
 
 
@@ -32,7 +33,8 @@ const AdminDash = () => {
     const handleLogout = () => {
         navigate('/');
     };
-
+    /* I want to add all the functional buttons to the side column, main page
+     * should be used for displaying the interaction information*/
     return (
         <div className="admin-dashboard">
             <div className="left-column">
@@ -48,7 +50,7 @@ const AdminDash = () => {
 
             <div className="main-content">
                 <section id="majors">
-                    <h2>Manage Majors</h2>
+                    <h2>Add Majors</h2>
                     <input
                         type="text"
                         placeholder="Add Major"
@@ -72,7 +74,7 @@ const AdminDash = () => {
                 </section>
 
                 <section id="users">
-                    <h2>Manage Users</h2>
+                    <h2>Add Users</h2>
                     <input
                         type="text"
                         placeholder="Add User"

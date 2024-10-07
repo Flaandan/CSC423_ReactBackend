@@ -12,10 +12,8 @@ function LoginPage() {
         e.preventDefault();
 
         if (username === 'admin' && password === 'admin') {
-            console.log('Login successful');
             navigate('/adminDash');
         } else {
-            console.log('Invalid credentials');
             alert('Invalid username or password');
         }
     };
