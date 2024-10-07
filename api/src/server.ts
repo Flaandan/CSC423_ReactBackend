@@ -1,6 +1,8 @@
 import { serve, ServerType } from "@hono/node-server";
 import { Hono } from "hono";
+import { compress } from "hono/compress";
 import { JwtVariables } from "hono/jwt";
+import { logger } from "hono/logger";
 import { config as Config } from "./config.js";
 import { setupEndpoints } from "./endpoints.js";
 import { jwtMiddleware } from "./middleware/jwtMiddleware.js";
@@ -52,6 +54,12 @@ function setup(): HonoServer {
 
   // MIDDLEWARE //
   responseMapper(server);
+
+  // Compress response body
+  server.use(compress());
+
+  // Simple logger provided by Hono
+  server.use(logger());
 
   // Restricts all users endpoints to only ADMIN users
   server.use("/users/*", jwtMiddleware(["ADMIN"]));
