@@ -1,9 +1,14 @@
 import pg from "pg";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
-import { CreateUserSchema } from "../utils/types.js";
+import {
+  ChangePasswordSchema,
+  CreateUserSchema,
+  LoginSchema,
+} from "../utils/types.js";
+import { computePasswordHash, validateCredentials } from "./authService.js";
 
-async function insertUser(
+export async function insertUser(
   payload: CreateUserSchema,
   password_hash: string,
 ): Promise<void> {
@@ -43,4 +48,32 @@ async function insertUser(
     });
 }
 
-export { insertUser };
+export async function changeUserPassword(
+  payload: ChangePasswordSchema,
+): Promise<void> {
+  const credentials: LoginSchema = {
+    username: payload.username!,
+    password: payload.current_password,
+  };
+
+  // Throw away return value
+  await validateCredentials(credentials);
+
+  const passwordHash = await computePasswordHash(payload.new_password);
+
+  await pgPool
+    .query(
+      `
+    UPDATE users SET password_hash = $1 
+    WHERE username = $2
+    `,
+      [passwordHash, payload.username],
+    )
+    .catch((err) => {
+      throw new ServerError(
+        `Failed to update users password in database: ${String(err)}`,
+        500,
+        ClientError.SERVICE_ERROR,
+      );
+    });
+}
