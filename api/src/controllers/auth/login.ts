@@ -18,7 +18,6 @@ async function login(ctx: Context): Promise<Response> {
     path: "/",
     secure: false,
     httpOnly: true,
-    domain: "localhost",
     maxAge: 3600, // 1 hour
     sameSite: "Strict",
   });

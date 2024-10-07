@@ -63,12 +63,6 @@ function setup(): HonoServer {
   // Simple logger provided by Hono
   server.use(logger());
 
-  // Restricts all users endpoints to only ADMIN users
-  server.use("/users/*", roleCheck(["ADMIN"]));
-
-  // Restricts endpoint to only authorized users (anyone with valid token)
-  server.use("/auth/change-password", jwtCheck());
-
   // CORS options
   server.use(
     "*",
@@ -85,6 +79,12 @@ function setup(): HonoServer {
       credentials: true,
     }),
   );
+
+  // Restricts all users endpoints to only ADMIN users
+  server.use("/users/*", roleCheck(["ADMIN"]));
+
+  // Restricts endpoint to only authorized users (anyone with valid token)
+  server.use("/auth/change-password", jwtCheck());
 
   // MIDDLEWARE - end //
 
