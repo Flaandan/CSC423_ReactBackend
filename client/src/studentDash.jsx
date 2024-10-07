@@ -32,7 +32,7 @@ const studentDash = () => {
                     Logout
                 </button>
 
-                <button onClick={() => setIsOpen(true)}>Open dialog</button>
+                <button onClick={() => setIsOpen(true)}>Change Password</button>
 
                 <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
                     <div className="fixed inset-0">
