@@ -8,6 +8,7 @@ import { setupEndpoints } from "./endpoints.js";
 import { responseMapper } from "./middleware/responseMapper.js";
 import { roleCheck } from "./middleware/roleCheckMiddleware.js";
 import { jwtCheck } from "./middleware/jwtMiddleware.js";
+import { cors } from "hono/cors";
 
 type HonoServer = Hono<{ Variables: JwtVariables }>;
 
@@ -53,7 +54,7 @@ class Application {
 function setup(): HonoServer {
   const server = new Hono<{ Variables: JwtVariables }>();
 
-  // MIDDLEWARE //
+  // MIDDLEWARE - start //
   responseMapper(server);
 
   // Compress response body
@@ -65,9 +66,29 @@ function setup(): HonoServer {
   // Restricts all users endpoints to only ADMIN users
   server.use("/users/*", roleCheck(["ADMIN"]));
 
+  // Restricts endpoint to only authorized users (anyone with valid token)
   server.use("/auth/change-password", jwtCheck());
 
-  // ENDPOINTS //
+  // CORS options
+  server.use(
+    "*",
+    cors({
+      origin: "http://localhost:5173",
+      allowHeaders: [
+        "Accept",
+        "Authorization",
+        "Content-Type",
+        "Access-Control-Allow-Origin",
+      ],
+      allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+      maxAge: 600,
+      credentials: true,
+    }),
+  );
+
+  // MIDDLEWARE - end //
+
+  // Server endpoints
   setupEndpoints(server);
 
   return server;

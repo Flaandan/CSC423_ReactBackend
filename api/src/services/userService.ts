@@ -64,7 +64,8 @@ export async function changeUserPassword(
   await pgPool
     .query(
       `
-    UPDATE users SET password_hash = $1 
+    UPDATE users 
+    SET password_hash = $1 
     WHERE username = $2
     `,
       [passwordHash, payload.username],
