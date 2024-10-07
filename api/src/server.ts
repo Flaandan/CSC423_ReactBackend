@@ -5,8 +5,9 @@ import { JwtVariables } from "hono/jwt";
 import { logger } from "hono/logger";
 import { config as Config } from "./config.js";
 import { setupEndpoints } from "./endpoints.js";
-import { jwtMiddleware } from "./middleware/jwtMiddleware.js";
 import { responseMapper } from "./middleware/responseMapper.js";
+import { roleCheck } from "./middleware/roleCheckMiddleware.js";
+import { jwtCheck } from "./middleware/jwtMiddleware.js";
 
 type HonoServer = Hono<{ Variables: JwtVariables }>;
 
@@ -62,7 +63,9 @@ function setup(): HonoServer {
   server.use(logger());
 
   // Restricts all users endpoints to only ADMIN users
-  server.use("/users/*", jwtMiddleware(["ADMIN"]));
+  server.use("/users/*", roleCheck(["ADMIN"]));
+
+  server.use("/auth/change-password", jwtCheck());
 
   // ENDPOINTS //
   setupEndpoints(server);
