@@ -2,29 +2,29 @@ import argon2 from "argon2";
 import { QueryResult } from "pg";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
-import { User } from "../models/user.js";
-import { LoginSchema } from "../controllers/auth/login.js";
+import { toUserDTO, User, UserDTO } from "../models/user.js";
+import { LoginSchema } from "../utils/types.js";
 
-async function validateCredentials(payload: LoginSchema): Promise<void> {
+async function validateCredentials(payload: LoginSchema): Promise<UserDTO> {
   // When attempting to validate credentials, passing an incorrect username and password takes
   // and order of magnitude less of time then with a correct username and incorrect password
   //
-  // Fallback fallbackPasswordHash is used so that the same operations happen during
-  // each scenario and no notable time difference can be observed
+  // fallbackPasswordHash is used so that the same operations, getting credentials and verifying
+  // password, always happen and no notable time difference can be observed
   //
   // Ex. Timing attacks (side-channel attack)
   const fallbackPasswordHash: string =
     "$argon2id$v=19$m=65536,t=3,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
 
-  const storedPasswordHash = await getCredentials(payload.username);
+  const user = await getCredentials(payload.username);
 
   const isVerified = await verifyPasswordHash(
-    storedPasswordHash || fallbackPasswordHash,
+    user?.password_hash || fallbackPasswordHash,
     payload.password,
   );
 
   if (!isVerified) {
-    if (!storedPasswordHash) {
+    if (!user?.password_hash) {
       // If the username was not found
       throw new ServerError(
         "Failed to find user associated with username",
@@ -40,13 +40,15 @@ async function validateCredentials(payload: LoginSchema): Promise<void> {
       );
     }
   }
+
+  return toUserDTO(user!);
 }
 
-async function getCredentials(username: string): Promise<string | null> {
+async function getCredentials(username: string): Promise<User | null> {
   const row: QueryResult<User> = await pgPool
     .query(
       `
-      SELECT password_hash
+      SELECT username, first_name, last_name, password_hash, role, office
       FROM users
       WHERE username = $1
       `,
@@ -60,12 +62,8 @@ async function getCredentials(username: string): Promise<string | null> {
       );
     });
 
-  if (row.rows.length > 0) {
-    return row.rows[0].password_hash;
-  }
-
-  // Return null if username not found
-  return null;
+  // Return null if user not found
+  return row.rows.length > 0 ? row.rows[0] : null;
 }
 
 async function verifyPasswordHash(

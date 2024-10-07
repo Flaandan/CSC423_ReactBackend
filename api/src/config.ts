@@ -13,6 +13,8 @@ class Config {
 
   #serverPort: number;
 
+  #jwtSecret: string;
+
   constructor() {
     // Detect the running environment
     const environment = process.env.NODE_ENV;
@@ -28,6 +30,7 @@ class Config {
     if (!process.env.PGPASSWORD) throw new Error("PGPASSWORD not defined");
     if (!process.env.SERVER_HOST) throw new Error("SERVER_HOST not defined");
     if (!process.env.SERVER_PORT) throw new Error("SERVER_PORT not defined");
+    if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
 
     this.#pgHost = process.env.PGHOST;
     this.#pgDatabase = process.env.PGDATABASE;
@@ -35,6 +38,7 @@ class Config {
     this.#pgPassword = process.env.PGPASSWORD;
     this.#serverHost = process.env.SERVER_HOST;
     this.#serverPort = Number(process.env.SERVER_PORT);
+    this.#jwtSecret = process.env.JWT_SECRET;
   }
 
   connectionString(environment: string | undefined): string {
@@ -47,6 +51,10 @@ class Config {
 
   get serverPort(): number {
     return this.#serverPort;
+  }
+
+  get jwtSecret(): string {
+    return this.#jwtSecret;
   }
 }
 

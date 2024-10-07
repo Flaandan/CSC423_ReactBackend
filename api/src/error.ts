@@ -12,11 +12,11 @@ class ServerError extends Error {
 enum ClientError {
   INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
   NOT_FOUND = "NOT_FOUND",
-  INVALID_PERMISSIONS = "INVALID_PERMISSIONS",
+  INVALID_ROLE = "INVALID_ROLE",
   NO_AUTH = "NO_AUTH",
   CONFLICT = "CONFLICT",
   INVALID_PAYLOAD = "INVALID_PAYLOAD",
   SERVICE_ERROR = "SERVICE_ERROR",
 }
 
-export { ServerError, ClientError };
+export { ClientError, ServerError };

@@ -4,9 +4,12 @@ import { Application } from "./server.js";
 function main() {
   const application = Application.build(config);
 
-  console.info(
-    `->>\t Listening on: ${application.host}:${application.port}\n->>\t Environment: ${process.env.NODE_ENV}`,
-  );
+  console.table([
+    {
+      Listening: `${application.host}:${application.port}`,
+      Environment: process.env.NODE_ENV || "development",
+    },
+  ]);
 
   application.runServer();
 }

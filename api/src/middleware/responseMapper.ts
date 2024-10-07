@@ -1,9 +1,9 @@
-import { Hono } from "hono";
 import { ZodError } from "zod";
 import { ClientError, ServerError } from "../error.js";
+import { HonoServer } from "../server.js";
 
 // Modify responses before they are sent to the client
-function responseMapperMiddleware(server: Hono) {
+function responseMapper(server: HonoServer) {
   server.onError(async (err) => {
     if (err instanceof ServerError) {
       const { statusCode, clientError } = err;
@@ -38,4 +38,4 @@ function responseMapperMiddleware(server: Hono) {
   });
 }
 
-export { responseMapperMiddleware };
+export { responseMapper };
