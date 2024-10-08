@@ -7,7 +7,7 @@ function main() {
   console.table([
     {
       Listening: `${application.host}:${application.port}`,
-      Environment: process.env.NODE_ENV || "development",
+      Environment: process.env.NODE_ENV,
     },
   ]);
 

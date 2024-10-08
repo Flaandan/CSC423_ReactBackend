@@ -1,19 +1,17 @@
 import globals from "globals";
 import js from "@eslint/js";
-import ts from "typescript-eslint";
 import prettier from "eslint-config-prettier";
 
 export default [
   { languageOptions: { globals: globals.node } },
   js.configs.recommended,
-  ...ts.configs.recommended,
   prettier,
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*.js"],
     ignores: ["node_modules"],
     rules: {
       eqeqeq: "warn",
-      "no-unused-vars": "off",
+      "no-unused-vars": "warn",
       "no-var": "error",
       "prefer-const": "warn",
       "no-undef": "error",
@@ -21,7 +19,7 @@ export default [
       "no-useless-escape": "warn",
       "no-duplicate-imports": "error",
       // TODO: Remove `allow` after implementing custom logging
-      "no-console": ["warn", { allow: ["info", "error"] }],
+      "no-console": ["warn", { allow: ["error"] }],
     },
   },
 ];

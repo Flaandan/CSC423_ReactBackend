@@ -1,19 +1,16 @@
 {
   "name": "react_backend_api",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "main": "src/main.js",
   "author": "",
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "npm run build && cross-env NODE_ENV=development node --watch dist/main.js",
-    "prod": "npm run build && cross-env NODE_ENV=production node dist/main.js",
-    "build": "npx tsc",
+    "dev": "cross-env NODE_ENV=development node --watch src/main.js",
+    "prod": "cross-env NODE_ENV=production node src/main.js",
     "lint": "eslint src/**/*",
     "fmt": "npx prettier . --write",
     "fmt-check": "npx prettier . --check",
-    "watch": "npx tsc --watch",
-    "clean": "rm -rf dist",
     "test": ""
   },
   "dependencies": {
@@ -26,15 +23,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
-    "@types/eslint-config-prettier": "^6.11.3",
-    "@types/node": "^22.7.4",
-    "@types/pg": "^8.11.10",
     "cross-env": "^7.0.3",
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.10.0",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.2",
-    "typescript-eslint": "^8.8.0"
+    "prettier": "^3.3.3"
   }
 }

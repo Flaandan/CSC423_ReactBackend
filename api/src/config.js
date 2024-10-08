@@ -1,19 +1,19 @@
 import dotenv from "dotenv";
 
 class Config {
-  #pgHost: string;
+  #pgHost;
 
-  #pgDatabase: string;
+  #pgDatabase;
 
-  #pgUser: string;
+  #pgUser;
 
-  #pgPassword: string;
+  #pgPassword;
 
-  #serverHost: string;
+  #serverHost;
 
-  #serverPort: number;
+  #serverPort;
 
-  #jwtSecret: string;
+  #jwtSecret;
 
   constructor() {
     // Detect the running environment
@@ -41,19 +41,19 @@ class Config {
     this.#jwtSecret = process.env.JWT_SECRET;
   }
 
-  connectionString(environment: string | undefined): string {
+  connectionString(environment) {
     return `postgres://${this.#pgUser}:${this.#pgPassword}@${this.#pgHost}:5432/${this.#pgDatabase}${environment === "production" ? "?sslmode=require" : ""}`;
   }
 
-  get serverHost(): string {
+  get serverHost() {
     return this.#serverHost;
   }
 
-  get serverPort(): number {
+  get serverPort() {
     return this.#serverPort;
   }
 
-  get jwtSecret(): string {
+  get jwtSecret() {
     return this.#jwtSecret;
   }
 }
