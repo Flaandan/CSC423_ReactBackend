@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
-import { toUserDTO } from "../models/user.js";
+import { toUserDTO } from "../models/userDTO.js";
 
 async function validateCredentials(payload) {
   // When attempting to validate credentials, passing an incorrect username and password takes
