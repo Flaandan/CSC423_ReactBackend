@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Popup } from 'reactjs-popup';
 import { Description, Dialog, DialogPanel, DialogTitle, DialogBackdrop } from '@headlessui/react'
 import '../stylesheets/webPage.css';
 
-const studentDash = () => {
+const StudentDash = () => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -86,4 +85,5 @@ const studentDash = () => {
         </div>
     );
 };
-/* Casey please*/
+
+export default StudentDash;
