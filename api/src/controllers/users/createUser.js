@@ -1,10 +1,8 @@
-import { Context } from "hono";
 import { computePasswordHash } from "../../services/authService.js";
 import { insertUser } from "../../services/userService.js";
-import { createUserPayload } from "../../utils/types.js";
+import { createUserPayload } from "../../utils/requestPayloads.js";
 
-// Propagates errors to responseMapper
-async function createUser(ctx: Context): Promise<Response> {
+async function createUser(ctx) {
   const payload = await ctx.req.json();
 
   const parsedPayload = createUserPayload.parse(payload);

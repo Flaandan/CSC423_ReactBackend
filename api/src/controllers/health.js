@@ -1,7 +1,6 @@
-import { Context } from "hono";
 import { pgPool } from "../db.js";
 
-async function healthCheck(ctx: Context): Promise<Response> {
+async function healthCheck(ctx) {
   try {
     await pgPool.query("SELECT NOW()");
 
@@ -15,7 +14,7 @@ async function healthCheck(ctx: Context): Promise<Response> {
 
     return ctx.json(response, 200);
   } catch (err) {
-    let errorMessage: string;
+    let errorMessage;
 
     if (err instanceof Error) {
       errorMessage = err.message;

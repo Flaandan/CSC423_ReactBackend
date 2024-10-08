@@ -1,18 +1,13 @@
-import { Context } from "hono";
 import { changeUserPassword } from "../../services/userService.js";
-import {
-  changePasswordPayload,
-  ChangePasswordSchema,
-} from "../../utils/types.js";
+import { changePasswordPayload } from "../../utils/requestPayloads.js";
 
-// Propagates errors to responseMapper
-async function changePassword(ctx: Context): Promise<Response> {
+async function changePassword(ctx) {
   const payload = await ctx.req.json();
   const jwtPayload = await ctx.get("jwtPayload");
 
   const parsedPayload = changePasswordPayload.parse(payload);
 
-  const userDetails: ChangePasswordSchema = {
+  const userDetails = {
     username: jwtPayload["sub"],
     ...parsedPayload,
   };
