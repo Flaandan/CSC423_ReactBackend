@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
-import { toUserDTO } from "../models/userDTO.js";
+import { User } from "../models/user.js";
 
 async function validateCredentials(payload) {
   // When attempting to validate credentials, passing an incorrect username and password takes
@@ -15,39 +15,51 @@ async function validateCredentials(payload) {
   const fallbackPasswordHash =
     "$argon2id$v=19$m=65536,t=3,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
 
-  const user = await getCredentials(payload.username);
+  const userDetails = await getUserDetails(payload.username);
 
   const isVerified = await verifyPasswordHash(
-    user.password_hash || fallbackPasswordHash,
+    userDetails.password_hash || fallbackPasswordHash,
     payload.password,
   );
 
   if (!isVerified) {
-    if (!user.password_hash) {
+    if (!userDetails.password_hash) {
       // If the username was not found
       throw new ServerError(
-        "Failed to find user associated with username",
+        `Failed to find user associated with username: ${payload.username}`,
         401,
         ClientError.INVALID_CREDENTIALS,
       );
     } else {
       // If the username exists but the password is incorrect
       throw new ServerError(
-        "Failed to verify password",
+        `Failed to verify password for user: ${payload.username}`,
         401,
         ClientError.INVALID_CREDENTIALS,
       );
     }
   }
 
-  return toUserDTO(user);
+  await updateLastLogin(userDetails.username);
+
+  const user = new User.builder()
+    .setUsername(userDetails.username)
+    .setFirstName(userDetails.first_name)
+    .setLastName(userDetails.last_name)
+    .setPasswordHash(userDetails.password_hash)
+    .setRole(userDetails.role)
+    .setPhoneNumber(userDetails.phone_number)
+    .setOffice(userDetails.office)
+    .build();
+
+  return user.toUserDTO();
 }
 
-async function getCredentials(username) {
+async function getUserDetails(username) {
   try {
     const row = await pgPool.query(
       `
-            SELECT username, first_name, last_name, password_hash, role, office
+            SELECT username, first_name, last_name, password_hash, role, phone_number, office
             FROM users
             WHERE username = $1
             `,
@@ -58,7 +70,7 @@ async function getCredentials(username) {
     return row.rows.length > 0 ? row.rows[0] : null;
   } catch (err) {
     throw new ServerError(
-      `Failed to fetch user credentials from database: ${String(err)}`,
+      `Failed to fetch credentials for user ${username} : ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );
@@ -75,6 +87,25 @@ async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {
   } catch (err) {
     throw new ServerError(
       `Failed to verify against password hash: ${String(err)}`,
+      500,
+      ClientError.SERVICE_ERROR,
+    );
+  }
+}
+
+async function updateLastLogin(username) {
+  try {
+    await pgPool.query(
+      `
+      UPDATE users
+      SET last_login = NOW()
+      WHERE username = $1
+    `,
+      [username],
+    );
+  } catch (err) {
+    throw new ServerError(
+      `Failed to update last login timestamp for user ${username}: ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );

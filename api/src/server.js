@@ -4,9 +4,9 @@ import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { setupEndpoints } from "./endpoints.js";
-import { jwtCheck } from "./middleware/jwtMiddleware.js";
+import { jwtFilter } from "./middleware/jwtAuthFilter.js";
 import { responseMapper } from "./middleware/responseMapper.js";
-import { roleCheck } from "./middleware/roleCheckMiddleware.js";
+import { roleFilter } from "./middleware/roleCheckFilter.js";
 
 class Application {
   #port;
@@ -71,10 +71,10 @@ function setup() {
   );
 
   // Restricts all users endpoints to only ADMIN users
-  server.use("/users/*", roleCheck(["ADMIN"]));
+  server.use("/users/*", roleFilter(["ADMIN"]));
 
   // Restricts endpoint to only authorized users (anyone with valid token)
-  server.use("/auth/change-password", jwtCheck());
+  server.use("/auth/change-password", jwtFilter());
 
   // Endpoints for server
   setupEndpoints(server);

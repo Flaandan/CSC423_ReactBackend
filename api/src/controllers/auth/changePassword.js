@@ -1,5 +1,11 @@
+import { z } from "zod";
 import { changeUserPassword } from "../../services/userService.js";
-import { changePasswordPayload } from "../../utils/requestPayloads.js";
+
+const changePasswordPayload = z.object({
+  username: z.string().optional(),
+  current_password: z.string(),
+  new_password: z.string().min(8).max(128),
+});
 
 async function changePassword(ctx) {
   const payload = await ctx.req.json();

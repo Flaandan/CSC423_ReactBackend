@@ -3,7 +3,7 @@ import { pgPool } from "../db.js";
 import { ClientError, ServerError } from "../error.js";
 import { computePasswordHash, validateCredentials } from "./authService.js";
 
-export async function insertUser(payload, password_hash) {
+export async function insertUser(user) {
   try {
     await pgPool.query(
       `
@@ -11,13 +11,13 @@ export async function insertUser(payload, password_hash) {
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          `,
       [
-        payload.username,
-        payload.first_name,
-        payload.last_name,
-        password_hash,
-        payload.role,
-        payload.phone_number,
-        payload.office || "Student Lounge",
+        user.username,
+        user.firstName,
+        user.lastName,
+        user.passwordHash,
+        user.role,
+        user.phoneNumber,
+        user.office,
       ],
     );
   } catch (err) {
@@ -27,7 +27,7 @@ export async function insertUser(payload, password_hash) {
         throw new ServerError(
           `Username is already in use: ${String(err)}`,
           409,
-          ClientError.CONFLICT,
+          ClientError.USER_CONFLICT,
         );
       }
     }

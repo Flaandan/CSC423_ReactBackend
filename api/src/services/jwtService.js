@@ -2,7 +2,6 @@ import { decode, sign, verify } from "hono/jwt";
 import { config } from "../config.js";
 import { ClientError, ServerError } from "../error.js";
 
-const COOKIE_KEY = "token";
 const JWT_ALG = "HS256";
 
 async function generateToken(user) {
@@ -32,4 +31,4 @@ function decodeToken(token) {
   return { header, payload };
 }
 
-export { COOKIE_KEY, decodeToken, generateToken, JWT_ALG, verifyToken };
+export { decodeToken, generateToken, JWT_ALG, verifyToken };

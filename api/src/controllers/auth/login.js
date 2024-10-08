@@ -1,28 +1,22 @@
-import { setCookie } from "hono/cookie";
+import { z } from "zod";
 import { validateCredentials } from "../../services/authService.js";
-import { COOKIE_KEY, generateToken } from "../../services/jwtService.js";
-import { logInPayload } from "../../utils/requestPayloads.js";
+import { generateToken } from "../../services/jwtService.js";
 
-// TODO: Change cookies. Tokens will be stored in local storage
+const logInPayload = z.object({
+  username: z.string(),
+  password: z.string(),
+});
 
 async function login(ctx) {
   const payload = await ctx.req.json();
 
   const parsedPayload = logInPayload.parse(payload);
 
-  const user = await validateCredentials(parsedPayload);
+  const userDTO = await validateCredentials(parsedPayload);
 
-  const token = await generateToken(user);
+  const token = await generateToken(userDTO);
 
-  setCookie(ctx, COOKIE_KEY, token, {
-    path: "/",
-    secure: false,
-    httpOnly: true,
-    maxAge: 3600, // 1 hour
-    sameSite: "Strict",
-  });
-
-  return ctx.json({ user: user }, 200);
+  return ctx.json({ user: userDTO, access_token: token }, 200);
 }
 
 export { login };
