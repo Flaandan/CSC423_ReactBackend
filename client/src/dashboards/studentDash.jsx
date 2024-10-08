@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Popup } from 'reactjs-popup';
-import './webPage.css';
 import { Description, Dialog, DialogPanel, DialogTitle, DialogBackdrop } from '@headlessui/react'
+import '../stylesheets/webPage.css';
 
 const studentDash = () => {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const studentDash = () => {
         // Handle password change logic here 
         console.log('Current Password:', currentPassword);
         console.log('New Password:', newPassword);
-        setIsOpen(false);  
+        setIsOpen(false);
     };
 
     return (

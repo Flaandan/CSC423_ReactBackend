@@ -1,6 +1,13 @@
+<<<<<<< Updated upstream:client/src/adminDash.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./webPage.css";
+=======
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../stylesheets/webPage.css';
+
+>>>>>>> Stashed changes:client/src/dashboards/adminDash.jsx
 
 const AdminDash = () => {
   const [majors, setMajors] = useState([]);
