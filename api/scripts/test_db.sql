@@ -12,7 +12,7 @@ CREATE TABLE users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
-    role user_role NOT NULL,
+    role user_role NOT NULL DEFAULT 'STUDENT',
     phone_number VARCHAR(14) NOT NULL,
     office VARCHAR(255) NOT NULL DEFAULT 'Student Lounge',
     last_login TIMESTAMPTZ DEFAULT NOW()

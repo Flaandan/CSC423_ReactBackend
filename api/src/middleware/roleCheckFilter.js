@@ -1,15 +1,15 @@
 import { jwt } from "hono/jwt";
 import { config } from "../config.js";
 import { ClientError, ServerError } from "../error.js";
-import { COOKIE_KEY, JWT_ALG } from "../services/jwtService.js";
+import { JWT_ALG } from "../services/jwtService.js";
 
-function roleCheck(requiredRoles) {
+function roleFilter(requiredRoles) {
   return async (ctx, next) => {
     // `jwt` is the default middleware provided by Hono to verify tokens
+    // Defaults to checking for Authentication (Bearer or Basic) header if cookie field is not provided
     try {
       await jwt({
         secret: config.jwtSecret,
-        cookie: COOKIE_KEY,
         alg: JWT_ALG,
       })(ctx, async () => {
         const payload = ctx.get("jwtPayload");
@@ -41,4 +41,4 @@ function roleCheck(requiredRoles) {
   };
 }
 
-export { roleCheck };
+export { roleFilter };
