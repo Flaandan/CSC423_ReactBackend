@@ -1,5 +1,5 @@
 const ClientError = {
-  INVALID_CREDENTIALS: "Invalid username or password",
+  INVALID_CREDENTIALS: "Invalid credentials",
   NOT_FOUND: "Requested resource not found",
   INVALID_ROLE:
     "You do not have the required permissions to access this resource",

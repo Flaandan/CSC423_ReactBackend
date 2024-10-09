@@ -18,7 +18,6 @@ export default [
       "callback-return": "warn",
       "no-useless-escape": "warn",
       "no-duplicate-imports": "error",
-      // TODO: Remove `allow` after implementing custom logging
       "no-console": ["warn", { allow: ["error"] }],
     },
   },

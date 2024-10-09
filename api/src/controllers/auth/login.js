@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validateCredentials } from "../../services/authService.js";
-import { generateToken } from "../../services/jwtService.js";
+import { generateAccessToken } from "../../services/jwtService.js";
 
 const logInPayload = z.object({
   username: z.string(),
@@ -14,7 +14,7 @@ async function login(ctx) {
 
   const userDTO = await validateCredentials(parsedPayload);
 
-  const token = await generateToken(userDTO);
+  const token = await generateAccessToken(userDTO);
 
   return ctx.json({ user: userDTO, access_token: token }, 200);
 }

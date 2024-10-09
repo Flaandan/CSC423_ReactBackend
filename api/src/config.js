@@ -41,8 +41,20 @@ class Config {
     this.#jwtSecret = process.env.JWT_SECRET;
   }
 
-  connectionString(environment) {
-    return `postgres://${this.#pgUser}:${this.#pgPassword}@${this.#pgHost}:5432/${this.#pgDatabase}${environment === "production" ? "?sslmode=require" : ""}`;
+  get pgHost() {
+    return this.#pgHost;
+  }
+
+  get pgDatabase() {
+    return this.#pgDatabase;
+  }
+
+  get pgUser() {
+    return this.#pgUser;
+  }
+
+  get pgPassword() {
+    return this.#pgPassword;
   }
 
   get serverHost() {

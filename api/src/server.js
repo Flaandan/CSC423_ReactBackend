@@ -3,10 +3,10 @@ import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { setupEndpoints } from "./endpoints.js";
 import { jwtFilter } from "./middleware/jwtAuthFilter.js";
 import { responseMapper } from "./middleware/responseMapper.js";
 import { roleFilter } from "./middleware/roleCheckFilter.js";
+import { setupRoutes } from "./routes.js";
 
 class Application {
   #port;
@@ -67,6 +67,9 @@ function setup() {
       allowHeaders: ["Accept", "Authorization", "Content-Type"],
       allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
       maxAge: 600,
+      // ^ How long the browser can cache the response from an OPTIONS request
+      // Browser will cache the response for 600 seconds before needing to send another OPTIONS request
+      // OPTIONS request is to determine what HTTP methods and headers the server allows
     }),
   );
 
@@ -77,7 +80,7 @@ function setup() {
   server.use("/auth/change-password", jwtFilter());
 
   // Endpoints for server
-  setupEndpoints(server);
+  setupRoutes(server);
 
   return server;
 }

@@ -2,7 +2,7 @@ import { pgPool } from "../db.js";
 
 async function healthCheck(ctx) {
   try {
-    await pgPool.query("SELECT NOW()");
+    await pgPool.query("SELECT version()");
 
     const response = {
       status: "available",
@@ -14,17 +14,9 @@ async function healthCheck(ctx) {
 
     return ctx.json(response, 200);
   } catch (err) {
-    let errorMessage;
-
-    if (err instanceof Error) {
-      errorMessage = err.message;
-    } else {
-      errorMessage = String(err);
-    }
-
     const response = {
       status: "error",
-      message: errorMessage,
+      message: err,
       environment: process.env.NODE_ENV,
       total_pool_connections: pgPool.totalCount,
       idle_pool_connections: pgPool.idleCount,
