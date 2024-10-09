@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Login from './Login.jsx';
-import AdminDash from './adminDash.jsx';
-import TeacherDash from './teacherDash.jsx';
-import StudentDash from './studentDash.jsx';
+import Login from './login/Login.jsx';
+import AdminDash from './dashboards/adminDash.jsx';
+import TeacherDash from './dashboards/teacherDash.jsx';
+import StudentDash from './dashboards/studentDash.jsx';
 //import Root from "./routes/root";
 import {
     createBrowserRouter,
