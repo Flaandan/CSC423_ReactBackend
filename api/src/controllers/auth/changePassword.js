@@ -20,7 +20,7 @@ async function changePassword(ctx) {
 
   await changeUserPassword(userDetails);
 
-  return ctx.json({ success: "password changed" }, 200);
+  return ctx.newResponse(null, 204);
 }
 
 export { changePassword };

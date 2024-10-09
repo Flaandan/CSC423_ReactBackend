@@ -4,13 +4,13 @@ import { ClientError, ServerError } from "../error.js";
 
 const JWT_ALG = "HS256";
 
-async function generateToken(user) {
+async function generateAccessToken(user) {
   const claims = {
     sub: user.username,
     role: user.role,
     iat: Math.floor(Date.now() / 1000),
     nbf: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 60 * 5, // Token expires in 5 minutes
+    exp: Math.floor(Date.now() / 1000) + 60 * 15, // Token expires in 15 minutes
   };
 
   return await sign(claims, config.jwtSecret, JWT_ALG);
@@ -31,4 +31,4 @@ function decodeToken(token) {
   return { header, payload };
 }
 
-export { decodeToken, generateToken, JWT_ALG, verifyToken };
+export { decodeToken, generateAccessToken, JWT_ALG, verifyToken };
