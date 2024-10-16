@@ -3,12 +3,21 @@ import { config } from "./config.js";
 
 class PGPool extends pg.Pool {
   constructor() {
-    super({
-      connectionString: config.connectionString(process.env.NODE_ENV),
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
+    const poolConfig = {
+      host: config.pgHost,
+      database: config.pgDatabase,
+      username: config.pgUser,
+      password: config.pgPassword,
+      port: 5432,
+    };
+
+    if (process.env.NODE_ENV === "production") {
+      poolConfig.ssl = {
+        require: true,
+      };
+    }
+
+    super(poolConfig);
   }
 }
 
