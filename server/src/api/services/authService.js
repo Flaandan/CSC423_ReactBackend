@@ -1,7 +1,8 @@
 import argon2 from "argon2";
-import { pgPool } from "../db.js";
-import { ClientError, ServerError } from "../error.js";
-import { User } from "../models/user.js";
+import { pgPool } from "../../db.js";
+import { ClientError, ServerError } from "../../error.js";
+import { User } from "../../models/user.js";
+import { getUserByUsername } from "./userService.js";
 
 async function validateCredentials(payload) {
   // When attempting to validate credentials, passing an incorrect username and password takes
@@ -11,11 +12,10 @@ async function validateCredentials(payload) {
   // password, always happen and no notable time difference can be observed
   //
   // Ex. Timing attacks (side-channel attack)
-
   const fallbackPasswordHash =
     "$argon2id$v=19$m=65536,t=3,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
 
-  const userDetails = await getUserDetails(payload.username);
+  const userDetails = await getUserByUsername(payload.username);
 
   const isVerified = await verifyPasswordHash(
     userDetails.password_hash || fallbackPasswordHash,
@@ -30,14 +30,13 @@ async function validateCredentials(payload) {
         401,
         ClientError.INVALID_CREDENTIALS,
       );
-    } else {
-      // If the username exists but the password is incorrect
-      throw new ServerError(
-        `Failed to verify password for user: ${payload.username}`,
-        401,
-        ClientError.INVALID_CREDENTIALS,
-      );
     }
+    // If the username exists but the password is incorrect
+    throw new ServerError(
+      `Failed to verify password for user: ${payload.username}`,
+      401,
+      ClientError.INVALID_CREDENTIALS,
+    );
   }
 
   await updateLastLogin(userDetails.username);
@@ -53,28 +52,6 @@ async function validateCredentials(payload) {
     .build();
 
   return user.toUserDTO();
-}
-
-async function getUserDetails(username) {
-  try {
-    const row = await pgPool.query(
-      `
-            SELECT username, first_name, last_name, password_hash, role, phone_number, office
-            FROM users
-            WHERE username = $1
-            `,
-      [username],
-    );
-
-    // Return null if user not found
-    return row.rows.length > 0 ? row.rows[0] : null;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to fetch credentials for user ${username} : ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
 }
 
 async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {

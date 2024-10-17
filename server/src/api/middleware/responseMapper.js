@@ -1,7 +1,8 @@
 import { ZodError } from "zod";
-import { ClientError, ServerError } from "../error.js";
+import { ClientError, ServerError } from "../../error.js";
 
 // Modify responses before they are sent to the client
+// All errors from handlers are propagated here
 function responseMapper(server) {
   server.onError(async (err) => {
     if (err instanceof ServerError) {

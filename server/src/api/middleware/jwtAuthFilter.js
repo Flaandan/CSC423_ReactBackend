@@ -1,6 +1,6 @@
 import { jwt } from "hono/jwt";
-import { config } from "../config.js";
-import { ClientError, ServerError } from "../error.js";
+import { config } from "../../config.js";
+import { ClientError, ServerError } from "../../error.js";
 import { JWT_ALG } from "../services/jwtService.js";
 
 function jwtFilter() {

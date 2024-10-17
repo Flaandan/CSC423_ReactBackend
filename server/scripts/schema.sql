@@ -14,7 +14,7 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     role user_role NOT NULL DEFAULT 'STUDENT',
     phone_number VARCHAR(14) NOT NULL,
-    office VARCHAR(255) NOT NULL DEFAULT 'Student Lounge',
+    office VARCHAR(255) DEFAULT 'Student Lounge',
     last_login TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -63,7 +63,3 @@ CREATE TABLE dropped (
     PRIMARY KEY (registration_id),
     FOREIGN KEY (registration_id) REFERENCES registration(id)
 );
-
-
-INSERT INTO users (username, first_name, last_name, password_hash, role, phone_number, office, last_login) VALUES
-('admin_user', 'John', 'Smith', '$argon2id$v=19$m=65536,t=3,p=1$8w6DtEReFBwhWgQb4dYiTQ$5FNTfLC7jpzQFYulwY5l/+u4hd/iEy5+6rC1AGWPo04', 'ADMIN', '345-678-9012', 'Admin Office', NOW());

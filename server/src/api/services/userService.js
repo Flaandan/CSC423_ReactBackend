@@ -1,7 +1,29 @@
 import pg from "pg";
-import { pgPool } from "../db.js";
-import { ClientError, ServerError } from "../error.js";
+import { pgPool } from "../../db.js";
+import { ClientError, ServerError } from "../../error.js";
 import { computePasswordHash, validateCredentials } from "./authService.js";
+
+export async function getUserByUsername(username) {
+  try {
+    const row = await pgPool.query(
+      `
+            SELECT username, first_name, last_name, password_hash, role, phone_number, office
+            FROM users
+            WHERE username = $1
+            `,
+      [username],
+    );
+
+    // Return null if user not found
+    return row.rows.length > 0 ? row.rows[0] : null;
+  } catch (err) {
+    throw new ServerError(
+      `Failed to fetch credentials for user ${username} : ${String(err)}`,
+      500,
+      ClientError.SERVICE_ERROR,
+    );
+  }
+}
 
 export async function insertUser(user) {
   try {

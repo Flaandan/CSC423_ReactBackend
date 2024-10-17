@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { computePasswordHash } from "../../services/authService.js";
-import { insertUser } from "../../services/userService.js";
 import { User } from "../../models/user.js";
+import { computePasswordHash } from "../services/authService.js";
+import { insertUser } from "../services/userService.js";
 
 const allowedRoles = ["STUDENT", "ADMIN", "INSTRUCTOR"];
 
