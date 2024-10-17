@@ -5,32 +5,23 @@ import { User } from "../../models/user.js";
 import { getUserByUsername } from "./userService.js";
 
 async function validateCredentials(payload) {
-  // When attempting to validate credentials, passing an incorrect username and password takes
-  // and order of magnitude less of time then with a correct username and incorrect password
-  //
-  // fallbackPasswordHash is used so that the same operations, getting credentials and verifying
-  // password, always happen and no notable time difference can be observed
-  //
-  // Ex. Timing attacks (side-channel attack)
-  const fallbackPasswordHash =
-    "$argon2id$v=19$m=65536,t=3,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
-
   const userDetails = await getUserByUsername(payload.username);
 
+  if (!userDetails) {
+    // If the username was not found
+    throw new ServerError(
+      `Failed to find user associated with username: ${payload.username}`,
+      401,
+      ClientError.INVALID_CREDENTIALS,
+    );
+  }
+
   const isVerified = await verifyPasswordHash(
-    userDetails.password_hash || fallbackPasswordHash,
+    userDetails.password_hash,
     payload.password,
   );
 
   if (!isVerified) {
-    if (!userDetails.password_hash) {
-      // If the username was not found
-      throw new ServerError(
-        `Failed to find user associated with username: ${payload.username}`,
-        401,
-        ClientError.INVALID_CREDENTIALS,
-      );
-    }
     // If the username exists but the password is incorrect
     throw new ServerError(
       `Failed to verify password for user: ${payload.username}`,
