@@ -1,0 +1,9 @@
+# dependencies
+node_modules/
+
+# config
+config/local.toml
+config/production.toml
+
+# misc
+.DS_Store

@@ -1,0 +1,10 @@
+[database]
+PGUSER =
+PGPASSWORD =
+PGDATABASE =
+PGHOST =
+
+[server]
+SERVER_HOST =
+SERVER_PORT =
+JWT_SECRET =

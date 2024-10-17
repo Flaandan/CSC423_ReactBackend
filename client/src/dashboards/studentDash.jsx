@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Description, Dialog, DialogPanel, DialogTitle, DialogBackdrop } from '@headlessui/react'
+import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import '../stylesheets/webPage.css';
 
 const StudentDash = () => {
@@ -15,7 +15,6 @@ const StudentDash = () => {
 
     const handleChangePassword = (e) => {
         e.preventDefault();
-        // Handle password change logic here 
         console.log('Current Password:', currentPassword);
         console.log('New Password:', newPassword);
         setIsOpen(false);
@@ -34,12 +33,9 @@ const StudentDash = () => {
                 <button onClick={() => setIsOpen(true)}>Change Password</button>
 
                 <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
-                    <div className="fixed inset-0">
-                        <DialogBackdrop className="dialog-pop-back" />
-                        {/* Full-screen container to center the panel */}
-                        <div className="pass-panel">
-                            {/* The actual dialog panel */}
-                            <DialogPanel className="pop-panel">
+                    <div className="dialog-pop-back">
+                        <div className="pop-panel">
+                            <DialogPanel>
                                 <DialogTitle className="font-bold">Change Password</DialogTitle>
                                 <Description>
                                     This will update your password.
@@ -48,7 +44,6 @@ const StudentDash = () => {
                                     Please enter your current password to confirm and your new password.
                                 </p>
 
-                                {/* Password change form */}
                                 <form onSubmit={handleChangePassword} className="password-form">
                                     <div className="form-group">
                                         <label htmlFor="currentPassword">Current Password</label>
