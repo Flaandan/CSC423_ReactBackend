@@ -4,41 +4,41 @@ import { generateToken } from "../services/jwtService.js";
 import { changeUserPassword } from "../services/userService.js";
 
 const logInPayload = z.object({
-  username: z.string(),
-  password: z.string(),
+    username: z.string(),
+    password: z.string(),
 });
 
 const changePasswordPayload = z.object({
-  current_password: z.string(),
-  new_password: z.string().min(8).max(128),
+    current_password: z.string(),
+    new_password: z.string().min(8).max(128),
 });
 
 async function login(ctx) {
-  const payload = await ctx.req.json();
+    const payload = await ctx.req.json();
 
-  const parsedPayload = logInPayload.parse(payload);
+    const parsedPayload = logInPayload.parse(payload);
 
-  const userDTO = await validateCredentials(parsedPayload);
+    const userDTO = await validateCredentials(parsedPayload);
 
-  const token = await generateToken(userDTO);
+    const token = await generateToken(userDTO);
 
-  return ctx.json({ user: userDTO, access_token: token }, 200);
+    return ctx.json({ user: userDTO, access_token: token }, 200);
 }
 
 async function changePassword(ctx) {
-  const payload = await ctx.req.json();
-  const jwtPayload = ctx.get("jwtPayload");
+    const payload = await ctx.req.json();
+    const jwtPayload = ctx.get("jwtPayload");
 
-  const parsedPayload = changePasswordPayload.parse(payload);
+    const parsedPayload = changePasswordPayload.parse(payload);
 
-  const userDetails = {
-    username: jwtPayload.sub,
-    ...parsedPayload,
-  };
+    const userDetails = {
+        username: jwtPayload.sub,
+        ...parsedPayload,
+    };
 
-  await changeUserPassword(userDetails);
+    await changeUserPassword(userDetails);
 
-  return ctx.json({ success: "password changed" }, 200);
+    return ctx.json({ success: "password changed" }, 200);
 }
 
 export { login, changePassword };
