@@ -73,7 +73,7 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
     NUM_INSTRUCTORS_ACTUAL=0
 
     # Fixed password hash for all users (everythinghastostartsomewhere)
-    PASSWORD_HASH='$argon2id$v=19$m=15000,t=2,p=1$OEx/rcq+3ts//WUDzGNl2g$Am8UFBA4w5NJEmAtquGvBmAlu92q/VQcaoL5AyJPfc8'
+    PASSWORD_HASH='$argon2id$v=19$m=15000,t=3,p=1$OEx/rcq+3ts//WUDzGNl2g$Am8UFBA4w5NJEmAtquGvBmAlu92q/VQcaoL5AyJPfc8'
 
     generate_details() {
         first_name=$(sed "$(jot -r 1 1 2047)q;d" ./scripts/names.txt | sed -e 's/[^a-zA-Z]//g')

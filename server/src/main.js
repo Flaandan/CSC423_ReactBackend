@@ -15,7 +15,7 @@ function main() {
   const port = config.serverPort;
   const host = config.serverHost;
 
-  const server = setup();
+  const server = setupServer();
 
   console.table([
     {
@@ -31,9 +31,13 @@ function main() {
   });
 }
 
-function setup() {
+function setupServer() {
   const server = new Hono();
 
+  // ALL MIDDLEWARE MUST BE DECLARED BEFORE DECLARING ROUTES OR
+  // ELSE THEY WILL NOT BE APPLIED TO THE ROUTES
+
+  // -- MIDDLEWARE start
   // Modify responses before they are sent to the client
   responseMapper(server);
 
@@ -49,7 +53,7 @@ function setup() {
     cors({
       origin: "http://localhost:5173",
       allowHeaders: ["Accept", "Authorization", "Content-Type"],
-      allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       maxAge: 600,
     }),
   );
@@ -59,6 +63,7 @@ function setup() {
 
   // Restricts endpoint to only authorized users (anyone with valid token)
   server.use("/v1/auth/change-password", jwtFilter());
+  // -- MIDDLEWARE end
 
   // Routes for server
   healthRoutes(server);
