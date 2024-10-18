@@ -18,7 +18,7 @@ async function validateCredentials(payload) {
 
   const isVerified = await verifyPasswordHash(
     userDetails.password_hash,
-    payload.password,
+    payload.password.trim(),
   );
 
   if (!isVerified) {
