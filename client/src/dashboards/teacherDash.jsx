@@ -68,6 +68,10 @@ const TeacherDash = () => {
           Logout
         </button>
 
+        <button onClick={() => setIsOpen(true)} type="button">
+          Change Password
+        </button>
+
         <Dialog
           open={isOpen}
           onClose={() => setIsOpen(false)}
