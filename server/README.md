@@ -14,7 +14,7 @@ Ensure you have Docker installed. See [Get Docker](https://docs.docker.com/get-s
 git clone https://github.com/Flaandan/CSC423_ReactBackend.git
 ```
 ```bash
-cd CSC423_ReactBackend && cd server
+cd CSC423_ReactBackend/server
 ```
 
 ### 3. **Run the API**
