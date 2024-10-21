@@ -69,24 +69,35 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
     NUM_INSTRUCTORS_EXPECTED=10
 
     NUM_ADMINS_ACTUAL=0
-    NUM_STUDENT_ACTUAL=0
+    NUM_STUDENTS_ACTUAL=0
     NUM_INSTRUCTORS_ACTUAL=0
 
     # Fixed password hash for all users (password123)
     PASSWORD_HASH='$argon2id$v=19$m=65536,t=3,p=1$5/JDguSRQqYWps2/V1ruJA$X33IbsiipHnq+8nqj14aXMx0qUNXGfjiVBPV6dgFE+U'
 
     generate_details() {
-        first_name=$(sed "$(jot -r 1 1 2047)q;d" ./scripts/names.txt | sed -e 's/[^a-zA-Z]//g')
-        last_name=$(sed "$(jot -r 1 1 2047)q;d" ./scripts/names.txt | sed -e 's/[^a-zA-Z]//g')
-        echo "${first_name}"
-        echo "${last_name}"
+        # Count the total number of lines in the names file
+        line_count=$(wc -l < ./scripts/names.txt)
+
+        # Generate a random line number between 1 and the total number of lines
+        random_line=$((RANDOM % line_count + 1))
+
+        # Use awk to get the random line based on the generated line number
+        first_name=$(awk "NR==$random_line {print; exit}" ./scripts/names.txt | sed -e 's/[^a-zA-Z]//g')
+        
+        # Generate another random line number for the last name
+        random_line=$((RANDOM % line_count + 1))
+        last_name=$(awk "NR==$random_line {print; exit}" ./scripts/names.txt | sed -e 's/[^a-zA-Z]//g')
 
         random_number=$((RANDOM % 900 + 100))
-        echo "${first_name}" | tr '[:upper:]' '[:lower:]' | sed "s/\$/${random_number}/"
+        username="${first_name}" | tr '[:upper:]' '[:lower:]' | sed "s/\$/${random_number}/"
+
+        echo "${first_name}"
+        echo "${last_name}"
+        echo "${username}"
     }
 
     for i in $(seq 1 $NUM_ADMINS_EXPECTED); do
-        while true; do
             details=($(generate_details))
             first_name=${details[0]}
             last_name=${details[1]}
@@ -99,19 +110,10 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
 
             result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 0 1"* ]]; then
-                # Insert successfully
-                ((NUM_ADMINS_ACTUAL++))
-                break
-            else
-                echo >&2 "duplicate username found: $username. regenerating details..."
-                continue
-            fi   
-        done
+            let NUM_ADMINS_ACTUAL+=1
     done
 
     for i in $(seq 1 $NUM_STUDENTS_EXPECTED); do
-        while true; do
             details=($(generate_details))
             first_name=${details[0]}
             last_name=${details[1]}
@@ -124,19 +126,10 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
 
             result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 0 1"* ]]; then
-                # Insert successfully
-                ((NUM_STUDENTS_ACTUAL++))
-                break
-            else
-                echo >&2 "duplicate username found: $username. regenerating details..."
-                continue
-            fi   
-        done
+            let NUM_STUDENTS_ACTUAL+=1
     done
 
     for i in $(seq 1 $NUM_INSTRUCTORS_EXPECTED); do
-        while true; do
             details=($(generate_details))
             first_name=${details[0]}
             last_name=${details[1]}
@@ -149,15 +142,7 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
 
             result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 0 1"* ]]; then
-                # Insert successfully
-                ((NUM_INSTRUCTORS_ACTUAL++))
-                break
-            else
-                echo >&2 "duplicate username found: $username. regenerating details..."
-                continue
-            fi   
-        done
+            let NUM_INSTRUCTORS_ACTUAL+=1
     done
 
     echo ">> seeded $NUM_ADMINS_ACTUAL admins"
