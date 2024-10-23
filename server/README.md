@@ -79,3 +79,21 @@ To verify the API is running, perform a health check using the following `curl` 
 curl -v http://<your_host>:<your_port>/v1/health
 ```
 > You should receive a 200 OK status and JSON response indicating the API status
+
+### 5. **Access Docker Container**
+
+To access the Docker container, enter the following commmand:
+
+```bash
+docker exec -it rb-pg /bin/bash
+```
+
+> Default container name should be `rb-pg`
+
+### 6. **Access Database withing Docker Container**
+
+```bash
+psql -U admin -d react_backend
+```
+
+> Enter this command while inside the Docker container
