@@ -1,9 +1,21 @@
+import {
+  Description,
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../stylesheets/webPage.css";
-import { JWT_KEY } from "../hooks/useLocalStorage";
+import { JWT_KEY, useLocalState } from "../hooks/useLocalStorage";
+import { apiFetch } from "../utils/apiFetch";
 
 const AdminDash = () => {
+  const [jwt, setJwt] = useLocalState("", JWT_KEY);
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [majors, setMajors] = useState([]);
   const [users, setUsers] = useState([]);
   const [majorInput, setMajorInput] = useState("");
@@ -28,15 +40,47 @@ const AdminDash = () => {
   const updateUser = (id, newName) => {
     //place holder for UpdateUser
   };
+
   const handleLogout = () => {
     localStorage.removeItem(JWT_KEY);
 
     navigate("/");
   };
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (currentPassword === newPassword) {
+      alert("passwords must be different");
+      return;
+    }
+
+    const params = {
+      url: "http://localhost:8000/v1/auth/change-password",
+      method: "POST",
+      jwt,
+      requestBody: {
+        current_password: currentPassword,
+        new_password: newPassword,
+      },
+    };
+
+    const response = await apiFetch(params);
+
+    if (response.error) {
+      alert(`${response.error}`);
+    } else {
+      alert(`${response.success}`);
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setIsOpen(false);
+    }
+  };
+
   /* I want to add all the functional buttons to the side column, main page
    * should be used for displaying the interaction information*/
   return (
-    <div className="admin-dashboard">
+    <div className="student-dashboard">
       <div className="left-column">
         <h1>Admin Dashboard</h1>
         {/*Place Holders*/}
@@ -47,63 +91,65 @@ const AdminDash = () => {
           Logout
         </button>
 
-        <div className="main-content">
-          <section id="majors">
-            <h2>Add Majors</h2>
-            <input
-              type="text"
-              placeholder="Add Major"
-              value={majorInput}
-              onChange={(e) => setMajorInput(e.target.value)}
-            />
-            <button onClick={addMajor} type="button">
-              Add Major
-            </button>
+        <button onClick={() => setIsOpen(true)} type="button">
+          Change Password
+        </button>
 
-            <ul>
-              {majors.map((major) => (
-                <li key={major.id}>
-                  <input
-                    type="text"
-                    value={major.name}
-                    onChange={(e) => updateMajor(major.id, e.target.value)}
-                  />
-                  <button onClick={() => deleteMajor(major.id)} type="button">
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="dialog-pop"
+        >
+          <div className="dialog-pop-back">
+            <div className="pop-panel">
+              <DialogPanel>
+                <DialogTitle className="font-bold">Change Password</DialogTitle>
+                <Description>This will update your password.</Description>
+                <p>
+                  Please enter your current password to confirm and your new
+                  password.
+                </p>
 
-          <section id="users">
-            <h2>Add Users</h2>
-            <input
-              type="text"
-              placeholder="Add User"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-            />
-            <button onClick={addUser} type="button">
-              Add User
-            </button>
+                <form onSubmit={handleChangePassword} className="password-form">
+                  <div className="form-group">
+                    <label htmlFor="currentPassword">Current Password</label>
+                    <input
+                      type="password"
+                      id="currentPassword"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                    />
+                  </div>
 
-            <ul>
-              {users.map((user) => (
-                <li key={user.id}>
-                  <input
-                    type="text"
-                    value={user.name}
-                    onChange={(e) => updateUser(user.id, e.target.value)}
-                  />
-                  <button onClick={() => deleteUser(user.id)} type="button">
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+                  <div className="form-group">
+                    <label htmlFor="newPassword">New Password</label>
+                    <input
+                      type="password"
+                      id="newPassword"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-actions">
+                    <button
+                      className="form-button"
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button className="form-button" type="submit">
+                      Confirm
+                    </button>
+                  </div>
+                </form>
+              </DialogPanel>
+            </div>
+          </div>
+        </Dialog>
       </div>
     </div>
   );
