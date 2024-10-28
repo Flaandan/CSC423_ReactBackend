@@ -3,6 +3,7 @@ import { pgPool } from "../../db.js";
 import { ClientError, ServerError } from "../../error.js";
 import { User } from "../../models/user.js";
 import { getUserByUsername } from "./userService.js";
+import { updateLastLogin } from "./userService.js";
 
 async function validateCredentials(payload) {
   const userDetails = await getUserByUsername(payload.username);
@@ -55,25 +56,6 @@ async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {
   } catch (err) {
     throw new ServerError(
       `Failed to verify against password hash: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
-}
-
-async function updateLastLogin(username) {
-  try {
-    await pgPool.query(
-      `
-      UPDATE users
-      SET last_login = NOW()
-      WHERE username = $1
-    `,
-      [username],
-    );
-  } catch (err) {
-    throw new ServerError(
-      `Failed to update last login timestamp for user ${username}: ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );

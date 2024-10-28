@@ -90,3 +90,22 @@ export async function changeUserPassword(payload) {
     );
   }
 }
+
+export async function updateLastLogin(username) {
+  try {
+    await pgPool.query(
+      `
+      UPDATE users
+      SET last_login = NOW()
+      WHERE username = $1
+    `,
+      [username],
+    );
+  } catch (err) {
+    throw new ServerError(
+      `Failed to update last login timestamp for user ${username}: ${String(err)}`,
+      500,
+      ClientError.SERVICE_ERROR,
+    );
+  }
+}

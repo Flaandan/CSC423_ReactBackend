@@ -45,12 +45,12 @@ SERVER_HOST= "127.0.0.1"
 SERVER_PORT= "8000"
 JWT_SECRET= "secret"
 ```
-> When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to update these values in `scripts/init_pg.sh` to reflect the changes
+> When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to update these values in `scripts/init_db.sh` to reflect the changes
 
-Run the `init_pg.sh` script to initialize a PostgreSQL database via Docker and optionally seed test users
+Run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test users
 
 ```bash
-./scripts/init_pg.sh
+./scripts/init_db.sh
 ```
 
 Install Dependencies:
@@ -85,15 +85,13 @@ curl -v http://<your_host>:<your_port>/v1/health
 To access the Docker container, enter the following commmand:
 
 ```bash
-docker exec -it rb-pg /bin/bash
+docker exec -it rb-db /bin/bash
 ```
+> Default container name should be `rb-db`
 
-> Default container name should be `rb-pg`
-
-### 6. **Access Database withing Docker Container**
+### 6. **Access Database within Docker Container**
 
 ```bash
 psql -U admin -d react_backend
 ```
-
-> Enter this command while inside the Docker container
+> Default user should be `admin`. Default database name should be `react_backend`

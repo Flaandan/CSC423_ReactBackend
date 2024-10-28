@@ -1,11 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Login from "./login/Login.jsx";
-import AdminDash from "./dashboards/adminDash.jsx";
-import TeacherDash from "./dashboards/teacherDash.jsx";
-import StudentDash from "./dashboards/studentDash.jsx";
-//import Root from "./routes/root";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Login from "./pages/Login.jsx";
+import AdminDash from "./pages/admin/AdminDashboard.jsx";
+import StudentDash from "./pages/student/StudentDashboard.jsx";
+import TeacherDash from "./pages/teacher/TeacherDashboard.jsx";
 
 const router = createBrowserRouter([
   {
@@ -13,15 +12,15 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/AdminDash",
+    path: "/admin",
     element: <AdminDash />,
   },
   {
-    path: "/studentDash",
+    path: "/student",
     element: <StudentDash />,
   },
   {
-    path: "/teacherDash",
+    path: "/teacher",
     element: <TeacherDash />,
   },
 ]);

@@ -41,4 +41,14 @@ async function changePassword(ctx) {
   return ctx.json({ success: "password changed" }, 200);
 }
 
-export { login, changePassword };
+async function checkToken(ctx) {
+  const jwtPayload = ctx.get("jwtPayload");
+
+  const tokenDetails = {
+    ...jwtPayload,
+  };
+
+  return ctx.json(tokenDetails, 200);
+}
+
+export { login, changePassword, checkToken };

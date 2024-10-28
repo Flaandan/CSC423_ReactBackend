@@ -10,7 +10,6 @@ async function generateToken(user) {
     role: user.role,
     iat: Math.floor(Date.now() / 1000),
     nbf: Math.floor(Date.now() / 1000),
-    // TODO: Change this
     // Tokens expire after a month until we implement a way to regenerate
     // JWTs for users (e.g. refresh tokens)
     exp: Math.floor(Date.now() / 1000) + 60 * 43_830,

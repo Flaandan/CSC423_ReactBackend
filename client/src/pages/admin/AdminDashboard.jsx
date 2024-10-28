@@ -5,66 +5,35 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../stylesheets/webPage.css";
-import { JWT_KEY, useLocalState } from "../hooks/useLocalStorage";
-import { apiFetch } from "../utils/apiFetch";
+import "../../styles/webPage.css";
+import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
+import { apiChangePassword, apiCheckToken } from "../../lib/api";
+import { decodeJWT } from "../../utils/decodeJWT";
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
-  const [isOpen, setIsOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [majors, setMajors] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [majorInput, setMajorInput] = useState("");
-  const [userInput, setUserInput] = useState("");
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const addMajor = () => {
-    //place holder for add major
-  };
-  const deleteMajor = (id) => {
-    //place holder for delete major
-  };
-  const updateMajor = (id, newName) => {
-    //place holder for updateMajor
-  };
-  const addUser = () => {
-    //place holder for addUser
-  };
-  const deleteUser = (id) => {
-    //place holder for deleteUser
-  };
-  const updateUser = (id, newName) => {
-    //place holder for UpdateUser
-  };
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem(JWT_KEY);
-
     navigate("/");
   };
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
 
     if (currentPassword === newPassword) {
       alert("passwords must be different");
       return;
     }
 
-    const params = {
-      url: "http://localhost:8000/v1/auth/change-password",
-      method: "POST",
-      jwt,
-      requestBody: {
-        current_password: currentPassword,
-        new_password: newPassword,
-      },
-    };
-
-    const response = await apiFetch(params);
+    const response = await apiChangePassword(currentPassword, newPassword, jwt);
 
     if (response.error) {
       alert(`${response.error}`);
@@ -76,6 +45,36 @@ const AdminDash = () => {
       setIsOpen(false);
     }
   };
+
+  useEffect(() => {
+    const checkToken = async () => {
+      if (jwt) {
+        const response = await apiCheckToken(jwt);
+
+        if (response.error) {
+          navigate("/");
+        }
+
+        const decodedRole = decodeJWT(jwt).role;
+
+        console.log(decodedRole);
+
+        if (decodedRole !== "ADMIN") {
+          navigate(
+            decodedRole === "STUDENT"
+              ? "/student"
+              : decodedRole === "INSTRUCTOR"
+                ? "/teacher"
+                : "/",
+          );
+        }
+      } else {
+        navigate("/");
+      }
+    };
+
+    checkToken();
+  }, [jwt, navigate]);
 
   /* I want to add all the functional buttons to the side column, main page
    * should be used for displaying the interaction information*/
