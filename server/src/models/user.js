@@ -23,7 +23,6 @@ class User {
     this.#office = builder.office || "Student Lounge";
   }
 
-  // ---------------------------------------------------------------------
   get username() {
     return this.#username;
   }
@@ -52,7 +51,6 @@ class User {
     return this.#office;
   }
 
-  // ---------------------------------------------------------------------
   set username(value) {
     this.#username = value;
   }
@@ -87,7 +85,6 @@ class User {
     this.#office = value;
   }
 
-  // ---------------------------------------------------------------------
   toUserDTO() {
     return {
       username: this.#username,

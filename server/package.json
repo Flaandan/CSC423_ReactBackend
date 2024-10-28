@@ -5,8 +5,8 @@
   "author": "",
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node --watch src/main.js",
-    "prod": "cross-env NODE_ENV=production node src/main.js",
+    "dev": "NODE_ENV=development node --watch src/main.js",
+    "prod": "NODE_ENV=production node src/main.js",
     "lint": "biome lint ./src",
     "fmt": "biome format --write ./src",
     "fmt-check": "biome format ./src",
@@ -21,7 +21,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.3",
-    "cross-env": "^7.0.3"
+    "@biomejs/biome": "1.9.3"
   }
 }

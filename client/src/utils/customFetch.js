@@ -17,7 +17,7 @@ class HttpError extends Error {
   }
 }
 
-export async function apiFetch(params) {
+export async function customFetch(params) {
   const { url, method, jwt, requestBody } = params;
 
   const fetchOptions = {

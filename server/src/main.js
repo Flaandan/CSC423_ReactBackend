@@ -47,7 +47,7 @@ function setupServer() {
   // Simple logger provided by Hono
   server.use(logger());
 
-  // CORS
+  // CORS for all endpoints
   server.use(
     "*",
     cors({
@@ -61,8 +61,9 @@ function setupServer() {
   // Restricts all users endpoints to only ADMIN users
   server.use("/v1/users/*", roleFilter(["ADMIN"]));
 
-  // Restricts endpoint to only authorized users (anyone with valid token)
+  // Restricts endpoints to only authorized users (anyone with valid token)
   server.use("/v1/auth/change-password", jwtFilter());
+  server.use("/v1/auth/check", jwtFilter());
   // -- MIDDLEWARE end
 
   // Routes for server

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import "../stylesheets/Login.css";
+import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import BrockportLogo from "/BrockportLogo.jpg";
+import Button from "../components/button";
 import { JWT_KEY, useLocalState } from "../hooks/useLocalStorage";
-import { apiFetch } from "../utils/apiFetch";
+import { apiLogin } from "../lib/api";
 import { decodeJWT } from "../utils/decodeJWT";
 
 function LoginPage() {
@@ -13,28 +14,21 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
 
-    const params = {
-      url: "http://localhost:8000/v1/auth/login",
-      method: "POST",
-      requestBody: {
-        username,
-        password,
-      },
-    };
+    if (username.length === 0 || password.length === 0) {
+      return;
+    }
 
-    const response = await apiFetch(params);
+    const response = await apiLogin(username, password);
+
+    console.log(response);
 
     if (response.error) {
       alert(`${response.error}`);
     } else {
-      const jwtToken = response.access_token;
-
-      if (jwtToken) {
-        setJwt(jwtToken);
-      }
+      setJwt(response.accessToken);
     }
   };
 
@@ -44,10 +38,10 @@ function LoginPage() {
 
       navigate(
         decodedRole === "ADMIN"
-          ? "/adminDash"
+          ? "/admin"
           : decodedRole === "STUDENT"
-            ? "/studentDash"
-            : "/teacherDash",
+            ? "/student"
+            : "/teacher",
       );
     }
   }, [jwt, navigate]);
@@ -71,9 +65,9 @@ function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="input"
         />
-        <button type="submit" className="loginButton">
+        <Button type="submit" className="loginButton">
           Login
-        </button>
+        </Button>
       </form>
     </div>
   );

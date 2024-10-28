@@ -3,16 +3,13 @@
 # set -x
 set -eo pipefail 
 
-# Initializes PostgreSQL DB using Docker
-# Optionally insert a specified number of users into DB
-
-# When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to
-# update the `config/local.toml` to reflect the changes
-
 if ! [ -x "$(command -v docker)" ]; then
     echo >&2 "error: docker is not installed"
     exit 1
 fi
+
+# When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to
+# update the `config/local.toml` to reflect the changes
 
 PGUSER=admin
 PGPASSWORD=password
@@ -22,7 +19,7 @@ PGHOST=127.0.0.1
 SUPERUSER=postgres
 SUPERUSER_PWD=password
 
-CONTAINER_NAME="rb-pg"
+CONTAINER_NAME="rb-db"
 
 docker run \
      --volume "./scripts/:/scripts/" \
@@ -39,11 +36,11 @@ docker run \
     > /dev/null
 
 until [ "$(docker inspect -f "{{.State.Health.Status}}" ${CONTAINER_NAME})" == "healthy" ]; do     
-    >&2 echo "postgres is still unavailable - sleeping"
+    >&2 echo "postgres is still unavailable - sleeping..."
     sleep 1 
 done
 
-echo "postgres is up on ${PGHOST}:5432 - ready for connections..."
+echo "postgres is up on ${PGHOST}:5432 - ready for connections"
 
 CREATE_QUERY="CREATE USER ${PGUSER} WITH PASSWORD '${PGPASSWORD}';"
 docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}" > /dev/null
