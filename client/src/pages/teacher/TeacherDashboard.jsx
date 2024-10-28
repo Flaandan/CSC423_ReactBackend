@@ -17,6 +17,7 @@ const TeacherDash = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
 
@@ -30,6 +31,11 @@ const TeacherDash = () => {
 
     if (currentPassword === newPassword) {
       alert("passwords must be different");
+      return;
+    }
+
+    if (confirmPassword !== newPassword) {
+      alert("Passwords do not match");
       return;
     }
 
@@ -124,6 +130,17 @@ const TeacherDash = () => {
                       id="newPassword"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="confirmPassword">Confrim New Password</label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
                   </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../styles/Login.css";
+import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
 import BrockportLogo from "/BrockportLogo.jpg";
 import Button from "../components/button";
