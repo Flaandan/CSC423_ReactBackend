@@ -11,45 +11,16 @@ import "../../styles/webPage.css";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiChangePassword, apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
+import ChangePassword from "../../components/changePassword";
 
 const TeacherDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem(JWT_KEY);
     navigate("/");
-  };
-
-  const handleChangePassword = async (event) => {
-    event.preventDefault();
-
-    if (currentPassword === newPassword) {
-      alert("passwords must be different");
-      return;
-    }
-
-    if (confirmPassword !== newPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    const response = await apiChangePassword(currentPassword, newPassword, jwt);
-
-    if (response.error) {
-      alert(`${response.error}`);
-    } else {
-      alert(`${response.success}`);
-
-      setCurrentPassword("");
-      setNewPassword("");
-      setIsOpen(false);
-    }
   };
 
   useEffect(() => {
@@ -84,9 +55,7 @@ const TeacherDash = () => {
     <div className="admin-dashboard">
       <div className="left-column">
         <h1>Teacher Dashboard</h1>
-        {/*Place Holders*/}
-        <a href="#majors">Manage Majors</a>
-        <a href="#users">Manage Users</a>
+        {/* Placeholder for other links or elements */}
 
         <button onClick={handleLogout} className="logout-button" type="button">
           Logout
@@ -96,73 +65,17 @@ const TeacherDash = () => {
           Change Password
         </button>
 
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          className="dialog-pop"
-        >
-          <div className="dialog-pop-back">
-            <div className="pop-panel">
-              <DialogPanel>
-                <DialogTitle className="font-bold">Change Password</DialogTitle>
-                <Description>This will update your password.</Description>
-                <p>
-                  Please enter your current password to confirm and your new
-                  password.
-                </p>
-
-                <form onSubmit={handleChangePassword} className="password-form">
-                  <div className="form-group">
-                    <label htmlFor="currentPassword">Current Password</label>
-                    <input
-                      type="password"
-                      id="currentPassword"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="newPassword">New Password</label>
-                    <input
-                      type="password"
-                      id="newPassword"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="confirmPassword">Confrim New Password</label>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-actions">
-                    <button
-                      className="form-button"
-                      type="button"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Cancel
-                    </button>
-
-                    <button className="form-button" type="submit">
-                      Confirm
-                    </button>
-                  </div>
-                </form>
-              </DialogPanel>
-            </div>
+        <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
+        <div className="dialog-pop-back">
+          <div className="pop-panel">
+            <DialogPanel>
+              <DialogTitle className="font-bold">Change Password</DialogTitle>
+              <Description>This will update your password.</Description>
+              <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
+            </DialogPanel>
           </div>
-        </Dialog>
+        </div>
+      </Dialog>
       </div>
     </div>
   );
