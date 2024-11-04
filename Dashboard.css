@@ -1,0 +1,252 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+
+  .sidebar {
+    background-color: #001F54;
+    color: #FEFCFB;
+    width: 250px;
+    transition: width 0.3s;
+    overflow: hidden;
+  }
+  
+  .sidebar.closed {
+    width: 50px;
+  }
+  
+  .toggle-sidebar {
+    background-color: #1282A2;
+    color: #FEFCFB;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .sidebar ul li {
+    padding: 15px 20px;
+    cursor: pointer;
+  }
+  
+  .sidebar ul li:hover {
+    background-color: #034078;
+  }
+  
+  /* Main content */
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #FEFCFB;
+  }
+
+  .header {
+    background-color: #034078;
+    padding: 20px;
+    color: #FEFCFB;
+    margin-bottom: 20px;
+  }
+  
+ 
+  .courses-section {
+    margin-bottom: 40px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .action-button {
+    background-color: #1282A2;
+    color: #FEFCFB;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+  }
+  
+  .course-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .course-table th, .course-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+  }
+  
+  .course-table th {
+    background-color: #034078;
+    color: #FEFCFB;
+  }
+  .add-course-button {
+    margin: 15px;
+    padding: 10px 20px;
+    background-color: #1282A2;
+    color: #FEFCFB;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .form-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FEFCFB;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+  }
+  
+  .course-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .course-form input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 5px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .submit-button, .close-button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #1282A2;
+    color: #FEFCFB;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .close-button {
+    background-color: #034078;
+    margin-left: 10px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  input, textarea {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .submit-button, .close-button {
+    margin-top: 1rem;
+  }
+  .course-lists {
+    margin-top: 1.5rem;
+  }
+  
+  .major-courses, .enrolled-courses, .dropped-courses {
+    margin-bottom: 1rem;
+  }
+  
+  .major-courses h4, .enrolled-courses h4, .dropped-courses h4 {
+    color: #034078;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .major-courses ul, .enrolled-courses ul, .dropped-courses ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .major-courses li, .enrolled-courses li, .dropped-courses li {
+    background-color: #1282a2;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .registration-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.registration-table th,
+.registration-table td {
+    border: 1px solid #ccc; 
+    padding: 10px;
+    text-align: left;
+}
+
+.registration-table th {
+    background-color: #034078; 
+    color: white; 
+}
+
+.registration-table tr:nth-child(even) {
+    background-color: #f9f9f9; 
+}
+
+.registration-table tr:hover {
+    background-color: #e0e0e0; 
+}
+.password-form .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.password-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.password-form input {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.password-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-button {
+  background-color: #1282A2;
+  color: #FEFCFB;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-left: 10px;
+  border-radius: 5px;
+}
+
+.form-button:hover {
+  background-color: #034078;
+}
