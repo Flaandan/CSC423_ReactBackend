@@ -24,6 +24,10 @@ const StudentDash = () => {
     navigate("/");
   };
 
+  const handleChooseMajor = () => {
+    console.log("Choose Major");
+  };
+
   useEffect(() => {
     const checkToken = async () => {
       if (jwt) {
@@ -57,7 +61,6 @@ const StudentDash = () => {
       <div className="left-column">
         <h1>Student Dashboard</h1>
         <a href="#classes">Register for Classes</a>
-
         <button onClick={handleLogout} className="logout-button" type="button">
           Logout
         </button>
@@ -65,6 +68,12 @@ const StudentDash = () => {
         <button onClick={() => setIsOpen(true)} type="button">
           Change Password
         </button>
+
+        
+        <button onClick={handleChooseMajor} className="choose-major-button" type="button">
+          Choose Major
+        </button>
+
 
         <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
         <div className="dialog-pop-back">
