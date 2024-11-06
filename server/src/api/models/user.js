@@ -1,4 +1,4 @@
-class User {
+export class User {
   #username;
 
   #firstName;
@@ -13,14 +13,17 @@ class User {
 
   #office;
 
+  #lastLogin;
+
   constructor(builder) {
     this.#username = builder.username;
     this.#firstName = builder.firstName;
     this.#lastName = builder.lastName;
-    this.#passwordHash = builder.passwordHash;
+    this.#passwordHash = builder.passwordHash || null;
     this.#role = builder.role;
     this.#phoneNumber = builder.phoneNumber;
     this.#office = builder.office || "Student Lounge";
+    this.#lastLogin = builder.lastLogin;
   }
 
   get username() {
@@ -49,6 +52,10 @@ class User {
 
   get office() {
     return this.#office;
+  }
+
+  get lastLogin() {
+    return this.#lastLogin;
   }
 
   set username(value) {
@@ -85,12 +92,19 @@ class User {
     this.#office = value;
   }
 
+  set lastLogin(value) {
+    this.#lastLogin = value;
+  }
+
   toUserDTO() {
     return {
       username: this.#username,
-      first_name: this.#firstName,
-      last_name: this.#lastName,
+      firstName: this.#firstName,
+      lastName: this.#lastName,
       role: this.#role,
+      phoneNumber: this.#phoneNumber,
+      office: this.#office,
+      lastLogin: this.#lastLogin,
     };
   }
 
@@ -104,6 +118,7 @@ class User {
         this.role = "STUDENT";
         this.phoneNumber = "";
         this.office = "Student Lounge";
+        this.lastLogin = "";
       }
 
       setUsername(username) {
@@ -147,17 +162,21 @@ class User {
         return this;
       }
 
+      setLastLogin(lastLogin) {
+        this.lastLogin = lastLogin;
+        return this;
+      }
+
       build() {
         if (
           !this.username ||
           !this.firstName ||
           !this.lastName ||
-          !this.passwordHash ||
           !this.role ||
           !this.phoneNumber
         ) {
           throw new Error(
-            "username, firstName, lastName, passwordHash, role, and phoneNumber are required",
+            "username, firstName, lastName, role, and phoneNumber are required",
           );
         }
 
@@ -168,5 +187,3 @@ class User {
     return UserBuilder;
   }
 }
-
-export { User };

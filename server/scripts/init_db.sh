@@ -32,7 +32,7 @@ docker run \
     --publish 5432:5432 \
     --detach \
     --name "${CONTAINER_NAME}" \
-    postgres:17-alpine -N 1000 \
+    postgres:alpine -N 1000 \
     > /dev/null
 
 until [ "$(docker inspect -f "{{.State.Health.Status}}" ${CONTAINER_NAME})" == "healthy" ]; do     
@@ -62,8 +62,8 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
     echo "seeding users..."
 
     NUM_ADMINS_EXPECTED=2
-    NUM_STUDENTS_EXPECTED=50
-    NUM_INSTRUCTORS_EXPECTED=10
+    NUM_STUDENTS_EXPECTED=5
+    NUM_INSTRUCTORS_EXPECTED=5
 
     NUM_ADMINS_ACTUAL=0
     NUM_STUDENTS_ACTUAL=0
@@ -105,7 +105,7 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
             if [[ $result == *"INSERT 1"* ]]; then
                 let NUM_ADMINS_ACTUAL+=1
             else
-                echo >&2 "duplicate username found: $username. regenerating details..." > /dev/null
+                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
                 let NUM_ADMINS_ACTUAL+=1
             fi   
     done
@@ -126,7 +126,7 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
             if [[ $result == *"INSERT 1"* ]]; then
                 let NUM_STUDENTS_ACTUAL+=1
             else
-                echo >&2 "duplicate username found: $username. regenerating details..." > /dev/null
+                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
                 let NUM_STUDENTS_ACTUAL+=1
             fi   
     done
@@ -147,7 +147,7 @@ if [[ "$SEED_USERS" == "yes" || "$SEED_USERS" == "y" ]]; then
             if [[ $result == *"INSERT 1"* ]]; then
                 let NUM_INSTRUCTORS_ACTUAL+=1
             else
-                echo >&2 "duplicate username found: $username. regenerating details..." > /dev/null
+                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
                 let NUM_INSTRUCTORS_ACTUAL+=1
             fi   
     done

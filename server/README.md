@@ -19,31 +19,26 @@ cd CSC423_ReactBackend/server
 
 ### 3. **Run the API**
 
-Rename `local.toml.example` and `production.toml.example` to `local.toml` and `production.toml`
+If running in production environment, create the `production.toml` file, if not skip this step:
 
 ```bash
-mv ./config/local.toml.example ./config/local.toml
+touch ./config/production.toml
 ```
 
-```bash
-mv ./config/production.toml.example ./config/production.toml
-```
-
-Update the contents of these files to your specific configuration
-
-Example:
+Update the contents of this file for your specific configuration. Example:
 
 ```toml
 [database]
 PGUSER= "admin"
 PGPASSWORD= "password"
 PGDATABASE= "react_backend"
-PGHOST = "127.0.0.1"
+PGHOST = "0.0.0.0"
 
 [server]
-SERVER_HOST= "127.0.0.1"
-SERVER_PORT= "8000"
+SERVER_HOST= "0.0.0.0"
+SERVER_PORT= "8080"
 JWT_SECRET= "secret"
+
 ```
 > When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to update these values in `scripts/init_db.sh` to reflect the changes
 

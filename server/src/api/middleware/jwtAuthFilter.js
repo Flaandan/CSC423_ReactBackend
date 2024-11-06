@@ -3,7 +3,7 @@ import { config } from "../../config.js";
 import { ClientError, ServerError } from "../../error.js";
 import { JWT_ALG } from "../services/jwtService.js";
 
-function jwtFilter() {
+export function jwtFilter() {
   return async (ctx, next) => {
     // `jwt` is the default middleware provided by Hono to verify tokens
     // Defaults to checking for Authentication (Bearer or Basic) header if cookie field is not provided
@@ -24,5 +24,3 @@ function jwtFilter() {
     }
   };
 }
-
-export { jwtFilter };

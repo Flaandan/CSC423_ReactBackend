@@ -66,16 +66,16 @@ const StudentDash = () => {
   useEffect(() => {
     const fetchDroppedCourses = async () => {
       try {
-        const response = await fetch('/api/dropped-courses', {
+        const response = await fetch("/api/dropped-courses", {
           headers: {
-            'Authorization': `Bearer ${jwt}`
-          }
+            Authorization: `Bearer ${jwt}`,
+          },
           //TODO: Change this to the actual API endpoint HMUNN
         });
         const data = await response.json();
         setDroppedCourses(data);
       } catch (error) {
-        console.error('Error fetching dropped courses:', error);
+        console.error("Error fetching dropped courses:", error);
       }
     };
 
@@ -152,7 +152,6 @@ const StudentDash = () => {
       <div className="left-column">
         {/* Student Dashboard Header */}
         <h1>Student Dashboard</h1>
-
         {/* Main buttons */}
         <div className="main-buttons">
           <button onClick={() => setIsAvailableOpen(true)} type="button">
@@ -162,8 +161,8 @@ const StudentDash = () => {
           <button onClick={() => setIsDroppedOpen(true)} type="button">
             View Dropped Courses
           </button>
-
           <button onClick={handleChooseMajor} className="choose-major-button" type="button">
+
             Choose Major
           </button>
         </div>
@@ -227,12 +226,14 @@ const StudentDash = () => {
 
         {/* Change Password Dialog */}
         <Dialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} className="dialog-pop">
+
           <div className="dialog-pop-back">
             <div className="pop-panel">
               <DialogPanel>
                 <DialogTitle className="font-bold">Change Password</DialogTitle>
                 <Description>This will update your password.</Description>
                 <ChangePassword jwt={jwt} setIsOpen={setIsPasswordOpen} />
+
               </DialogPanel>
             </div>
           </div>

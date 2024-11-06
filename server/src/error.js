@@ -1,15 +1,17 @@
-const ClientError = {
-  INVALID_CREDENTIALS: "Invalid username or password",
-  NOT_FOUND: "Requested resource not found",
+export const ClientError = {
+  INVALID_CREDENTIALS: "The username or password provided is incorrect",
+  NOT_FOUND: "The requested resource could not be found",
   INVALID_ROLE:
-    "You do not have the required permissions to access this resource",
-  NO_AUTH: "Authentication required. Please log in",
-  USER_CONFLICT: "An account with this username already exists",
-  INVALID_PAYLOAD: "The data provided in the request is not valid",
-  SERVICE_ERROR: "Something went wrong on our end. Please try again later",
+    "You do not have the necessary permissions to access this resource",
+  NO_AUTH: "Authentication is required to access this resource. Please log in",
+  CONFLICT: "A conflict occurred. The record already exists",
+  INVALID_PAYLOAD:
+    "The data provided in the request is not valid. Please ensure all fields are correct",
+  SERVICE_ERROR:
+    "An unexpected issue occurred on our end. Please try again later",
 };
 
-class ServerError extends Error {
+export class ServerError extends Error {
   statusCode;
 
   clientError;
@@ -20,5 +22,3 @@ class ServerError extends Error {
     this.clientError = clientError;
   }
 }
-
-export { ClientError, ServerError };

@@ -12,6 +12,4 @@ class PGPool extends pg.Pool {
   }
 }
 
-const pgPool = new PGPool();
-
-export { pgPool };
+export const pgPool = new PGPool();

@@ -1,12 +1,21 @@
-import { changePassword, checkToken, login } from "../handlers/authHandler.js";
+import {
+  apiChangePassword,
+  apiCheckToken,
+  apiLogin,
+} from "../controllers/authController.js";
 
-function authRoutes(server) {
-  server.get("/v1/auth/check", async (ctx) => await checkToken(ctx));
-  server.post("/v1/auth/login", async (ctx) => await login(ctx));
-  server.post(
-    "/v1/auth/change-password",
-    async (ctx) => await changePassword(ctx),
+export function authRoutes(server) {
+  server.on(
+    "GET",
+    "/api/v1/auth/check",
+    async (ctx) => await apiCheckToken(ctx),
+  );
+
+  server.on("POST", "/api/v1/auth/login", async (ctx) => await apiLogin(ctx));
+
+  server.on(
+    "POST",
+    "/api/v1/auth/change-password",
+    async (ctx) => await apiChangePassword(ctx),
   );
 }
-
-export { authRoutes };

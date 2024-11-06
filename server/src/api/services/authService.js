@@ -1,12 +1,12 @@
 import argon2 from "argon2";
 import { pgPool } from "../../db.js";
 import { ClientError, ServerError } from "../../error.js";
-import { User } from "../../models/user.js";
-import { getUserByUsername } from "./userService.js";
-import { updateLastLogin } from "./userService.js";
+import { User } from "../models/user.js";
+import { formatDate } from "../utils/formatDate.js";
+import { updateUserLastLogin } from "./userService.js";
 
-async function validateCredentials(payload) {
-  const userDetails = await getUserByUsername(payload.username);
+export async function validateCredentials(payload) {
+  const userDetails = await getUserCredentials(payload.username);
 
   if (!userDetails) {
     // If the username was not found
@@ -31,19 +31,44 @@ async function validateCredentials(payload) {
     );
   }
 
-  await updateLastLogin(userDetails.username);
+  await updateUserLastLogin(userDetails.username);
 
-  const user = new User.builder()
-    .setUsername(userDetails.username)
-    .setFirstName(userDetails.first_name)
-    .setLastName(userDetails.last_name)
-    .setPasswordHash(userDetails.password_hash)
-    .setRole(userDetails.role)
-    .setPhoneNumber(userDetails.phone_number)
-    .setOffice(userDetails.office)
-    .build();
+  return userDetails.username;
+}
 
-  return user.toUserDTO();
+async function getUserCredentials(username) {
+  try {
+    const row = await pgPool.query(
+      `
+        SELECT username, password_hash
+        FROM users
+        WHERE username = $1
+      `,
+      [username],
+    );
+
+    // Null if user not found
+    const record = row.rows.length > 0 ? row.rows[0] : null;
+
+    if (!record)
+      throw new ServerError(
+        `No user found with the username: ${username}`,
+        404,
+        ClientError.NOT_FOUND,
+      );
+
+    return record;
+  } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
+    throw new ServerError(
+      `Failed to fetch credentials for user ${username} : ${String(err)}`,
+      500,
+      ClientError.SERVICE_ERROR,
+    );
+  }
 }
 
 async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {
@@ -62,7 +87,7 @@ async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {
   }
 }
 
-async function computePasswordHash(password) {
+export async function computePasswordHash(password) {
   try {
     const hashedPassword = await argon2.hash(password, {
       type: argon2.argon2id,
@@ -80,5 +105,3 @@ async function computePasswordHash(password) {
     );
   }
 }
-
-export { computePasswordHash, validateCredentials };

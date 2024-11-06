@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "NODE_ENV=development node --watch src/main.js",
     "prod": "NODE_ENV=production node src/main.js",
-    "lint": "biome lint ./src",
+    "lint": "biome lint --error-on-warnings ./src",
     "fmt": "biome format --write ./src",
     "fmt-check": "biome format ./src",
     "test": ""
