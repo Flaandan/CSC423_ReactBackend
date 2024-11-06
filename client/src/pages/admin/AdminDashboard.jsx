@@ -1,17 +1,12 @@
-import {
-  Description,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle, Description } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/webPage.css";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
-import { apiChangePassword, apiCheckToken } from "../../lib/api";
+import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import ChangePassword from "../../components/changePassword";
+import "../../styles/webPage.css";
+
 //import ManageMajorSection from "../../components/manageMajors";
 //import ManageUsersSection from "../../components/manageUsers";
 
@@ -39,8 +34,6 @@ const AdminDash = () => {
         }
 
         const decodedRole = decodeJWT(jwt).role;
-
-        console.log(decodedRole);
 
         if (decodedRole !== "ADMIN") {
           navigate(
@@ -75,13 +68,22 @@ const AdminDash = () => {
           </a>
         </div>
 
-        <button onClick={handleLogout} className="logout-button" type="button">
-          Logout
-        </button>
+        {/* Bottom buttons */}
+        <div className="bottom-buttons">
+          <button onClick={() => setIsPasswordOpen(true)} type="button">
+            Change Password
+          </button>
+          <button onClick={handleLogout} className="logout-button" type="button">
+            Logout
+          </button>
+        </div>
+      </div>
 
-        <button onClick={() => setIsOpen(true)} type="button">
-          Change Password
-        </button>
+      {/* Main Content */}
+      <div className="main-content">
+        <h2>Welcome to Admin Dashboard</h2>
+        {/* Add admin-specific content here */}
+      </div>
 
         <Dialog
           open={isOpen}
