@@ -66,16 +66,16 @@ const StudentDash = () => {
   useEffect(() => {
     const fetchDroppedCourses = async () => {
       try {
-        const response = await fetch('/api/dropped-courses', {
+        const response = await fetch("/api/dropped-courses", {
           headers: {
-            'Authorization': `Bearer ${jwt}`
-          }
+            Authorization: `Bearer ${jwt}`,
+          },
           //TODO: Change this to the actual API endpoint HMUNN
         });
         const data = await response.json();
         setDroppedCourses(data);
       } catch (error) {
-        console.error('Error fetching dropped courses:', error);
+        console.error("Error fetching dropped courses:", error);
       }
     };
 
@@ -152,18 +152,37 @@ const StudentDash = () => {
       <div className="left-column">
         {/* Student Dashboard Header */}
         <h1>Student Dashboard</h1>
+<<<<<<< HEAD
 
         {/* Main buttons */}
         <div className="main-buttons">
           <button onClick={() => setIsAvailableOpen(true)} type="button">
             Register for Classes
+=======
+        <div className="button-container">
+          <a href="#classes">Register for Classes</a>
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+            type="button"
+          >
+            Logout
+>>>>>>> 55d3ecb (added 2 components and updated admin page so they can be imported)
           </button>
 
           <button onClick={() => setIsDroppedOpen(true)} type="button">
             View Dropped Courses
           </button>
+<<<<<<< HEAD
 
           <button onClick={handleChooseMajor} className="choose-major-button" type="button">
+=======
+          <button
+            onClick={handleChooseMajor}
+            className="choose-major-button"
+            type="button"
+          >
+>>>>>>> 55d3ecb (added 2 components and updated admin page so they can be imported)
             Choose Major
           </button>
         </div>
@@ -174,6 +193,7 @@ const StudentDash = () => {
             Change Password
           </button>
 
+<<<<<<< HEAD
           <button onClick={handleLogout} className="logout-button" type="button">
             Logout
           </button>
@@ -227,12 +247,23 @@ const StudentDash = () => {
 
         {/* Change Password Dialog */}
         <Dialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} className="dialog-pop">
+=======
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="dialog-pop"
+        >
+>>>>>>> 55d3ecb (added 2 components and updated admin page so they can be imported)
           <div className="dialog-pop-back">
             <div className="pop-panel">
               <DialogPanel>
                 <DialogTitle className="font-bold">Change Password</DialogTitle>
                 <Description>This will update your password.</Description>
+<<<<<<< HEAD
                 <ChangePassword jwt={jwt} setIsOpen={setIsPasswordOpen} />
+=======
+                <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
+>>>>>>> 55d3ecb (added 2 components and updated admin page so they can be imported)
               </DialogPanel>
             </div>
           </div>
