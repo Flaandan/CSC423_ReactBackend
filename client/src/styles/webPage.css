@@ -1,6 +1,6 @@
 :root {
   --color1: #0a1128;
-  --color1-80: rgba(10, 17, 40, 0.8); /* color1 but 0.8 opacticy */
+  --color1-80: rgba(10, 17, 40, 0.8);
   --color2: #001f54;
   --color3: #034078;
   --color4: #1282a2;
@@ -11,6 +11,13 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
+  background-color: var(--color5);
+}
+
+/* Layout Structure */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
 }
 
 .left-column {
@@ -19,47 +26,72 @@ body {
   top: 0;
   width: 300px;
   height: 100vh;
-  background-color: #333;
+  background-color: var(--color1);
   color: white;
   padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
-  margin-left: 300px;
-  padding: 20px;
+  flex: 1;
+  margin-left: 300px; /* Same as left-column width */
+  padding: 30px;
+  background-color: var(--color5);
+  min-height: 100vh;
 }
 
-.left-column a {
+/* Left Column Styles */
+.left-column h1 {
+  margin-bottom: 30px;
+  color: var(--color5);
+  font-size: 24px;
+}
+
+.main-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: auto; /* Pushes the bottom buttons down */
+}
+
+.bottom-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px; /* Adds space between main buttons and bottom buttons */
+}
+
+.main-buttons button,
+.bottom-buttons button {
+  padding: 12px 20px;
+  background-color: var(--color3);
   color: white;
-  text-decoration: none;
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #444;
-  border-radius: 4px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.left-column a:hover {
-  background-color: #555;
+.main-buttons button:hover,
+.bottom-buttons button:hover {
+  background-color: var(--color4);
 }
 
-@media (max-width: 768px) {
-  .left-column {
-    width: 100%;
-    height: auto;
-    position: relative;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
+.bottom-buttons .logout-button {
+  background-color: #dc3545;
 }
 
+.bottom-buttons .logout-button:hover {
+  background-color: #c82333;
+}
+
+/* Dialog Styles */
 .dialog-pop {
-  margin-left: 300px;
-  padding: 20px;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
 }
 
 .dialog-pop-back {
@@ -74,17 +106,42 @@ body {
 
 .pop-panel {
   background-color: var(--color5);
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 12px;
+  width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 20;
   position: relative;
   max-width: 90%;
-  max-height: 90%;
+  max-height: 90vh;
   overflow: auto;
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .left-column {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .pop-panel {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+/* Form Styles */
 .password-form {
   display: flex;
   flex-direction: column;
@@ -94,17 +151,45 @@ body {
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: var(--color1);
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .form-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 15px;
   margin-top: 20px;
 }
 
-form-button {
-  padding: 10px 15px;
+.form-button {
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  background-color: #d0d0d0;
 }
