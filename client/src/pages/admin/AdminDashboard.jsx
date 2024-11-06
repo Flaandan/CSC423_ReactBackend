@@ -1,22 +1,15 @@
-import {
-  Description,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle, Description } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/webPage.css";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
-import { apiChangePassword, apiCheckToken } from "../../lib/api";
+import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import ChangePassword from "../../components/changePassword";
+import "../../styles/webPage.css";
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
-  const [isOpen, setIsOpen] = useState(false);
-
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -35,8 +28,6 @@ const AdminDash = () => {
 
         const decodedRole = decodeJWT(jwt).role;
 
-        console.log(decodedRole);
-
         if (decodedRole !== "ADMIN") {
           navigate(
             decodedRole === "STUDENT"
@@ -54,36 +45,57 @@ const AdminDash = () => {
     checkToken();
   }, [jwt, navigate]);
 
-  /* I want to add all the functional buttons to the side column, main page
-   * should be used for displaying the interaction information*/
   return (
-    <div className="student-dashboard">
+    <div className="dashboard-container">
+      {/* Left Column */}
       <div className="left-column">
         <h1>Admin Dashboard</h1>
-        {/*Place Holders*/}
-        <a href="#majors">Manage Majors</a>
-        <a href="#users">Manage Users</a>
+        
+        {/* Main buttons */}
+        <div className="main-buttons">
+          <button type="button">
+            Manage Users
+          </button>
+          <button type="button">
+            Manage Courses
+          </button>
+          <button type="button">
+            View Reports
+          </button>
+          <button type="button">
+            System Settings
+          </button>
+        </div>
 
-        <button onClick={handleLogout} className="logout-button" type="button">
-          Logout
-        </button>
+        {/* Bottom buttons */}
+        <div className="bottom-buttons">
+          <button onClick={() => setIsPasswordOpen(true)} type="button">
+            Change Password
+          </button>
+          <button onClick={handleLogout} className="logout-button" type="button">
+            Logout
+          </button>
+        </div>
+      </div>
 
-        <button onClick={() => setIsOpen(true)} type="button">
-          Change Password
-        </button>
+      {/* Main Content */}
+      <div className="main-content">
+        <h2>Welcome to Admin Dashboard</h2>
+        {/* Add admin-specific content here */}
+      </div>
 
-        <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
+      {/* Change Password Dialog */}
+      <Dialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} className="dialog-pop">
         <div className="dialog-pop-back">
           <div className="pop-panel">
             <DialogPanel>
               <DialogTitle className="font-bold">Change Password</DialogTitle>
               <Description>This will update your password.</Description>
-              <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
+              <ChangePassword jwt={jwt} setIsOpen={setIsPasswordOpen} />
             </DialogPanel>
           </div>
         </div>
       </Dialog>
-      </div>
     </div>
   );
 };
