@@ -15,23 +15,6 @@ function main() {
   const port = config.serverPort;
   const host = config.serverHost;
 
-  const server = setupServer();
-
-  console.table([
-    {
-      Listening: `${host}:${port}`,
-      Environment: process.env.NODE_ENV,
-    },
-  ]);
-
-  serve({
-    fetch: server.fetch,
-    port: port,
-    hostname: host,
-  });
-}
-
-function setupServer() {
   const server = new Hono();
 
   // ALL MIDDLEWARE MUST BE DECLARED BEFORE DECLARING ROUTES OR
@@ -59,11 +42,11 @@ function setupServer() {
   );
 
   // Restricts all users endpoints to only ADMIN users
-  server.use("/v1/users/*", roleFilter(["ADMIN"]));
+  server.use("/api/v1/users/*", roleFilter(["ADMIN"]));
 
   // Restricts endpoints to only authorized users (anyone with valid token)
-  server.use("/v1/auth/change-password", jwtFilter());
-  server.use("/v1/auth/check", jwtFilter());
+  server.use("/api/v1/auth/change-password", jwtFilter());
+  server.use("/api/v1/auth/check", jwtFilter());
   // -- MIDDLEWARE end
 
   // Routes for server
@@ -71,7 +54,18 @@ function setupServer() {
   authRoutes(server);
   userRoutes(server);
 
-  return server;
+  console.table([
+    {
+      Listening: `${host}:${port}`,
+      Environment: process.env.NODE_ENV,
+    },
+  ]);
+
+  serve({
+    fetch: server.fetch,
+    port: port,
+    hostname: host,
+  });
 }
 
 main();

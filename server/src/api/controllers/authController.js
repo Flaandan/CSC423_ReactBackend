@@ -1,31 +1,26 @@
-import { z } from "zod";
 import { validateCredentials } from "../services/authService.js";
 import { generateToken } from "../services/jwtService.js";
-import { changeUserPassword } from "../services/userService.js";
+import {
+  changeUserPassword,
+  fetchUserByUsername,
+} from "../services/userService.js";
+import { changePasswordPayload, logInPayload } from "../utils/schemas.js";
 
-const logInPayload = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-
-const changePasswordPayload = z.object({
-  current_password: z.string(),
-  new_password: z.string().min(8).max(128),
-});
-
-async function login(ctx) {
+export async function apiLogin(ctx) {
   const payload = await ctx.req.json();
 
   const parsedPayload = logInPayload.parse(payload);
 
-  const userDTO = await validateCredentials(parsedPayload);
+  const username = await validateCredentials(parsedPayload);
+
+  const userDTO = await fetchUserByUsername(username);
 
   const token = await generateToken(userDTO);
 
   return ctx.json({ user: userDTO, access_token: token }, 200);
 }
 
-async function changePassword(ctx) {
+export async function apiChangePassword(ctx) {
   const payload = await ctx.req.json();
   const jwtPayload = ctx.get("jwtPayload");
 
@@ -41,7 +36,7 @@ async function changePassword(ctx) {
   return ctx.json({ success: "password changed" }, 200);
 }
 
-async function checkToken(ctx) {
+export async function apiCheckToken(ctx) {
   const jwtPayload = ctx.get("jwtPayload");
 
   const tokenDetails = {
@@ -50,5 +45,3 @@ async function checkToken(ctx) {
 
   return ctx.json(tokenDetails, 200);
 }
-
-export { login, changePassword, checkToken };

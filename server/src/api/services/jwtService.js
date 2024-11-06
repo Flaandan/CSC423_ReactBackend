@@ -2,9 +2,9 @@ import { decode, sign, verify } from "hono/jwt";
 import { config } from "../../config.js";
 import { ClientError, ServerError } from "../../error.js";
 
-const JWT_ALG = "HS256";
+export const JWT_ALG = "HS256";
 
-async function generateToken(user) {
+export async function generateToken(user) {
   const claims = {
     sub: user.username,
     role: user.role,
@@ -18,7 +18,7 @@ async function generateToken(user) {
   return await sign(claims, config.jwtSecret, JWT_ALG);
 }
 
-async function verifyToken(token) {
+export async function verifyToken(token) {
   return await verify(token, config.jwtSecret).catch((err) => {
     throw new ServerError(
       `Failed to verify JWT: ${String(err)}`,
@@ -28,9 +28,7 @@ async function verifyToken(token) {
   });
 }
 
-function decodeToken(token) {
+export function decodeToken(token) {
   const { header, payload } = decode(token);
   return { header, payload };
 }
-
-export { decodeToken, generateToken, JWT_ALG, verifyToken };

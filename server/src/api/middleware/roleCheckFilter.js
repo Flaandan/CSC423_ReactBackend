@@ -3,7 +3,7 @@ import { config } from "../../config.js";
 import { ClientError, ServerError } from "../../error.js";
 import { JWT_ALG } from "../services/jwtService.js";
 
-function roleFilter(requiredRoles) {
+export function roleFilter(requiredRoles) {
   return async (ctx, next) => {
     // `jwt` is the default middleware provided by Hono to verify tokens
     // Defaults to checking for Authentication (Bearer or Basic) header if cookie field is not provided
@@ -40,5 +40,3 @@ function roleFilter(requiredRoles) {
     }
   };
 }
-
-export { roleFilter };

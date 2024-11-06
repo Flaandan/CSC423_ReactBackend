@@ -1,6 +1,6 @@
 import { pgPool } from "../../db.js";
 
-async function healthCheck(ctx) {
+export async function apiHealthCheck(ctx) {
   await pgPool.query("SELECT NOW()");
 
   const response = {
@@ -9,5 +9,3 @@ async function healthCheck(ctx) {
 
   return ctx.json(response);
 }
-
-export { healthCheck };

@@ -1,7 +1,5 @@
-import { healthCheck } from "../handlers/healthHandler.js";
+import { apiHealthCheck } from "../controllers/healthController.js";
 
-function healthRoutes(server) {
-  server.get("/v1/health", async (ctx) => await healthCheck(ctx));
+export function healthRoutes(server) {
+  server.on("GET", "/api/v1/health", async (ctx) => await apiHealthCheck(ctx));
 }
-
-export { healthRoutes };
