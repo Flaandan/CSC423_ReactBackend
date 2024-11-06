@@ -61,16 +61,16 @@ const StudentDash = () => {
   useEffect(() => {
     const fetchDroppedCourses = async () => {
       try {
-        const response = await fetch('/api/dropped-courses', {
+        const response = await fetch("/api/dropped-courses", {
           headers: {
-            'Authorization': `Bearer ${jwt}`
-          }
+            Authorization: `Bearer ${jwt}`,
+          },
           //TODO: Change this to the actual API endpoint HMUNN
         });
         const data = await response.json();
         setDroppedCourses(data);
       } catch (error) {
-        console.error('Error fetching dropped courses:', error);
+        console.error("Error fetching dropped courses:", error);
       }
     };
 
@@ -85,30 +85,42 @@ const StudentDash = () => {
         <h1>Student Dashboard</h1>
         <div className="button-container">
           <a href="#classes">Register for Classes</a>
-          <button onClick={handleLogout} className="logout-button" type="button">
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+            type="button"
+          >
             Logout
           </button>
           <button onClick={() => setIsOpen(true)} type="button">
             Change Password
           </button>
-          <button onClick={handleChooseMajor} className="choose-major-button" type="button">
+          <button
+            onClick={handleChooseMajor}
+            className="choose-major-button"
+            type="button"
+          >
             Choose Major
           </button>
         </div>
 
         <DroppedCourses courses={droppedCourses} />
 
-        <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
-        <div className="dialog-pop-back">
-          <div className="pop-panel">
-            <DialogPanel>
-              <DialogTitle className="font-bold">Change Password</DialogTitle>
-              <Description>This will update your password.</Description>
-              <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
-            </DialogPanel>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="dialog-pop"
+        >
+          <div className="dialog-pop-back">
+            <div className="pop-panel">
+              <DialogPanel>
+                <DialogTitle className="font-bold">Change Password</DialogTitle>
+                <Description>This will update your password.</Description>
+                <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
+              </DialogPanel>
+            </div>
           </div>
-        </div>
-      </Dialog>
+        </Dialog>
       </div>
     </div>
   );

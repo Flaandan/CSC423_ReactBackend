@@ -12,10 +12,13 @@ import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiChangePassword, apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import ChangePassword from "../../components/changePassword";
+//import ManageMajorSection from "../../components/manageMajors";
+//import ManageUsersSection from "../../components/manageUsers";
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [isOpen, setIsOpen] = useState(false);
+  const [currentSection, setCurrentSection] = useState("dashboard");
 
   const navigate = useNavigate();
 
@@ -23,6 +26,8 @@ const AdminDash = () => {
     localStorage.removeItem(JWT_KEY);
     navigate("/");
   };
+
+  const handleCreateMajor = () => {};
 
   useEffect(() => {
     const checkToken = async () => {
@@ -54,15 +59,21 @@ const AdminDash = () => {
     checkToken();
   }, [jwt, navigate]);
 
-  /* I want to add all the functional buttons to the side column, main page
-   * should be used for displaying the interaction information*/
   return (
-    <div className="student-dashboard">
+    <div className="admin-dashboard">
       <div className="left-column">
         <h1>Admin Dashboard</h1>
-        {/*Place Holders*/}
-        <a href="#majors">Manage Majors</a>
-        <a href="#users">Manage Users</a>
+
+        <div classname="manage-major-section">
+          <a href="#majors" onclick={() => setcurrentsection("managemajors")}>
+            Manage Majors
+          </a>
+        </div>
+        <div classname="manage-users-section">
+          <a href="#users" onclick={() => setcurrentsection("manageusers")}>
+            Manage Users
+          </a>
+        </div>
 
         <button onClick={handleLogout} className="logout-button" type="button">
           Logout
@@ -72,17 +83,27 @@ const AdminDash = () => {
           Change Password
         </button>
 
-        <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="dialog-pop">
-        <div className="dialog-pop-back">
-          <div className="pop-panel">
-            <DialogPanel>
-              <DialogTitle className="font-bold">Change Password</DialogTitle>
-              <Description>This will update your password.</Description>
-              <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
-            </DialogPanel>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="dialog-pop"
+        >
+          <div className="dialog-pop-back">
+            <div className="pop-panel">
+              <DialogPanel>
+                <DialogTitle className="font-bold">Change Password</DialogTitle>
+                <Description>This will update your password.</Description>
+                <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
+              </DialogPanel>
+            </div>
           </div>
-        </div>
-      </Dialog>
+        </Dialog>
+      </div>
+
+      <div className="main-content">
+        {currentSection === "dashboard" && <div>Admin Dash Placeholder</div>}
+        {currentSection === "manageMajors" && <ManageMajorsSection />}
+        {currentSection === "manageUsers" && <ManageUsersSection />}
       </div>
     </div>
   );
