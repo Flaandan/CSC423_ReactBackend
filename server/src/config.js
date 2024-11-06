@@ -67,4 +67,6 @@ class Config {
 
 const config = new Config();
 
+Object.freeze(config);
+
 export { config };

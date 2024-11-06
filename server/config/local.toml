@@ -1,0 +1,10 @@
+[database]
+PGUSER= "admin"
+PGPASSWORD= "password"
+PGDATABASE= "react_backend"
+PGHOST = "127.0.0.1"
+
+[server]
+SERVER_HOST= "127.0.0.1"
+SERVER_PORT= "8000"
+JWT_SECRET= "secret"

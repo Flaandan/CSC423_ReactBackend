@@ -3,7 +3,7 @@ import { ClientError, ServerError } from "../../error.js";
 
 // Modify responses before they are sent to the client
 // All errors from handlers are propagated here
-function responseMapper(server) {
+export function responseMapper(server) {
   server.onError(async (err) => {
     if (err instanceof ServerError) {
       const { statusCode, clientError } = err;
@@ -37,5 +37,3 @@ function responseMapper(server) {
     });
   });
 }
-
-export { responseMapper };
