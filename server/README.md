@@ -19,19 +19,13 @@ cd CSC423_ReactBackend/server
 
 ### 3. **Run the API**
 
-Rename `local.toml.example` and `production.toml.example` to `local.toml` and `production.toml`
+If running in `production` environment, create `production.toml` file, otherwise skip this step:
 
 ```bash
-mv ./config/local.toml.example ./config/local.toml
+touch ./config/production.toml
 ```
 
-```bash
-mv ./config/production.toml.example ./config/production.toml
-```
-
-Update the contents of these files to your specific configuration
-
-Example:
+Update the contents of this file for your specific configuration. Example:
 
 ```toml
 [database]
