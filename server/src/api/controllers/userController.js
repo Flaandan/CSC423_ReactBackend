@@ -62,24 +62,24 @@ export async function apiUpdateUser(ctx) {
 
   const user = await fetchUserByUsername(username);
 
-  if (payload.first_name) {
-    user.firstName = payload.first_name;
+  if (parsedPayload.first_name) {
+    user.firstName = parsedPayload.first_name;
   }
 
-  if (payload.last_name) {
-    user.lastName = payload.last_name;
+  if (parsedPayload.last_name) {
+    user.lastName = parsedPayload.last_name;
   }
 
-  if (payload.role) {
-    user.role = payload.role;
+  if (parsedPayload.role) {
+    user.role = parsedPayload.role;
   }
 
-  if (payload.phone_number) {
-    user.phoneNumber = payload.phone_number;
+  if (parsedPayload.phone_number) {
+    user.phoneNumber = parsedPayload.phone_number;
   }
 
-  if (payload.office) {
-    user.office = payload.office;
+  if (parsedPayload.office) {
+    user.office = parsedPayload.office;
   }
 
   await updateUser(user);

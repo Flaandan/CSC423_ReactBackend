@@ -7,6 +7,7 @@ import { jwtFilter } from "./api/middleware/jwtAuthFilter.js";
 import { responseMapper } from "./api/middleware/responseMapper.js";
 import { roleFilter } from "./api/middleware/roleCheckFilter.js";
 import { authRoutes } from "./api/routes/authRoutes.js";
+import { courseRoutes } from "./api/routes/courseRoutes.js";
 import { healthRoutes } from "./api/routes/healthRoutes.js";
 import { majorRoutes } from "./api/routes/majorRoutes.js";
 import { userRoutes } from "./api/routes/userRoutes.js";
@@ -49,6 +50,7 @@ function main() {
   server.use("/api/v1/auth/change-password", jwtFilter());
   server.use("/api/v1/auth/check", jwtFilter());
   server.use("/api/v1/majors/*", jwtFilter());
+  server.use("/api/v1/courses/*", jwtFilter());
   // -- MIDDLEWARE end
 
   // Routes for server
@@ -57,6 +59,8 @@ function main() {
   userRoutes(server);
   // TODO: Find out if these endpoints need to be restricted by role
   majorRoutes(server);
+  // TODO: Find out if these endpoints need to be restricted by role
+  courseRoutes(server);
 
   console.table([
     {

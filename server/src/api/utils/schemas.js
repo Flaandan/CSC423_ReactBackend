@@ -44,3 +44,15 @@ export const updateMajorPayload = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().min(1).max(255).optional(),
 });
+
+export const createCoursePayload = z.object({
+  discipline: z.string().min(1).max(50),
+  course_number: z.number().int().positive(),
+  description: z.string().min(1).max(255),
+  max_capacity: z.number().int().positive(),
+});
+
+export const updateCoursePayload = z.object({
+  description: z.string().min(1).max(255).optional(),
+  max_capacity: z.number().int().positive().optional(),
+});

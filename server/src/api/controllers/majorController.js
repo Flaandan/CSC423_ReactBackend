@@ -54,12 +54,12 @@ export async function apiUpdateMajor(ctx) {
 
   const major = await fetchMajorByName(majorName);
 
-  if (payload.name) {
-    major.name = payload.name;
+  if (parsedPayload.name) {
+    major.name = parsedPayload.name;
   }
 
-  if (payload.description) {
-    major.description = payload.description;
+  if (parsedPayload.description) {
+    major.description = parsedPayload.description;
   }
 
   await updateMajor(major);
