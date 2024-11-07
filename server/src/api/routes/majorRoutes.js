@@ -1,5 +1,4 @@
 import {
-<<<<<<< HEAD
   apiAddCourseToMajor,
   apiCreateMajor,
   apiDeleteMajor,
@@ -7,12 +6,6 @@ import {
   apiGetCoursesForMajor,
   apiGetMajorByName,
   apiRemoveCourseFromMajor,
-=======
-  apiCreateMajor,
-  apiDeleteMajor,
-  apiGetAllMajors,
-  apiGetMajorByName,
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
   apiUpdateMajor,
 } from "../controllers/majorController.js";
 
@@ -21,10 +14,7 @@ export function majorRoutes(server) {
 
   server.on("POST", "/api/v1/majors", async (ctx) => await apiCreateMajor(ctx));
 
-<<<<<<< HEAD
   // -----------------------------------------------------------------------
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
   server.on(
     "GET",
     "/api/v1/majors/:majorName",
@@ -42,7 +32,6 @@ export function majorRoutes(server) {
     "/api/v1/majors/:majorName",
     async (ctx) => await apiDeleteMajor(ctx),
   );
-<<<<<<< HEAD
 
   // -----------------------------------------------------------------------
   server.on(
@@ -62,6 +51,4 @@ export function majorRoutes(server) {
     "/api/v1/majors/:majorName/courses",
     async (ctx) => await apiGetCoursesForMajor(ctx),
   );
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
 }

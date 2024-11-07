@@ -51,7 +51,6 @@ export const createMajorPayload = z.object({
   description: z.string().min(1).max(255),
 });
 
-<<<<<<< HEAD
 export const addUserMajorPayload = z.object({
   major_name: z.string().min(1).max(255),
 });
@@ -61,13 +60,10 @@ export const addMajorCoursePayload = z.object({
   course_number: z.number().int().positive(),
 });
 
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
 export const updateMajorPayload = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().min(1).max(255).optional(),
 });
-<<<<<<< HEAD
 
 export const createCoursePayload = z.object({
   discipline: z.string().min(1).max(10),
@@ -80,5 +76,3 @@ export const updateCoursePayload = z.object({
   description: z.string().min(1).max(255).optional(),
   max_capacity: z.number().int().positive().optional(),
 });
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)

@@ -85,6 +85,25 @@ export async function removeMajorFromUser(username, majorName) {
 
 export async function fetchMajorsForUser(username) {
   try {
+    const row = await pgPool.query(
+      `
+        SELECT username
+        FROM users
+        WHERE username = $1
+    `,
+      [username],
+    );
+
+    const record = row.rows.length > 0 ? row.rows[0] : null;
+
+    if (!record) {
+      throw new ServerError(
+        `User ${username} does not exist`,
+        404,
+        ClientError.NOT_FOUND,
+      );
+    }
+
     const rows = await pgPool.query(
       `
       SELECT m.name, m.description
@@ -97,6 +116,10 @@ export async function fetchMajorsForUser(username) {
 
     return rows.rows;
   } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
     throw new ServerError(
       `Failed to fetch majors for user ${username}: ${String(err)}`,
       500,

@@ -140,6 +140,25 @@ export async function unregisterUserFromCourse(
 
 export async function fetchRegistrationsForUser(username) {
   try {
+    const row = await pgPool.query(
+      `
+        SELECT username
+        FROM users
+        WHERE username = $1
+    `,
+      [username],
+    );
+
+    const record = row.rows.length > 0 ? row.rows[0] : null;
+
+    if (!record) {
+      throw new ServerError(
+        `User ${username} does not exist`,
+        404,
+        ClientError.NOT_FOUND,
+      );
+    }
+
     const rows = await pgPool.query(
       `
       SELECT r.course_discipline, r.course_number, r.status, r.semester_taken, r.year_taken
@@ -151,6 +170,10 @@ export async function fetchRegistrationsForUser(username) {
 
     return rows.rows;
   } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
     throw new ServerError(
       `Failed to fetch registrations for user ${username}: ${String(err)}`,
       500,

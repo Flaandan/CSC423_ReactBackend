@@ -1,28 +1,21 @@
 import { Major } from "../models/major.js";
 import {
-<<<<<<< HEAD
   addCourseToMajor,
   fetchCoursesForMajor,
   removeCourseFromMajor,
 } from "../services/majorCoursesService.js";
 import {
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
   deleteMajor,
   fetchAllMajors,
   fetchMajorByName,
   insertMajor,
   updateMajor,
 } from "../services/majorService.js";
-<<<<<<< HEAD
 import {
   addMajorCoursePayload,
   createMajorPayload,
   updateMajorPayload,
 } from "../utils/schemas.js";
-=======
-import { createMajorPayload, updateMajorPayload } from "../utils/schemas.js";
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
 
 export async function apiCreateMajor(ctx) {
   const payload = await ctx.req.json();
@@ -70,28 +63,18 @@ export async function apiUpdateMajor(ctx) {
 
   const major = await fetchMajorByName(majorName);
 
-<<<<<<< HEAD
   if (parsedPayload.name) {
     major.name = parsedPayload.name;
   }
 
   if (parsedPayload.description) {
     major.description = parsedPayload.description;
-=======
-  if (payload.name) {
-    major.name = payload.name;
-  }
-
-  if (payload.description) {
-    major.description = payload.description;
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
   }
 
   await updateMajor(major);
 
   return ctx.json({ success: "major updated" }, 200);
 }
-<<<<<<< HEAD
 
 export async function apiAddCourseToMajor(ctx) {
   const { majorName } = ctx.req.param();
@@ -124,5 +107,3 @@ export async function apiGetCoursesForMajor(ctx) {
 
   return ctx.json({ courses: courses }, 200);
 }
-=======
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)

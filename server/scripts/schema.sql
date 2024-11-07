@@ -83,11 +83,7 @@ CREATE TABLE dropped (
         ON UPDATE CASCADE    -- If the registration ID changes, update it in the child table
 );
 
-<<<<<<< HEAD
 -- For when registration_status is changed to DROPPED, insert registration_id in dropped table
-=======
--- For when registration_status is changed to DROPPED
->>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
 CREATE OR REPLACE FUNCTION insert_into_dropped() 
 RETURNS TRIGGER AS $$
 BEGIN

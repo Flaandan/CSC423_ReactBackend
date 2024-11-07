@@ -96,6 +96,25 @@ export async function removeCourseFromMajor(
 
 export async function fetchCoursesForMajor(majorName) {
   try {
+    const row = await pgPool.query(
+      `
+        SELECT name
+        FROM major
+        WHERE name = $1
+    `,
+      [majorName],
+    );
+
+    const record = row.rows.length > 0 ? row.rows[0] : null;
+
+    if (!record) {
+      throw new ServerError(
+        `Major ${majorName} does not exist`,
+        404,
+        ClientError.NOT_FOUND,
+      );
+    }
+
     const rows = await pgPool.query(
       `
       SELECT c.discipline, c.course_number, c.description, c.max_capacity
@@ -108,6 +127,10 @@ export async function fetchCoursesForMajor(majorName) {
 
     return rows.rows;
   } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
     throw new ServerError(
       `Failed to fetch courses for major ${majorName}: ${String(err)}`,
       500,
