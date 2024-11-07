@@ -3,6 +3,7 @@ import {
   deleteCourse,
   fetchAllCourses,
   fetchCourseByDisciplineAndNumber,
+  fetchUsersInCourse,
   insertCourse,
   updateCourse,
 } from "../services/courseService.js";
@@ -26,9 +27,9 @@ export async function apiCreateCourse(ctx) {
 }
 
 export async function apiDeleteCourse(ctx) {
-  const { discipline, courseNumber } = ctx.req.param();
+  const { courseDiscipline, courseNumber } = ctx.req.param();
 
-  await deleteCourse(discipline, courseNumber);
+  await deleteCourse(courseDiscipline, courseNumber);
 
   return ctx.json({ success: "course deleted" }, 200);
 }
@@ -40,10 +41,10 @@ export async function apiGetAllCourses(ctx) {
 }
 
 export async function apiGetCourseByDisciplineAndNumber(ctx) {
-  const { discipline, courseNumber } = ctx.req.param();
+  const { courseDiscipline, courseNumber } = ctx.req.param();
 
   const course = await fetchCourseByDisciplineAndNumber(
-    discipline,
+    courseDiscipline,
     courseNumber,
   );
 
@@ -51,14 +52,14 @@ export async function apiGetCourseByDisciplineAndNumber(ctx) {
 }
 
 export async function apiUpdateCourse(ctx) {
-  const { discipline, courseNumber } = ctx.req.param();
+  const { courseDiscipline, courseNumber } = ctx.req.param();
 
   const payload = await ctx.req.json();
 
   const parsedPayload = updateCoursePayload.parse(payload);
 
   const course = await fetchCourseByDisciplineAndNumber(
-    discipline,
+    courseDiscipline,
     courseNumber,
   );
 
@@ -73,4 +74,12 @@ export async function apiUpdateCourse(ctx) {
   await updateCourse(course);
 
   return ctx.json({ success: "course updated" }, 200);
+}
+
+export async function apiGetUsersInCourse(ctx) {
+  const { courseDiscipline, courseNumber } = ctx.req.param();
+
+  const users = await fetchUsersInCourse(courseDiscipline, courseNumber);
+
+  return ctx.json({ users: users }, 200);
 }

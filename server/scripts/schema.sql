@@ -33,16 +33,27 @@ CREATE TABLE major_courses (
     course_number INT,
     last_updated TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (major_name, course_discipline, course_number),
-    FOREIGN KEY (major_name) REFERENCES major(name),
-    FOREIGN KEY (course_discipline, course_number) REFERENCES course(discipline, course_number)
+    FOREIGN KEY (major_name) 
+        REFERENCES major(name) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE,  -- If the major name changes, update it in the child table
+    FOREIGN KEY (course_discipline, course_number) 
+        REFERENCES course(discipline, course_number) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE   -- If the course discipline/number changes, update it in the child table
 );
 
 CREATE TABLE user_majors (
     username VARCHAR(255),
     major_name VARCHAR(255),
     PRIMARY KEY (username, major_name),
-    FOREIGN KEY (username) REFERENCES users(username),
-    FOREIGN KEY (major_name) REFERENCES major(name)
+    FOREIGN KEY (username) 
+        REFERENCES users(username) 
+        ON DELETE CASCADE, 
+    FOREIGN KEY (major_name) 
+        REFERENCES major(name) 
+        ON DELETE SET NULL   -- If the major is deleted, set the foreign key to NULL (user may have no major now)
+        ON UPDATE CASCADE    -- If the major name changes, update it in the child table
 );
 
 CREATE TABLE registration (
@@ -50,21 +61,29 @@ CREATE TABLE registration (
     username VARCHAR(255),
     course_discipline VARCHAR(10),
     course_number INT,
-    status registration_status NOT NULL,
+    status registration_status NOT NULL DEFAULT 'ENROLLED',
     semester_taken semester NOT NULL,
     year_taken INT NOT NULL,
-    FOREIGN KEY (username) REFERENCES users(username),
-    FOREIGN KEY (course_discipline, course_number) REFERENCES course(discipline, course_number)
+    FOREIGN KEY (username) 
+        REFERENCES users(username) 
+        ON DELETE CASCADE,   -- If the user is deleted, remove the registration
+    FOREIGN KEY (course_discipline, course_number) 
+        REFERENCES course(discipline, course_number) 
+        ON DELETE CASCADE   -- If the course is deleted, remove the registration
+        ON UPDATE CASCADE   -- If the course discipline/number changes, update it in the child table
 );
 
 CREATE TABLE dropped (
     registration_id BIGINT,
     date_dropped TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (registration_id),
-    FOREIGN KEY (registration_id) REFERENCES registration(id)
+    FOREIGN KEY (registration_id) 
+        REFERENCES registration(id) 
+        ON DELETE CASCADE   -- If a registration is deleted, drop record should also be deleted
+        ON UPDATE CASCADE    -- If the registration ID changes, update it in the child table
 );
 
--- For when registration_status is changed to DROPPED
+-- For when registration_status is changed to DROPPED, insert registration_id in dropped table
 CREATE OR REPLACE FUNCTION insert_into_dropped() 
 RETURNS TRIGGER AS $$
 BEGIN

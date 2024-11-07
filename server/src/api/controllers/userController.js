@@ -1,13 +1,22 @@
 import { User } from "../models/user.js";
 import { computePasswordHash } from "../services/authService.js";
 import {
+  addMajorToUser,
+  fetchMajorsForUser,
+  removeMajorFromUser,
+} from "../services/userMajorsService.js";
+import {
   deleteUser,
   fetchAllUsers,
   fetchUserByUsername,
   insertUser,
   updateUser,
 } from "../services/userService.js";
-import { createUserPayload, updateUserPayload } from "../utils/schemas.js";
+import {
+  addUserMajorPayload,
+  createUserPayload,
+  updateUserPayload,
+} from "../utils/schemas.js";
 
 export async function apiCreateUser(ctx) {
   const payload = await ctx.req.json();
@@ -85,4 +94,32 @@ export async function apiUpdateUser(ctx) {
   await updateUser(user);
 
   return ctx.json({ success: "user updated" }, 200);
+}
+
+export async function apiAssignMajorToUser(ctx) {
+  const { username } = ctx.req.param();
+
+  const payload = await ctx.req.json();
+
+  const parsedPayload = addUserMajorPayload.parse(payload);
+
+  await addMajorToUser(username, parsedPayload.major_name);
+
+  return ctx.json({ success: "major assigned to user" }, 200);
+}
+
+export async function apiRemoveMajorFromUser(ctx) {
+  const { username, majorName } = ctx.req.param();
+
+  await removeMajorFromUser(username, majorName);
+
+  return ctx.json({ success: "major removed from user" }, 200);
+}
+
+export async function apiGetMajorsForUser(ctx) {
+  const { username } = ctx.req.param();
+
+  const majors = await fetchMajorsForUser(username);
+
+  return ctx.json({ majors: majors }, 200);
 }

@@ -177,3 +177,25 @@ export async function fetchAllCourses() {
     );
   }
 }
+
+export async function fetchUsersInCourse(courseDiscipline, courseNumber) {
+  try {
+    const rows = await pgPool.query(
+      `
+      SELECT u.username, u.first_name, u.last_name
+      FROM users u
+      JOIN registration r ON u.username = r.username
+      WHERE r.course_discipline = $1 AND r.course_number = $2 AND r.status = 'ENROLLED'
+      `,
+      [courseDiscipline, courseNumber],
+    );
+
+    return rows.rows;
+  } catch (err) {
+    throw new ServerError(
+      `Failed to fetch users in course ${courseDiscipline} ${courseNumber}: ${String(err)}`,
+      500,
+      ClientError.SERVICE_ERROR,
+    );
+  }
+}

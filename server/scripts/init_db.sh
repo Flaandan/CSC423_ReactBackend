@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: update to seed data using relational tables (major_courses, user_majors, registration)
+
 # set -x
 set -eo pipefail 
 
@@ -159,7 +161,7 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
     echo ">> seeded $NUM_STUDENTS_ACTUAL students"
     echo ">> seeded $NUM_INSTRUCTORS_ACTUAL instructors"
 
-    echo "seeding majors..."
+    echo "Seeding majors..."
 
     for i in $(seq 1 $NUM_MAJORS); do
         case $i in
@@ -173,7 +175,7 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
             8) major_name="Chemistry"; major_description="The study of substances, their properties, and chemical reactions." ;;
             9) major_name="Mathematics"; major_description="The abstract study of numbers, quantities, and shapes." ;;
             10) major_name="Law"; major_description="The study of legal systems, laws, and their application." ;;
-            *) major_name="Undecided"; major_description="Exploring various fields to choose a major." ;;
+            *) major_name="UND"; major_description="Exploring various fields to choose a major." ;;
         esac
 
         INSERT_QUERY="
@@ -186,32 +188,31 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
 
     >&2 echo ">> seeded $NUM_MAJORS majors"
 
-    # Seed Courses
-    echo "seeding courses..."
+    echo "Seeding courses..."
 
     for i in $(seq 1 $NUM_COURSES); do
         case $i in
-            1) discipline="Computer Science"; course_number=101; course_description="Introduction to Computer Science."; max_capacity=50 ;;
-            2) discipline="Computer Science"; course_number=102; course_description="Data Structures and Algorithms."; max_capacity=60 ;;
-            3) discipline="Mechanical Engineering"; course_number=201; course_description="Statics and Dynamics."; max_capacity=40 ;;
-            4) discipline="Mechanical Engineering"; course_number=202; course_description="Thermodynamics."; max_capacity=45 ;;
-            5) discipline="Biology"; course_number=101; course_description="General Biology I."; max_capacity=80 ;;
-            6) discipline="Biology"; course_number=102; course_description="General Biology II."; max_capacity=75 ;;
-            7) discipline="Electrical Engineering"; course_number=101; course_description="Circuit Analysis."; max_capacity=50 ;;
-            8) discipline="Electrical Engineering"; course_number=102; course_description="Digital Systems Design."; max_capacity=45 ;;
-            9) discipline="Psychology"; course_number=101; course_description="Introduction to Psychology."; max_capacity=90 ;;
-            10) discipline="Psychology"; course_number=102; course_description="Abnormal Psychology."; max_capacity=85 ;;
-            11) discipline="Business Administration"; course_number=101; course_description="Principles of Management."; max_capacity=60 ;;
-            12) discipline="Business Administration"; course_number=102; course_description="Marketing Fundamentals."; max_capacity=65 ;;
-            13) discipline="Physics"; course_number=101; course_description="General Physics I."; max_capacity=70 ;;
-            14) discipline="Physics"; course_number=102; course_description="General Physics II."; max_capacity=65 ;;
-            15) discipline="Chemistry"; course_number=101; course_description="General Chemistry I."; max_capacity=80 ;;
-            16) discipline="Chemistry"; course_number=102; course_description="General Chemistry II."; max_capacity=75 ;;
-            17) discipline="Mathematics"; course_number=101; course_description="Calculus I."; max_capacity=50 ;;
-            18) discipline="Mathematics"; course_number=102; course_description="Calculus II."; max_capacity=55 ;;
-            19) discipline="Law"; course_number=101; course_description="Introduction to Law."; max_capacity=40 ;;
-            20) discipline="Law"; course_number=102; course_description="Criminal Law."; max_capacity=45 ;;
-            *) discipline="Undecided"; course_number=$i; course_description="Exploring various courses."; max_capacity=30 ;;
+            1) discipline="CSC"; course_number=101; course_description="Introduction to Computer Science."; max_capacity=50 ;;
+            2) discipline="CSC"; course_number=102; course_description="Data Structures and Algorithms."; max_capacity=60 ;;
+            3) discipline="ME"; course_number=201; course_description="Statics and Dynamics."; max_capacity=40 ;;
+            4) discipline="ME"; course_number=202; course_description="Thermodynamics."; max_capacity=45 ;;
+            5) discipline="BIO"; course_number=101; course_description="General Biology I."; max_capacity=80 ;;
+            6) discipline="BIO"; course_number=102; course_description="General Biology II."; max_capacity=75 ;;
+            7) discipline="EE"; course_number=101; course_description="Circuit Analysis."; max_capacity=50 ;;
+            8) discipline="EE"; course_number=102; course_description="Digital Systems Design."; max_capacity=45 ;;
+            9) discipline="PSY"; course_number=101; course_description="Introduction to Psychology."; max_capacity=90 ;;
+            10) discipline="PSY"; course_number=102; course_description="Abnormal Psychology."; max_capacity=85 ;;
+            11) discipline="BA"; course_number=101; course_description="Principles of Management."; max_capacity=60 ;;
+            12) discipline="BA"; course_number=102; course_description="Marketing Fundamentals."; max_capacity=65 ;;
+            13) discipline="PHYS"; course_number=101; course_description="General Physics I."; max_capacity=70 ;;
+            14) discipline="PHYS"; course_number=102; course_description="General Physics II."; max_capacity=65 ;;
+            15) discipline="CHEM"; course_number=101; course_description="General Chemistry I."; max_capacity=80 ;;
+            16) discipline="CHEM"; course_number=102; course_description="General Chemistry II."; max_capacity=75 ;;
+            17) discipline="MATH"; course_number=101; course_description="Calculus I."; max_capacity=50 ;;
+            18) discipline="MATH"; course_number=102; course_description="Calculus II."; max_capacity=55 ;;
+            19) discipline="LAW"; course_number=101; course_description="Introduction to Law."; max_capacity=40 ;;
+            20) discipline="LAW"; course_number=102; course_description="Criminal Law."; max_capacity=45 ;;
+            *) discipline="UND"; course_number=$i; course_description="Exploring various courses."; max_capacity=30 ;;
         esac
 
         INSERT_QUERY="

@@ -3,6 +3,7 @@ import {
   apiDeleteCourse,
   apiGetAllCourses,
   apiGetCourseByDisciplineAndNumber,
+  apiGetUsersInCourse,
   apiUpdateCourse,
 } from "../controllers/courseController.js";
 
@@ -19,21 +20,29 @@ export function courseRoutes(server) {
     async (ctx) => await apiCreateCourse(ctx),
   );
 
+  // -----------------------------------------------------------------------
   server.on(
     "GET",
-    "/api/v1/courses/:discipline/:courseNumber",
+    "/api/v1/courses/:courseDiscipline/:courseNumber",
     async (ctx) => await apiGetCourseByDisciplineAndNumber(ctx),
   );
 
   server.on(
     "PATCH",
-    "/api/v1/courses/:discipline/:courseNumber",
+    "/api/v1/courses/:courseDiscipline/:courseNumber",
     async (ctx) => await apiUpdateCourse(ctx),
   );
 
   server.on(
     "DELETE",
-    "/api/v1/courses/:discipline/:courseNumber",
+    "/api/v1/courses/:courseDiscipline/:courseNumber",
     async (ctx) => await apiDeleteCourse(ctx),
+  );
+
+  // -----------------------------------------------------------------------
+  server.on(
+    "GET",
+    "/api/v1/courses/:courseDiscipline/:courseNumber/users",
+    async (ctx) => await apiGetUsersInCourse(ctx),
   );
 }

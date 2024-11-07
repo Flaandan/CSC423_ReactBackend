@@ -1,12 +1,21 @@
 import { Major } from "../models/major.js";
 import {
+  addCourseToMajor,
+  fetchCoursesForMajor,
+  removeCourseFromMajor,
+} from "../services/majorCoursesService.js";
+import {
   deleteMajor,
   fetchAllMajors,
   fetchMajorByName,
   insertMajor,
   updateMajor,
 } from "../services/majorService.js";
-import { createMajorPayload, updateMajorPayload } from "../utils/schemas.js";
+import {
+  addMajorCoursePayload,
+  createMajorPayload,
+  updateMajorPayload,
+} from "../utils/schemas.js";
 
 export async function apiCreateMajor(ctx) {
   const payload = await ctx.req.json();
@@ -65,4 +74,36 @@ export async function apiUpdateMajor(ctx) {
   await updateMajor(major);
 
   return ctx.json({ success: "major updated" }, 200);
+}
+
+export async function apiAddCourseToMajor(ctx) {
+  const { majorName } = ctx.req.param();
+
+  const payload = await ctx.req.json();
+
+  const parsedPayload = addMajorCoursePayload.parse(payload);
+
+  await addCourseToMajor(
+    majorName,
+    parsedPayload.discipline,
+    parsedPayload.course_number,
+  );
+
+  return ctx.json({ success: "course added to major" }, 200);
+}
+
+export async function apiRemoveCourseFromMajor(ctx) {
+  const { majorName, courseDiscipline, courseNumber } = ctx.req.param();
+
+  await removeCourseFromMajor(majorName, courseDiscipline, courseNumber);
+
+  return ctx.json({ success: "course removed from major" }, 200);
+}
+
+export async function apiGetCoursesForMajor(ctx) {
+  const { majorName } = ctx.req.param();
+
+  const courses = await fetchCoursesForMajor(majorName);
+
+  return ctx.json({ courses: courses }, 200);
 }
