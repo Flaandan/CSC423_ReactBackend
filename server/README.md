@@ -42,7 +42,7 @@ JWT_SECRET= "secret"
 ```
 > When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to update these values in `scripts/init_db.sh` to reflect the changes
 
-Run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test users
+Run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test data
 
 ```bash
 ./scripts/init_db.sh
@@ -73,7 +73,9 @@ To verify the API is running, perform a health check using the following `curl` 
 ```bash
 curl -v http://<your_host>:<your_port>/v1/health
 ```
-> You should receive a 200 OK status and JSON response indicating the API status
+> Replace with the host and port shown after starting the server
+
+> You should receive a `200 OK` status and JSON response indicating the API is available
 
 ### 5. **Access Docker Container**
 
