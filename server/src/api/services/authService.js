@@ -53,8 +53,8 @@ async function getUserCredentials(username) {
     if (!record)
       throw new ServerError(
         `No user found with the username: ${username}`,
-        404,
-        ClientError.NOT_FOUND,
+        401,
+        ClientError.INVALID_CREDENTIALS,
       );
 
     return record;

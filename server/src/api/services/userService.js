@@ -22,15 +22,19 @@ export async function updateUserLastLogin(username) {
 
     if (!record)
       throw new ServerError(
-        `No user found with the username: ${username ?? ""}`,
+        `No user found with the username: ${username}`,
         404,
         ClientError.NOT_FOUND,
       );
 
     return record.last_login;
   } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
     throw new ServerError(
-      `Failed to update last login timestamp for user ${username ?? ""}: ${String(err)}`,
+      `Failed to update last login timestamp for user ${username}: ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );
@@ -82,7 +86,7 @@ export async function fetchUserByUsername(username) {
 
     if (!record)
       throw new ServerError(
-        `No user found with the username: ${username ?? ""}`,
+        `No user found with the username: ${username}`,
         404,
         ClientError.NOT_FOUND,
       );
@@ -105,7 +109,7 @@ export async function fetchUserByUsername(username) {
     }
 
     throw new ServerError(
-      `Failed to fetch details for user ${username ?? ""} : ${String(err)}`,
+      `Failed to fetch details for user ${username} : ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );
@@ -177,7 +181,7 @@ export async function insertUser(user) {
     }
 
     throw new ServerError(
-      `Failed to insert user ${user.username ?? ""}: ${String(err)}`,
+      `Failed to insert user ${user.username}: ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );
@@ -207,13 +211,17 @@ export async function updateUser(user) {
 
     if (!record)
       throw new ServerError(
-        `No user found with the username: ${username ?? ""}`,
+        `No user found with the username: ${username}`,
         404,
         ClientError.NOT_FOUND,
       );
   } catch (err) {
+    if (err instanceof ServerError) {
+      throw err;
+    }
+
     throw new ServerError(
-      `Failed to update user ${user.username ?? ""}: ${String(err)}`,
+      `Failed to update user ${user.username}: ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );
@@ -236,7 +244,7 @@ export async function deleteUser(username) {
 
     if (!record)
       throw new ServerError(
-        `No user found with the username: ${username ?? ""}`,
+        `No user found with the username: ${username}`,
         404,
         ClientError.NOT_FOUND,
       );
@@ -246,7 +254,7 @@ export async function deleteUser(username) {
     }
 
     throw new ServerError(
-      `Failed to delete user ${username ?? ""} : ${String(err)}`,
+      `Failed to delete user ${username} : ${String(err)}`,
       500,
       ClientError.SERVICE_ERROR,
     );

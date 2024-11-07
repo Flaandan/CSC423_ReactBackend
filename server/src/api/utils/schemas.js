@@ -2,6 +2,17 @@ import { z } from "zod";
 
 const allowedRoles = ["STUDENT", "ADMIN", "INSTRUCTOR"];
 
+const semesters = ["FALL", "WINTER", "SPRING", "SUMMER"];
+
+export const createRegistrationPayload = z.object({
+  course_discipline: z.string().min(1).max(10),
+  course_number: z.number().int().positive(),
+  semester_taken: z.string().refine((value) => {
+    return semesters.includes(value);
+  }),
+  year_taken: z.number().int().min(1900).max(2100),
+});
+
 export const logInPayload = z.object({
   username: z.string(),
   password: z.string(),
@@ -33,4 +44,35 @@ export const updateUserPayload = z.object({
     .optional(),
   phone_number: z.string().min(10).max(14).optional(),
   office: z.string().min(1).max(255).optional(),
+});
+
+export const createMajorPayload = z.object({
+  name: z.string().min(1).max(255),
+  description: z.string().min(1).max(255),
+});
+
+export const addUserMajorPayload = z.object({
+  major_name: z.string().min(1).max(255),
+});
+
+export const addMajorCoursePayload = z.object({
+  discipline: z.string().min(1).max(10),
+  course_number: z.number().int().positive(),
+});
+
+export const updateMajorPayload = z.object({
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().min(1).max(255).optional(),
+});
+
+export const createCoursePayload = z.object({
+  discipline: z.string().min(1).max(10),
+  course_number: z.number().int().positive(),
+  description: z.string().min(1).max(255),
+  max_capacity: z.number().int().positive(),
+});
+
+export const updateCoursePayload = z.object({
+  description: z.string().min(1).max(255).optional(),
+  max_capacity: z.number().int().positive().optional(),
 });

@@ -1,13 +1,22 @@
 import { User } from "../models/user.js";
 import { computePasswordHash } from "../services/authService.js";
 import {
+  addMajorToUser,
+  fetchMajorsForUser,
+  removeMajorFromUser,
+} from "../services/userMajorsService.js";
+import {
   deleteUser,
   fetchAllUsers,
   fetchUserByUsername,
   insertUser,
   updateUser,
 } from "../services/userService.js";
-import { createUserPayload, updateUserPayload } from "../utils/schemas.js";
+import {
+  addUserMajorPayload,
+  createUserPayload,
+  updateUserPayload,
+} from "../utils/schemas.js";
 
 export async function apiCreateUser(ctx) {
   const payload = await ctx.req.json();
@@ -25,8 +34,6 @@ export async function apiCreateUser(ctx) {
     .setPhoneNumber(parsedPayload.phone_number)
     .setOffice(parsedPayload.office)
     .build();
-
-  console.log(user.username);
 
   await insertUser(user);
 
@@ -64,27 +71,55 @@ export async function apiUpdateUser(ctx) {
 
   const user = await fetchUserByUsername(username);
 
-  if (payload.first_name) {
-    user.firstName = payload.first_name;
+  if (parsedPayload.first_name) {
+    user.firstName = parsedPayload.first_name;
   }
 
-  if (payload.last_name) {
-    user.lastName = payload.last_name;
+  if (parsedPayload.last_name) {
+    user.lastName = parsedPayload.last_name;
   }
 
-  if (payload.role) {
-    user.role = payload.role;
+  if (parsedPayload.role) {
+    user.role = parsedPayload.role;
   }
 
-  if (payload.phone_number) {
-    user.phoneNumber = payload.phone_number;
+  if (parsedPayload.phone_number) {
+    user.phoneNumber = parsedPayload.phone_number;
   }
 
-  if (payload.office) {
-    user.office = payload.office;
+  if (parsedPayload.office) {
+    user.office = parsedPayload.office;
   }
 
   await updateUser(user);
 
   return ctx.json({ success: "user updated" }, 200);
+}
+
+export async function apiAssignMajorToUser(ctx) {
+  const { username } = ctx.req.param();
+
+  const payload = await ctx.req.json();
+
+  const parsedPayload = addUserMajorPayload.parse(payload);
+
+  await addMajorToUser(username, parsedPayload.major_name);
+
+  return ctx.json({ success: "major assigned to user" }, 200);
+}
+
+export async function apiRemoveMajorFromUser(ctx) {
+  const { username, majorName } = ctx.req.param();
+
+  await removeMajorFromUser(username, majorName);
+
+  return ctx.json({ success: "major removed from user" }, 200);
+}
+
+export async function apiGetMajorsForUser(ctx) {
+  const { username } = ctx.req.param();
+
+  const majors = await fetchMajorsForUser(username);
+
+  return ctx.json({ majors: majors }, 200);
 }

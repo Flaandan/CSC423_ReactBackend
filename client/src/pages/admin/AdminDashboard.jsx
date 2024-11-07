@@ -1,17 +1,22 @@
-import { Dialog, DialogPanel, DialogTitle, Description } from "@headlessui/react";
+import {
+  Description,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ChangePassword from "../../components/changePassword";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
-import ChangePassword from "../../components/changePassword";
+// import ManageMajorsSection from "../../components/manageMajors";
+// import ManageUsersSection from "../../components/manageUsers";
 import "../../styles/webPage.css";
-
-//import ManageMajorSection from "../../components/manageMajors";
-//import ManageUsersSection from "../../components/manageUsers";
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState("dashboard");
 
@@ -57,56 +62,61 @@ const AdminDash = () => {
       <div className="left-column">
         <h1>Admin Dashboard</h1>
 
-        <div classname="manage-major-section">
-          <a href="#majors" onclick={() => setcurrentsection("managemajors")}>
+        <div className="manage-major-section">
+          <button
+            type="button"
+            href="#majors"
+            onClick={() => setCurrentSection("manageMajors")}
+          >
             Manage Majors
-          </a>
+          </button>
         </div>
-        <div classname="manage-users-section">
-          <a href="#users" onclick={() => setcurrentsection("manageusers")}>
+        <div className="manage-users-section">
+          <button
+            type="button"
+            href="#users"
+            onClick={() => setCurrentSection("manageUsers")}
+          >
             Manage Users
-          </a>
+          </button>
         </div>
 
-        {/* Bottom buttons */}
         <div className="bottom-buttons">
           <button onClick={() => setIsPasswordOpen(true)} type="button">
             Change Password
           </button>
-          <button onClick={handleLogout} className="logout-button" type="button">
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+            type="button"
+          >
             Logout
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="main-content">
         <h2>Welcome to Admin Dashboard</h2>
-        {/* Add admin-specific content here */}
-      </div>
-
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          className="dialog-pop"
-        >
-          <div className="dialog-pop-back">
-            <div className="pop-panel">
-              <DialogPanel>
-                <DialogTitle className="font-bold">Change Password</DialogTitle>
-                <Description>This will update your password.</Description>
-                <ChangePassword jwt={jwt} setIsOpen={setIsOpen} />
-              </DialogPanel>
-            </div>
-          </div>
-        </Dialog>
-      </div>
-
-      <div className="main-content">
         {currentSection === "dashboard" && <div>Admin Dash Placeholder</div>}
-        {currentSection === "manageMajors" && <ManageMajorsSection />}
-        {currentSection === "manageUsers" && <ManageUsersSection />}
+        {/* {currentSection === "manageMajors" && <ManageMajorsSection />} */}
+        {/* {currentSection === "manageUsers" && <ManageUsersSection />} */}
       </div>
+
+      <Dialog
+        open={isPasswordOpen}
+        onClose={() => setIsPasswordOpen(false)}
+        className="dialog-pop"
+      >
+        <div className="dialog-pop-back">
+          <div className="pop-panel">
+            <DialogPanel>
+              <DialogTitle className="font-bold">Change Password</DialogTitle>
+              <Description>This will update your password.</Description>
+              <ChangePassword jwt={jwt} setIsOpen={setIsPasswordOpen} />
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };
