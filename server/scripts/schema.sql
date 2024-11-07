@@ -19,7 +19,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE course (
-    discipline VARCHAR(10) NOT NULL,
+    discipline VARCHAR(50) NOT NULL,
     course_number INT NOT NULL,
     description TEXT NOT NULL,
     max_capacity INT NOT NULL,
@@ -63,3 +63,24 @@ CREATE TABLE dropped (
     PRIMARY KEY (registration_id),
     FOREIGN KEY (registration_id) REFERENCES registration(id)
 );
+
+-- For when registration_status is changed to DROPPED
+CREATE OR REPLACE FUNCTION insert_into_dropped() 
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED' THEN
+    INSERT INTO dropped (registration_id)
+    VALUES (NEW.id);
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER after_status_change_to_dropped
+AFTER UPDATE OF status
+ON registration
+FOR EACH ROW
+WHEN (NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED')
+EXECUTE FUNCTION insert_into_dropped();

@@ -8,6 +8,7 @@ import { responseMapper } from "./api/middleware/responseMapper.js";
 import { roleFilter } from "./api/middleware/roleCheckFilter.js";
 import { authRoutes } from "./api/routes/authRoutes.js";
 import { healthRoutes } from "./api/routes/healthRoutes.js";
+import { majorRoutes } from "./api/routes/majorRoutes.js";
 import { userRoutes } from "./api/routes/userRoutes.js";
 import { config } from "./config.js";
 
@@ -47,12 +48,15 @@ function main() {
   // Restricts endpoints to only authorized users (anyone with valid token)
   server.use("/api/v1/auth/change-password", jwtFilter());
   server.use("/api/v1/auth/check", jwtFilter());
+  server.use("/api/v1/majors/*", jwtFilter());
   // -- MIDDLEWARE end
 
   // Routes for server
   healthRoutes(server);
   authRoutes(server);
   userRoutes(server);
+  // TODO: Find out if these endpoints need to be restricted by role
+  majorRoutes(server);
 
   console.table([
     {

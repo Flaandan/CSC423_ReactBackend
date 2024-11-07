@@ -34,3 +34,13 @@ export const updateUserPayload = z.object({
   phone_number: z.string().min(10).max(14).optional(),
   office: z.string().min(1).max(255).optional(),
 });
+
+export const createMajorPayload = z.object({
+  name: z.string().min(1).max(255),
+  description: z.string().min(1).max(255),
+});
+
+export const updateMajorPayload = z.object({
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().min(1).max(255).optional(),
+});

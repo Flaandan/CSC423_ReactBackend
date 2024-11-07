@@ -26,8 +26,6 @@ export async function apiCreateUser(ctx) {
     .setOffice(parsedPayload.office)
     .build();
 
-  console.log(user.username);
-
   await insertUser(user);
 
   return ctx.json({ success: "user created" }, 201);
