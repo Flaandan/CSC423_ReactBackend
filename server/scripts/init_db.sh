@@ -161,7 +161,7 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
     echo ">> seeded $NUM_STUDENTS_ACTUAL students"
     echo ">> seeded $NUM_INSTRUCTORS_ACTUAL instructors"
 
-    echo "Seeding majors..."
+    echo "seeding majors..."
 
     for i in $(seq 1 $NUM_MAJORS); do
         case $i in
@@ -175,7 +175,7 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
             8) major_name="Chemistry"; major_description="The study of substances, their properties, and chemical reactions." ;;
             9) major_name="Mathematics"; major_description="The abstract study of numbers, quantities, and shapes." ;;
             10) major_name="Law"; major_description="The study of legal systems, laws, and their application." ;;
-            *) major_name="UND"; major_description="Exploring various fields to choose a major." ;;
+            *) major_name="Undecided"; major_description="Exploring various fields to choose a major." ;;
         esac
 
         INSERT_QUERY="

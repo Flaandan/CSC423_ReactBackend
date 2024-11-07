@@ -50,7 +50,10 @@ function main() {
   server.use("/api/v1/auth/change-password", jwtFilter());
   server.use("/api/v1/auth/check", jwtFilter());
   server.use("/api/v1/majors/*", jwtFilter());
+<<<<<<< HEAD
   server.use("/api/v1/courses/*", jwtFilter());
+=======
+>>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
   // -- MIDDLEWARE end
 
   // Routes for server
@@ -59,8 +62,11 @@ function main() {
   userRoutes(server);
   // TODO: Find out if these endpoints need to be restricted by role
   majorRoutes(server);
+<<<<<<< HEAD
   // TODO: Find out if these endpoints need to be restricted by role
   courseRoutes(server);
+=======
+>>>>>>> 7ad3c6a (updated init_db script to also seed courses and majors, created routes, controller, and service for major, updated schema)
 
   console.table([
     {
