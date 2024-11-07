@@ -62,6 +62,7 @@ const AdminDash = () => {
       <div className="left-column">
         <h1>Admin Dashboard</h1>
 
+        <div className="main-buttons">
         <div className="manage-major-section">
           <button
             type="button"
@@ -79,6 +80,7 @@ const AdminDash = () => {
           >
             Manage Users
           </button>
+        </div>
         </div>
 
         <div className="bottom-buttons">

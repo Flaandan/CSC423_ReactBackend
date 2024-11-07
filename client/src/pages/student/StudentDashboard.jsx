@@ -151,7 +151,7 @@ const StudentDash = () => {
         <h1>Student Dashboard</h1>
 
         {/* Main buttons */}
-        <div className="button-container">
+        <div className="main-buttons">
           <button onClick={() => setIsAvailableOpen(true)} type="button">
             Register for Classes
           </button>
@@ -160,6 +160,7 @@ const StudentDash = () => {
             View Dropped Courses
           </button>
 
+          
           <button
             onClick={handleChooseMajor}
             className="choose-major-button"
