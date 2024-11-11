@@ -40,9 +40,10 @@ SERVER_PORT= "8080"
 JWT_SECRET= "secret"
 
 ```
-> When changing PGUSER, PGPASSWORD, PGDATABASE, or PGHOST, make sure to update these values in `scripts/init_db.sh` to reflect the changes
 
 Run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test data
+
+> Will only read from `config/local.toml` file by default
 
 ```bash
 ./scripts/init_db.sh
