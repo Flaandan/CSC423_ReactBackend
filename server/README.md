@@ -2,11 +2,11 @@
 
 ## Usage
 
-### 1. **Install Node and Docker**
+### 1. **Prerequisites**
 
-Ensure you have Node.js installed. See [Node.js](https://nodejs.org/en/download/package-manager)
+- Ensure that you have [Node.js](https://nodejs.org/en/download/package-manager) installed
 
-Ensure you have Docker installed. See [Get Docker](https://docs.docker.com/get-started/get-docker/)
+- Ensure that you have [Docker](https://docs.docker.com/get-started/get-docker/) installed
 
 ### 2. **Clone the Repository**
 
@@ -17,7 +17,7 @@ git clone https://github.com/Flaandan/CSC423_ReactBackend.git
 cd CSC423_ReactBackend/server
 ```
 
-### 3. **Run the API**
+### 3. **Create Production Configuration**
 
 If running in production environment, create the `production.toml` file, if not skip this step:
 
@@ -40,22 +40,25 @@ SERVER_PORT= "8080"
 JWT_SECRET= "secret"
 
 ```
+### 4. **Initialize Database**
 
-Run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test data
+If running in development environment, run the `init_db.sh` script to initialize a PostgreSQL database via Docker and optionally seed test data
 
-> Will only read from `config/local.toml` file by default
+> Will only read from `config/development.toml` file
 
 ```bash
 ./scripts/init_db.sh
 ```
 
-Install Dependencies:
+### 5. **Install Dependencies**
 
 ```bash
 npm install
 ```
 
-Start in local environment:
+### 6. **Run the API**
+
+Run this command to start in development environment:
 
 ```bash
 npm run dev
@@ -67,7 +70,7 @@ Or start in production environment:
 npm run prod
 ```
 
-### 4. **Perform a Health Check**
+### 7. **Perform a Health Check**
 
 To verify the API is running, perform a health check using the following `curl` command:
 
@@ -78,16 +81,16 @@ curl -v http://<your_host>:<your_port>/v1/health
 
 > You should receive a `200 OK` status and JSON response indicating the API is available
 
-### 5. **Access Docker Container**
+### 8. **Access Docker Container**
 
-To access the Docker container, enter the following commmand:
+To access the PostgreSQL Docker container, enter the following commmand:
 
 ```bash
 docker exec -it rb-db /bin/bash
 ```
 > Default container name should be `rb-db`
 
-### 6. **Access Database within Docker Container**
+### 9. **Access Database within Docker Container**
 
 ```bash
 psql -U admin -d react_backend

@@ -1,105 +1,116 @@
-CREATE TYPE user_role AS ENUM ('STUDENT', 'ADMIN', 'INSTRUCTOR');
-CREATE TYPE registration_status AS ENUM ('ENROLLED', 'UNENROLLED', 'DROPPED', 'INSTRUCTING');
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TYPE user_role AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
+
+CREATE TYPE course_status AS ENUM ('ACTIVE', 'INACTIVE');
+
+CREATE TYPE registration_status AS ENUM ('ENROLLED', 'UNENROLLED', 'DROPPED');
+
 CREATE TYPE semester AS ENUM ('FALL', 'WINTER', 'SPRING', 'SUMMER');
 
-CREATE TABLE major (
-    name VARCHAR(255) PRIMARY KEY,
-    description TEXT NOT NULL
-);
-
 CREATE TABLE users (
-    username VARCHAR(255) PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL CHECK (length(first_name) > 0),
+    last_name VARCHAR(100) NOT NULL CHECK (length(last_name) > 0),
+    username VARCHAR(25) NOT NULL UNIQUE CHECK (length(username) > 0),
     password_hash TEXT NOT NULL,
-    role user_role NOT NULL DEFAULT 'STUDENT',
-    phone_number VARCHAR(14) NOT NULL,
-    office VARCHAR(255) DEFAULT 'Student Lounge',
-    last_login TIMESTAMPTZ DEFAULT NOW()
+    role user_role DEFAULT 'STUDENT',
+    phone_number VARCHAR(15) NOT NULL CHECK (length(phone_number) > 0),
+    office VARCHAR(100) DEFAULT 'Student Lounge',
+    last_login TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE course (
-    discipline VARCHAR(50) NOT NULL,
-    course_number INT NOT NULL,
-    description TEXT NOT NULL,
-    max_capacity INT NOT NULL,
-    last_updated TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (discipline, course_number)
+CREATE TABLE majors (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE CHECK (length(name) > 0),
+    description VARCHAR(255) NOT NULL CHECK (length(description) > 0),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE courses (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    teacher_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    course_discipline VARCHAR(10) NOT NULL CHECK (length(course_discipline) > 0),
+    course_number INT NOT NULL CHECK (course_number >= 100 AND course_number <= 999),
+    description VARCHAR(255) NOT NULL CHECK (length(description) > 0),
+    max_capacity INT NOT NULL DEFAULT 35 CHECK (max_capacity >= 0 AND max_capacity <= 35),
+    status course_status DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT unique_course UNIQUE (course_discipline, course_number)
 );
 
 CREATE TABLE major_courses (
-    major_name VARCHAR(255),
-    course_discipline VARCHAR(10),
-    course_number INT,
-    last_updated TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (major_name, course_discipline, course_number),
-    FOREIGN KEY (major_name) 
-        REFERENCES major(name) 
-        ON DELETE CASCADE 
-        ON UPDATE CASCADE,  -- If the major name changes, update it in the child table
-    FOREIGN KEY (course_discipline, course_number) 
-        REFERENCES course(discipline, course_number) 
-        ON DELETE CASCADE 
-        ON UPDATE CASCADE   -- If the course discipline/number changes, update it in the child table
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    major_id UUID NOT NULL REFERENCES majors(id) ON DELETE CASCADE,
+    course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT unique_major_course UNIQUE (major_id, course_id)
 );
 
 CREATE TABLE user_majors (
-    username VARCHAR(255),
-    major_name VARCHAR(255),
-    PRIMARY KEY (username, major_name),
-    FOREIGN KEY (username) 
-        REFERENCES users(username) 
-        ON DELETE CASCADE, 
-    FOREIGN KEY (major_name) 
-        REFERENCES major(name) 
-        ON DELETE SET NULL   -- If the major is deleted, set the foreign key to NULL (user may have no major now)
-        ON UPDATE CASCADE    -- If the major name changes, update it in the child table
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    major_id UUID NOT NULL REFERENCES majors(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE registration (
-    id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255),
-    course_discipline VARCHAR(10),
-    course_number INT,
-    status registration_status NOT NULL DEFAULT 'ENROLLED',
+CREATE TABLE registrations (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    status registration_status DEFAULT 'ENROLLED',
     semester_taken semester NOT NULL,
-    year_taken INT NOT NULL,
-    FOREIGN KEY (username) 
-        REFERENCES users(username) 
-        ON DELETE CASCADE,   -- If the user is deleted, remove the registration
-    FOREIGN KEY (course_discipline, course_number) 
-        REFERENCES course(discipline, course_number) 
-        ON DELETE CASCADE   -- If the course is deleted, remove the registration
-        ON UPDATE CASCADE   -- If the course discipline/number changes, update it in the child table
+    year_taken INT NOT NULL CHECK (year_taken >= 2024 AND year_taken <= 2150),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE dropped (
-    registration_id BIGINT,
-    date_dropped TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (registration_id),
-    FOREIGN KEY (registration_id) 
-        REFERENCES registration(id) 
-        ON DELETE CASCADE   -- If a registration is deleted, drop record should also be deleted
-        ON UPDATE CASCADE    -- If the registration ID changes, update it in the child table
-);
+-- CREATE TABLE dropped (
+--     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+--     registration_id UUID NOT NULL REFERENCES registrations(id) ON DELETE CASCADE,
+--     date_dropped TIMESTAMPTZ DEFAULT NOW()
+-- );
+-- 
+-- CREATE OR REPLACE FUNCTION insert_registration_into_dropped() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+-- IF NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED' THEN
+-- INSERT INTO dropped (registration_id)
+-- VALUES (NEW.id);
+--   END IF;
+-- 
+-- RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+-- 
+-- 
+-- CREATE TRIGGER after_status_change_to_dropped
+-- AFTER UPDATE OF status
+-- ON registrations
+-- FOR EACH ROW
+-- WHEN (NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED')
+-- EXECUTE FUNCTION insert_into_dropped();
 
--- For when registration_status is changed to DROPPED, insert registration_id in dropped table
-CREATE OR REPLACE FUNCTION insert_into_dropped() 
+CREATE INDEX idx_user_majors_student_id ON user_majors(student_id);
+
+CREATE INDEX idx_registrations_student_id_course_id ON registrations(student_id, course_id);
+
+CREATE OR REPLACE FUNCTION update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED' THEN
-    INSERT INTO dropped (registration_id)
-    VALUES (NEW.id);
-  END IF;
-
-  RETURN NEW;
+    NEW.updated_at = NOW();
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TRIGGER update_courses_timestamp_before_update
+    BEFORE UPDATE ON courses
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
 
-CREATE TRIGGER after_status_change_to_dropped
-AFTER UPDATE OF status
-ON registration
-FOR EACH ROW
-WHEN (NEW.status = 'DROPPED' AND OLD.status <> 'DROPPED')
-EXECUTE FUNCTION insert_into_dropped();
+CREATE TRIGGER update_registrations_timestamp_before_update
+    BEFORE UPDATE ON registrations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();

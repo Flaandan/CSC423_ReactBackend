@@ -24,7 +24,7 @@ class Config {
     const filePath =
       environment === "production"
         ? "config/production.toml"
-        : "config/local.toml";
+        : "config/development.toml";
 
     const configPath = path.join(process.cwd(), filePath);
 

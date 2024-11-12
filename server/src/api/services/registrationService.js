@@ -23,7 +23,7 @@ export async function registerUserForCourse(
       [username, courseDiscipline, courseNumber, semester, year],
     );
 
-    // TODO: Changing DROPPED registrations to ENROLLED might be removed + ensure all fields are up to date. 
+    // TODO: Changing DROPPED registrations to ENROLLED might be removed + ensure all fields are up to date.
     if (existingRegistration.rows.length > 0) {
       if (existingRegistration.rows[0].status === "DROPPED") {
         await pgPool.query(

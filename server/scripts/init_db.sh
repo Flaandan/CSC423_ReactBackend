@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Create local PostgreSQL database instance using Docker
-
 # set -x
 set -eo pipefail 
 
@@ -10,7 +8,7 @@ if ! [ -x "$(command -v docker)" ]; then
     exit 1
 fi
 
-TOML_FILE="${PWD}/config/local.toml"
+TOML_FILE="${PWD}/config/development.toml"
 
 if [ ! -f "$TOML_FILE" ]; then
     echo >&2 "config file not found: $TOML_FILE"
@@ -61,7 +59,7 @@ docker run \
     --health-interval=1s \
     --health-timeout=5s \
     --health-retries=5 \
-    --publish "${DB_PORT}":5432 \
+    --publish 5432:5432 \
     --detach \
     --name "${CONTAINER_NAME}" \
     postgres:alpine -N 1000 > /dev/null
@@ -74,20 +72,23 @@ until [ \
     sleep 1 
 done
 
-CREATE_QUERY="CREATE USER ${PGUSER} WITH PASSWORD '${PGPASSWORD}';"
-docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}" > /dev/null
+CREATE_QUERY="CREATE USER ${PGUSER} WITH ENCRYPTED PASSWORD '${PGPASSWORD}';"
+docker exec "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
 
 echo "postgres is up on ${PGHOST}:5432 - ready for connections..."
 
 CREATE_DB_QUERY="CREATE DATABASE ${PGDATABASE};"
-docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_DB_QUERY}" > /dev/null
+docker exec "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_DB_QUERY}"
 
 GRANT_SCHEMA_QUERY="GRANT ALL PRIVILEGES ON SCHEMA public TO ${PGUSER};"
-docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -d "${PGDATABASE}" -c "${GRANT_SCHEMA_QUERY}" > /dev/null
+docker exec "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -d "${PGDATABASE}" -c "${GRANT_SCHEMA_QUERY}"
+
+GRANT_CREATE_PRIVILEGES_QUERY="GRANT CREATE ON DATABASE ${PGDATABASE} TO ${PGUSER};"
+docker exec "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -d "${PGDATABASE}" -c "${GRANT_CREATE_PRIVILEGES_QUERY}"
 
 echo "database '${PGDATABASE}' created successfully - inserting tables..."
 
-docker exec -it "${CONTAINER_NAME}" psql -h "${PGHOST}" -U "${PGUSER}" -d "${PGDATABASE}" -f "./scripts/schema.sql" > /dev/null
+docker exec "${CONTAINER_NAME}" psql -h "${PGHOST}" -U "${PGUSER}" -d "${PGDATABASE}" -f "./scripts/schema.sql"
 echo "tables inserted successfully for database: '${PGDATABASE}'"
 
 read -p "do you want to seed test data? (y/n): " SEED_DATA
@@ -97,11 +98,11 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
 
     NUM_ADMINS_EXPECTED=1
     NUM_STUDENTS_EXPECTED=3
-    NUM_INSTRUCTORS_EXPECTED=3
+    NUM_TEACHERS_EXPECTED=3
 
     NUM_ADMINS_ACTUAL=0
     NUM_STUDENTS_ACTUAL=0
-    NUM_INSTRUCTORS_ACTUAL=0
+    NUM_TEACHERS_ACTUAL=0
 
     # Fixed password hash for all users (password123)
     PASSWORD_HASH='$argon2id$v=19$m=65536,t=3,p=1$5/JDguSRQqYWps2/V1ruJA$X33IbsiipHnq+8nqj14aXMx0qUNXGfjiVBPV6dgFE+U'
@@ -119,135 +120,199 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
         echo "${first_name}"
         echo "${last_name}"
 
+        # Username
         random_number=$((RANDOM % 900 + 100))
         echo "${first_name}" | tr '[:upper:]' '[:lower:]' | sed "s/\$/${random_number}/"
     }
 
     for i in $(seq 1 $NUM_ADMINS_EXPECTED); do
-            details=($(generate_details))
-            first_name=${details[0]}
-            last_name=${details[1]}
-            username=${details[2]}
+        details=($(generate_details))
+        first_name=${details[0]}
+        last_name=${details[1]}
+        username=${details[2]}
 
-            INSERT_QUERY="
-                INSERT INTO users (username, first_name, last_name, password_hash, role, phone_number, office)
-                VALUES ('$username', '$first_name', '$last_name', '${PASSWORD_HASH}', 'ADMIN', '555-555-5555', 'Admin Office')
-                ON CONFLICT (username) DO NOTHING;" 2>&1
+        INSERT_QUERY="
+            INSERT INTO users (first_name, last_name, username, password_hash, role, phone_number, office)
+            VALUES ('$first_name', '$last_name', '$username', '${PASSWORD_HASH}', 'ADMIN', '555-555-5555', 'Admin Office')
+            ON CONFLICT (username) DO NOTHING;" 2>&1
 
-            result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
+        result=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 1"* ]]; then
-                let NUM_ADMINS_ACTUAL+=1
-            else
-                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
-                let NUM_ADMINS_ACTUAL+=1
-            fi   
+        let NUM_ADMINS_ACTUAL+=1
     done
 
     for i in $(seq 1 $NUM_STUDENTS_EXPECTED); do
-            details=($(generate_details))
-            first_name=${details[0]}
-            last_name=${details[1]}
-            username=${details[2]}
+        details=($(generate_details))
+        first_name=${details[0]}
+        last_name=${details[1]}
+        username=${details[2]}
 
-            INSERT_QUERY="
-                INSERT INTO users (username, first_name, last_name, password_hash, role, phone_number)
-                VALUES ('$username', '$first_name', '$last_name', '${PASSWORD_HASH}', 'STUDENT', '555-555-5555')
-                ON CONFLICT (username) DO NOTHING;" 2>&1
+        INSERT_QUERY="
+            INSERT INTO users (first_name, last_name, username, password_hash, role, phone_number)
+            VALUES ('$first_name', '$last_name', '$username', '${PASSWORD_HASH}', 'STUDENT', '555-555-5555')
+            ON CONFLICT (username) DO NOTHING;" 2>&1
 
-            result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
+        result=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 1"* ]]; then
-                let NUM_STUDENTS_ACTUAL+=1
-            else
-                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
-                let NUM_STUDENTS_ACTUAL+=1
-            fi   
+        let NUM_STUDENTS_ACTUAL+=1
     done
 
-    for i in $(seq 1 $NUM_INSTRUCTORS_EXPECTED); do
-            details=($(generate_details))
-            first_name=${details[0]}
-            last_name=${details[1]}
-            username=${details[2]}
+    for i in $(seq 1 $NUM_TEACHERS_EXPECTED); do
+        details=($(generate_details))
+        first_name=${details[0]}
+        last_name=${details[1]}
+        username=${details[2]}
 
-            INSERT_QUERY="
-                INSERT INTO users (username, first_name, last_name, password_hash, role, phone_number, office)
-                VALUES ('$username', '$first_name', '$last_name', '${PASSWORD_HASH}', 'INSTRUCTOR', '555-555-5555', 'Instructor Office')
-                ON CONFLICT (username) DO NOTHING;" 2>&1
+        INSERT_QUERY="
+            INSERT INTO users (first_name, last_name, username, password_hash, role, phone_number, office)
+            VALUES ('$first_name', '$last_name', '$username', '${PASSWORD_HASH}', 'TEACHER', '555-555-5555', 'Teacher Office')
+            ON CONFLICT (username) DO NOTHING;" 2>&1
 
-            result=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
+        result=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}")
 
-            if [[ $result == *"INSERT 1"* ]]; then
-                let NUM_INSTRUCTORS_ACTUAL+=1
-            else
-                echo >&2 "duplicate username found: $username. Skipping..." > /dev/null
-                let NUM_INSTRUCTORS_ACTUAL+=1
-            fi   
+        let NUM_TEACHERS_ACTUAL+=1
     done
 
     echo ">> seeded $NUM_ADMINS_ACTUAL admins"
     echo ">> seeded $NUM_STUDENTS_ACTUAL students"
-    echo ">> seeded $NUM_INSTRUCTORS_ACTUAL instructors"
+    echo ">> seeded $NUM_TEACHERS_ACTUAL teachers"
 
-    echo "seeding majors, courses, and major courses..."
+    echo "seeding majors..."
 
-    majors=("Computer Science" "Psychology" "Business Administration")
-    disciplines=("CSC" "PSY" "BA")
+    majors=("Computer Science" "Computer Information Systems" "Business Administration")
+    descriptions=(
+        "Computer Science is the study of computational systems, programming languages, algorithms, and software development. It prepares students to design, develop, and implement software solutions."
+        "Computer Information Systems focuses on the application of technology to solve business problems. It bridges the gap between business and IT, covering areas like systems analysis, database management, and IT project management."
+        "Business Administration is a broad field that teaches students the fundamentals of managing and overseeing business operations. It includes areas like accounting, marketing, human resources, and operations management."
+    )
 
     for i in ${!majors[@]}; do
         major_name="${majors[$i]}"
-        discipline="${disciplines[$i]}"
+        major_description="${descriptions[$i]}"
 
-        # Insert major into the major table
         INSERT_QUERY="
-            INSERT INTO major (name, description)
-            VALUES ('$major_name', 'Description for $major_name')
-            ON CONFLICT (name) DO NOTHING;" 2>&1
+            INSERT INTO majors (name, description)
+            VALUES ('$major_name', '$major_description')
+            ON CONFLICT (name) DO NOTHING;"
 
-        docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}" > /dev/null
+        docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}"
 
-        # Insert 5 courses for each major
-        for j in $(seq 1 5); do
-            course_number=$((100 + j))
-            
-            # Insert course into the course table
+    done
+
+    echo ">> successfully seeded majors"
+
+    echo "seeding courses..."
+
+    disciplines=("CSC" "CIS" "BA")
+
+    course_descriptions=(
+        "Introduction to programming, focusing on algorithms, data structures, and problem-solving techniques."
+        "Focuses on the analysis, design, and implementation of business information systems to support organizational needs."
+        "Covers the fundamentals of business management including operations, strategy, and entrepreneurship."
+    )
+
+    for i in ${!disciplines[@]}; do
+        discipline="${disciplines[$i]}"
+        description="${descriptions[$i]}"
+
+        teacher_id=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM users WHERE role = 'TEACHER' LIMIT 1 OFFSET $(($RANDOM % $NUM_TEACHERS_ACTUAL));")
+
+        # Remove leading or trailing spaces
+        teacher_id=$(echo "$teacher_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        
+        for course_number in $(seq 100 110); do
             INSERT_QUERY="
-                INSERT INTO course (discipline, course_number, description, max_capacity)
-                VALUES ('$discipline', '$course_number', 'Description for $discipline $course_number', 30)
-                ON CONFLICT (discipline, course_number) DO NOTHING;" 2>&1
+                INSERT INTO courses (teacher_id, course_discipline, course_number, description)
+                VALUES ('$teacher_id', '$discipline', $course_number, '$description')
+                ON CONFLICT (course_discipline, course_number) DO NOTHING;"
 
-            docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}" > /dev/null
-
-            # Insert into major_courses table, establishing the relationship
-            INSERT_QUERY="
-                INSERT INTO major_courses (major_name, course_discipline, course_number)
-                VALUES ('$major_name', '$discipline', '$course_number')
-                ON CONFLICT (major_name, course_discipline, course_number) DO NOTHING;" 2>&1
-
-            docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}" > /dev/null
+            docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "$INSERT_QUERY"
         done
     done
 
-    echo ">> seeded majors, courses, and major courses"
+    echo ">> successfully seeded courses"
+    
+    echo "seeding major_courses..."
 
-    echo "assigning instructors to majors..."
+    major_info=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id, name FROM majors;")
 
-    for i in $(seq 1 $NUM_INSTRUCTORS_ACTUAL); do
-        username=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT username FROM users WHERE role='INSTRUCTOR' LIMIT 1 OFFSET $((i - 1));" | xargs)
+    echo "$major_info" | while read -r major_id major_name; do
+        # Remove leading or trailing spaces
+        major_id=$(echo "$major_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        major_name=$(echo "$major_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^|*//;s/|*$//')
 
-        username=$(echo "$username" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        if [ -z "$major_id" ] || [ -z "$major_name" ]; then
+            continue
+        fi
 
-        major_name=$(docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT name FROM major ORDER BY RANDOM() LIMIT 1;" | xargs)
-
+        # Remove leading or trailing spaces
         major_name=$(echo "$major_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
-        INSERT_QUERY="INSERT INTO user_majors (username, major_name) VALUES ('$username', '$major_name') ON CONFLICT (username, major_name) DO NOTHING;"
+        case "$major_name" in
+            "Computer Science")
+                discipline="CSC"
+                ;;
+            "Computer Information Systems")
+                discipline="CIS"
+                ;;
+            "Business Administration")
+                discipline="BA"
+                ;;
+            *)
+                echo "Unknown major_name: '$major_name', skipping..."
+                continue
+                ;;
+        esac
 
-        docker exec -it ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "${INSERT_QUERY}" > /dev/null
+        course_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM courses WHERE course_discipline = '$discipline';")
+
+        for course_id in $course_ids; do
+            # Remove leading or trailing spaces
+            course_id=$(echo "$course_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+            if [ -n "$course_id" ]; then
+                INSERT_QUERY="
+                    INSERT INTO major_courses (major_id, course_id)
+                    VALUES ('$major_id', '$course_id')
+                    ON CONFLICT (major_id, course_id) DO NOTHING;"
+
+                docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "$INSERT_QUERY"
+            else
+                echo "error: skipping empty course_id"
+            fi
+        done
     done
 
-    echo ">> assigned instructors to majors"
+    echo ">> successfully seeded major_courses"
+
+    echo "assigning students to majors..."
+
+    student_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM users WHERE role = 'STUDENT';")
+
+    major_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM majors;")
+
+    student_array=($student_ids)
+    major_array=($major_ids)
+
+    for i in $(seq 0 $((${#student_array[@]} - 1))); do
+        student_id="${student_array[$i]}"
+        major_id="${major_array[$i]}"
+
+        # Remove leading or trailing spaces
+        student_id=$(echo "$student_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+        # Remove leading or trailing spaces
+        major_id=$(echo "$major_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+        INSERT_QUERY="
+            INSERT INTO user_majors (student_id, major_id)
+            VALUES ('$student_id', '$major_id');"
+
+        docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "$INSERT_QUERY"
+    done
+
+    echo ">> successfully assigned students to majors"
+
 else
     echo "skipping test data seeding"
 fi
