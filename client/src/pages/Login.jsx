@@ -22,8 +22,6 @@ function LoginPage() {
 
     const response = await apiLogin(username, password);
 
-    console.log(response);
-
     if (response.error) {
       alert(`${response.error}`);
     } else {

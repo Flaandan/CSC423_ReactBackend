@@ -56,5 +56,5 @@ export async function apiCheckToken(jwt) {
     return { error: response.error };
   }
 
-  return { success: response.success };
+  return;
 }

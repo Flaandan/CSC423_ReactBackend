@@ -31,8 +31,20 @@ const TeacherDash = () => {
       if (jwt) {
         const response = await apiCheckToken(jwt);
 
-        if (response.error) {
+        if (response?.error) {
           navigate("/");
+        }
+
+        const decodedRole = decodeJWT(jwt).user_role;
+
+        if (decodedRole !== "TEACHER") {
+          navigate(
+            decodedRole === "STUDENT"
+              ? "/student"
+              : decodedRole === "ADMIN"
+                ? "/admin"
+                : "/",
+          );
         }
       } else {
         navigate("/");
