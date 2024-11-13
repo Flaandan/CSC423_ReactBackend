@@ -1,7 +1,7 @@
 import { jwt } from "hono/jwt";
 import { config } from "../../config.js";
 import { ClientError, ServerError } from "../../error.js";
-import { JWT_ALG } from "../services/jwtService.js";
+import { JWT_ALG } from "../utils/jwt/generate.js";
 
 export function roleFilter(requiredRoles) {
   return async (ctx, next) => {
@@ -12,10 +12,10 @@ export function roleFilter(requiredRoles) {
         secret: config.jwtSecret,
         alg: JWT_ALG,
       })(ctx, async () => {
-        const payload = ctx.get("jwtPayload");
+        const token = ctx.get("jwtPayload");
 
         // Check role found in payload from token
-        if (!requiredRoles.includes(payload.role)) {
+        if (!requiredRoles.includes(token.user_role)) {
           throw new ServerError(
             "Role is not valid for the requested endpoint",
             403,

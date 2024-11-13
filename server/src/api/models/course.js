@@ -1,79 +1,154 @@
+import { courseStatus } from "../utils/validationSchemas.js";
+
 export class Course {
-  #discipline;
-
-  #courseNumber;
-
+  #id;
+  #teacher_id;
+  #course_discipline;
+  #course_number;
   #description;
-
-  #maxCapacity;
-
-  #lastUpdated;
+  #max_capacity;
+  #current_enrollment;
+  #status;
+  #updated_at;
 
   constructor(builder) {
-    this.#discipline = builder.discipline;
-    this.#courseNumber = builder.courseNumber;
+    this.#id = builder.id;
+    this.#teacher_id = builder.teacher_id;
+    this.#course_discipline = builder.course_discipline;
+    this.#course_number = builder.course_number;
     this.#description = builder.description;
-    this.#maxCapacity = builder.maxCapacity;
-    this.#lastUpdated = builder.lastUpdated;
+    this.#max_capacity = builder.max_capacity || 35;
+    this.#current_enrollment = builder.current_enrollment || 0;
+    this.#status = builder.status || "ACTIVE";
+    this.#updated_at = builder.updated_at;
   }
 
-  get discipline() {
-    return this.#discipline;
+  get id() {
+    return this.#id;
   }
 
-  get courseNumber() {
-    return this.#courseNumber;
+  get teacher_id() {
+    return this.#teacher_id;
+  }
+
+  get course_discipline() {
+    return this.#course_discipline;
+  }
+
+  get course_number() {
+    return this.#course_number;
   }
 
   get description() {
     return this.#description;
   }
 
-  get maxCapacity() {
-    return this.#maxCapacity;
+  get max_capacity() {
+    return this.#max_capacity;
   }
 
-  get lastUpdated() {
-    return this.#lastUpdated;
+  get current_enrollment() {
+    return this.#current_enrollment;
   }
 
-  set discipline(value) {
-    this.#discipline = value;
+  get status() {
+    return this.#status;
   }
 
-  set courseNumber(value) {
-    this.#courseNumber = value;
+  get updated_at() {
+    return this.#updated_at;
+  }
+
+  set id(value) {
+    this.#id = value;
+  }
+
+  set teacher_id(value) {
+    this.#teacher_id = value;
+  }
+
+  set course_discipline(value) {
+    this.#course_discipline = value;
+  }
+
+  set course_number(value) {
+    this.#course_number = value;
   }
 
   set description(value) {
     this.#description = value;
   }
 
-  set maxCapacity(value) {
-    this.#maxCapacity = value;
+  set max_capacity(value) {
+    this.#max_capacity = value;
   }
 
-  set lastUpdated(value) {
-    this.#lastUpdated = value;
+  set current_enrollment(value) {
+    if (value < 0) {
+      throw new Error("Current enrollment cannot be negative");
+    }
+    if (value > this.#max_capacity) {
+      throw new Error("Current enrollment cannot exceed max capacity");
+    }
+    this.#current_enrollment = value;
+  }
+
+  set status(value) {
+    if (courseStatus.includes(value)) {
+      this.#status = value;
+    } else {
+      throw new Error("Invalid status. Must be either 'ACTIVE' or 'INACTIVE'");
+    }
+  }
+
+  set updated_at(value) {
+    this.#updated_at = value;
+  }
+
+  toCourseDTO() {
+    return {
+      id: this.#id,
+      teacher_id: this.#teacher_id,
+      course_discipline: this.#course_discipline,
+      course_number: this.#course_number,
+      description: this.#description,
+      max_capacity: this.#max_capacity,
+      current_enrollment: this.#current_enrollment,
+      status: this.#status,
+    };
   }
 
   static get builder() {
     class CourseBuilder {
       constructor() {
-        this.discipline = "";
-        this.courseNumber = null;
+        this.id = "";
+        this.teacher_id = "";
+        this.course_discipline = "";
+        this.course_number = null;
         this.description = "";
-        this.maxCapacity = null;
-        this.lastUpdated = null;
+        this.max_capacity = 35;
+        this.current_enrollment = 0;
+        this.status = "ACTIVE";
+        this.updated_at = "";
       }
 
-      setDiscipline(discipline) {
-        this.discipline = discipline;
+      setId(id) {
+        this.id = id;
         return this;
       }
 
-      setCourseNumber(courseNumber) {
-        this.courseNumber = courseNumber;
+      setTeacherId(teacher_id) {
+        this.teacher_id = teacher_id;
+        return this;
+      }
+
+      setCourseDiscipline(course_discipline) {
+        this.course_discipline = course_discipline;
+        return this;
+      }
+
+      setCourseNumber(course_number) {
+        this.course_number = course_number;
         return this;
       }
 
@@ -82,25 +157,42 @@ export class Course {
         return this;
       }
 
-      setMaxCapacity(maxCapacity) {
-        this.maxCapacity = maxCapacity;
+      setMaxCapacity(max_capacity) {
+        this.max_capacity = max_capacity;
         return this;
       }
 
-      setLastUpdated(lastUpdated) {
-        this.lastUpdated = lastUpdated;
+      setCurrentEnrollment(current_enrollment) {
+        this.current_enrollment = current_enrollment;
+        return this;
+      }
+
+      setStatus(status) {
+        if (courseStatus.includes(status)) {
+          this.status = status;
+        } else {
+          throw new Error(
+            "Invalid status. Must be either 'ACTIVE' or 'INACTIVE'",
+          );
+        }
+        return this;
+      }
+
+      setUpdatedAt(updated_at) {
+        this.updated_at = updated_at;
         return this;
       }
 
       build() {
         if (
-          !this.discipline ||
-          !this.courseNumber ||
+          !this.teacher_id ||
+          !this.course_discipline ||
+          !this.course_number ||
           !this.description ||
-          !this.maxCapacity
+          this.max_capacity == null
         ) {
           throw new Error(
-            "discipline, courseNumber, description, and maxCapacity are required",
+            "teacher_id, course_discipline, course_number, description, and max_capacity are required",
           );
         }
 

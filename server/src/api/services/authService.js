@@ -1,102 +1,69 @@
 import argon2 from "argon2";
-import { pgPool } from "../../db.js";
-import { ClientError, ServerError } from "../../error.js";
-import { User } from "../models/user.js";
-import { formatDate } from "../utils/formatDate.js";
-import { updateUserLastLogin } from "./userService.js";
+import { ServerError } from "../../error.js";
+import { fetchUserCredentialsDB } from "../repositories/authRepository.js";
+import { updateUserLastLoginDB } from "../repositories/userRepository.js";
 
-export async function validateCredentials(payload) {
-  const userDetails = await getUserCredentials(payload.username);
+export async function validateCredentialsService(credentials) {
+  // userDetails include id, username, and password_hash
+  const userDetails = await fetchUserCredentialsDB(credentials.username);
 
   if (!userDetails) {
-    // If the username was not found
     throw new ServerError(
-      `Failed to find user associated with username: ${payload.username}`,
+      `Failed to find user associated with username: ${credentials.username}`,
       401,
-      ClientError.INVALID_CREDENTIALS,
+      "INVALID_CREDENTIALS",
     );
   }
 
-  const isVerified = await verifyPasswordHash(
+  const isVerified = await verifyPasswordHashService(
     userDetails.password_hash,
-    payload.password.trim(),
+    credentials.password.trim(),
   );
 
   if (!isVerified) {
-    // If the username exists but the password is incorrect
     throw new ServerError(
-      `Failed to verify password for user: ${payload.username}`,
+      `Failed to verify password for user: ${userDetails.username}`,
       401,
-      ClientError.INVALID_CREDENTIALS,
+      "INVALID_CREDENTIALS",
     );
   }
 
-  await updateUserLastLogin(userDetails.username);
+  const updated = await updateUserLastLoginDB(userDetails.id);
 
-  return userDetails.username;
-}
-
-async function getUserCredentials(username) {
-  try {
-    const row = await pgPool.query(
-      `
-        SELECT username, password_hash
-        FROM users
-        WHERE username = $1
-      `,
-      [username],
-    );
-
-    // Null if user not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record)
-      throw new ServerError(
-        `No user found with the username: ${username}`,
-        401,
-        ClientError.INVALID_CREDENTIALS,
-      );
-
-    return record;
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!updated) {
     throw new ServerError(
-      `Failed to fetch credentials for user ${username} : ${String(err)}`,
+      `BUG: Failed to find user associated with username: ${credentials.username} when updating last login`,
       500,
-      ClientError.SERVICE_ERROR,
+      "SERVICE_ERROR",
     );
   }
+
+  return userDetails;
 }
 
-async function verifyPasswordHash(expectedPasswordHash, passwordCandidate) {
+async function verifyPasswordHashService(
+  expectedPasswordHash,
+  passwordCandidate,
+) {
   try {
-    const isVerified = await argon2.verify(
-      expectedPasswordHash,
-      passwordCandidate,
-    );
-    return isVerified;
+    return await argon2.verify(expectedPasswordHash, passwordCandidate);
   } catch (err) {
     throw new ServerError(
       `Failed to verify against password hash: ${String(err)}`,
       500,
-      ClientError.SERVICE_ERROR,
+      "SERVICE_ERROR",
     );
   }
 }
 
-export async function computePasswordHash(password) {
+export async function computePasswordHashService(password) {
   try {
-    const hashedPassword = await argon2.hash(password, {
+    return await argon2.hash(password, {
       type: argon2.argon2id,
-      memoryCost: 2 ** 16, // (65536 KiB)
-      timeCost: 3, // (number of iterations)
-      parallelism: 1, // (parallel execution threads)
+      memoryCost: 2 ** 16,
+      timeCost: 3,
+      parallelism: 1,
     });
-
-    return hashedPassword;
   } catch (err) {
     throw new ServerError(
       `Failed to compute password hash: ${String(err)}`,

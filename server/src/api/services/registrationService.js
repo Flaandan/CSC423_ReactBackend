@@ -1,183 +1,92 @@
-import pg from "pg";
-import { pgPool } from "../../db.js";
-import { ClientError, ServerError } from "../../error.js";
+import { ServerError } from "../../error.js";
+import {
+  fetchRegistrationsForUserDB,
+  insertRegistrationForUserDB,
+  updateRegistrationStatusForUserDB,
+} from "../repositories/registrationRepository.js";
 
-export async function registerUserForCourse(
-  username,
-  courseDiscipline,
-  courseNumber,
-  semester,
-  year,
+export async function registerUserForCourseService(
+  studentId,
+  courseId,
+  semesterTaken,
+  yearTaken,
+  token,
 ) {
-  try {
-    const existingRegistration = await pgPool.query(
-      `
-      SELECT status
-      FROM registration
-      WHERE username = $1 
-      AND course_discipline = $2
-      AND course_number = $3
-      AND semester_taken = $4
-      AND year_taken = $5
-      `,
-      [username, courseDiscipline, courseNumber, semester, year],
-    );
-
-    // TODO: Changing DROPPED registrations to ENROLLED might be removed
-    if (existingRegistration.rows.length > 0) {
-      if (existingRegistration.rows[0].status === "DROPPED") {
-        await pgPool.query(
-          `
-          UPDATE registration
-          SET status = 'ENROLLED'
-          WHERE username = $1 AND course_discipline = $2 AND course_number = $3
-          RETURNING id
-          `,
-          [username, courseDiscipline, courseNumber],
-        );
-        return;
-      }
-
+  if (token.user_role === "STUDENT") {
+    if (token.user_id !== studentId) {
       throw new ServerError(
-        `User ${username} is already registered for ${courseDiscipline} ${courseNumber} in ${semester} ${year}`,
-        400,
-        ClientError.CONFLICT,
+        `Student with ID ${token.user_id} attempted to register student with ID ${studentId} to course ${courseId}`,
+        403,
+        "INVALID_ROLE",
       );
     }
+  }
 
-    await pgPool.query(
-      `
-      INSERT INTO registration (username, course_discipline, course_number, status, semester_taken, year_taken)
-      VALUES ($1, $2, $3, 'ENROLLED', $4, $5)
-      `,
-      [username, courseDiscipline, courseNumber, semester, year],
-    );
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
+  const registration = await insertRegistrationForUserDB(
+    studentId,
+    courseId,
+    semesterTaken,
+    yearTaken,
+  );
 
-    if (err instanceof pg.DatabaseError) {
-      if (err.code === "23503") {
-        if (err.detail.includes("username")) {
-          // Foreign key violation due to invalid username
-          throw new ServerError(
-            `User ${username} does not exist`,
-            404,
-            ClientError.NOT_FOUND,
-          );
-        }
-        if (
-          err.detail.includes("course_discipline") ||
-          err.detail.includes("course_number")
-        ) {
-          // Foreign key violation due to invalid course
-          throw new ServerError(
-            `Course ${courseDiscipline} ${courseNumber} does not exist`,
-            404,
-            ClientError.NOT_FOUND,
-          );
-        }
-      }
-    }
-
+  if (registration === null) {
     throw new ServerError(
-      `Failed to register user ${username} for course ${courseDiscipline} ${courseNumber}: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `User with ID ${studentId} is already registered for the course or has an invalid registration status`,
+      400,
+      "User is already registered for this course",
     );
   }
 }
 
-export async function unregisterUserFromCourse(
-  username,
-  courseDiscipline,
-  courseNumber,
+export async function changeUserRegistrationStatusService(
+  studentId,
+  courseId,
+  token,
 ) {
-  try {
-    const row = await pgPool.query(
-      `
-      UPDATE registration
-      SET status = 'DROPPED'
-      WHERE username = $1 AND course_discipline = $2 AND course_number = $3
-      RETURNING id
-      `,
-      [username, courseDiscipline, courseNumber],
-    );
-
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
+  if (token.user_role === "STUDENT") {
+    if (token.user_id !== studentId) {
       throw new ServerError(
-        `No registration found for user ${username} in course ${courseDiscipline} ${courseNumber}`,
-        404,
-        ClientError.NOT_FOUND,
+        `Student with ID ${token.user_id} attempted to unregister student with ID ${studentId} from course ${courseId}`,
+        403,
+        "INVALID_ROLE",
       );
     }
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
+  }
 
-    if (err instanceof pg.DatabaseError) {
-      if (err.code === "23505") {
-        // Duplicate key violation
-        throw new ServerError(
-          `${username} has already dropped the course ${courseDiscipline} ${courseNumber}`,
-          409,
-          ClientError.CONFLICT,
-        );
-      }
-    }
+  const updatedRegistration = await updateRegistrationStatusForUserDB(
+    studentId,
+    courseId,
+  );
 
+  if (!updatedRegistration) {
     throw new ServerError(
-      `Failed to unregister user ${username} from course ${courseDiscipline} ${courseNumber}: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Failed to update registration status for student with ID ${studentId}`,
+      400,
+      "User is not registered for this course",
     );
   }
 }
 
-export async function fetchRegistrationsForUser(username) {
-  try {
-    const row = await pgPool.query(
-      `
-        SELECT username
-        FROM users
-        WHERE username = $1
-    `,
-      [username],
-    );
-
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
+export async function getAllRegistrationsForUserService(studentId, token) {
+  if (token.user_role === "STUDENT") {
+    if (token.user_id !== studentId) {
       throw new ServerError(
-        `User ${username} does not exist`,
-        404,
-        ClientError.NOT_FOUND,
+        `Student with ID ${token.user_id} attempted to get registrations of student with ID ${studentId}`,
+        403,
+        "INVALID_ROLE",
       );
     }
+  }
 
-    const rows = await pgPool.query(
-      `
-      SELECT r.course_discipline, r.course_number, r.status, r.semester_taken, r.year_taken
-      FROM registration r
-      WHERE r.username = $1
-      `,
-      [username],
-    );
+  const registrations = await fetchRegistrationsForUserDB(studentId);
 
-    return rows.rows;
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!registrations) {
     throw new ServerError(
-      `Failed to fetch registrations for user ${username}: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Failed to fetch registrations for student with ID ${studentId}`,
+      404,
+      "User could not be found",
     );
   }
+
+  return registrations;
 }

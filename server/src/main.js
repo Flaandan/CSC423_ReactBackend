@@ -13,6 +13,7 @@ import { majorRoutes } from "./api/routes/majorRoutes.js";
 import { userRoutes } from "./api/routes/userRoutes.js";
 import { config } from "./config.js";
 
+// TODO: Double check ServerError status codes
 function main() {
   const port = config.serverPort;
   const host = config.serverHost;
@@ -23,7 +24,7 @@ function main() {
   // ELSE THEY WILL NOT BE APPLIED TO THE ROUTES
 
   // -- MIDDLEWARE start
-  // Modify responses before they are sent to the client
+  // Modify responses errors before they are sent to the client
   responseMapper(server);
 
   // Compress response body
@@ -32,34 +33,27 @@ function main() {
   // Simple logger provided by Hono
   server.use(logger());
 
-  // CORS for all endpoints
+  // CORS configuration for all endpoints
   server.use(
     "*",
     cors({
       origin: "http://localhost:5173",
       allowHeaders: ["Accept", "Authorization", "Content-Type"],
-      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      maxAge: 600,
+      allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+      maxAge: 600, // Cache preflight responses for 600 seconds (10 minutes)
     }),
+    // ^ A preflight request is an OPTIONS request sent by the browser to the server to check
+    // if cross-origin requests with specific methods or headers are allowed.
+    // The server responds with the allowed methods, headers, and cache time for the preflight
+    // response to determine if the actual request can proceed
   );
-
-  // Restricts all users endpoints to only ADMIN users
-  server.use("/api/v1/users/*", roleFilter(["ADMIN"]));
-
-  // Restricts endpoints to only authorized users (anyone with valid token)
-  server.use("/api/v1/auth/change-password", jwtFilter());
-  server.use("/api/v1/auth/check", jwtFilter());
-  server.use("/api/v1/majors/*", jwtFilter());
-  server.use("/api/v1/courses/*", jwtFilter());
   // -- MIDDLEWARE end
 
   // Routes for server
   healthRoutes(server);
   authRoutes(server);
   userRoutes(server);
-  // TODO: Find out if these endpoints need to be restricted by role
   majorRoutes(server);
-  // TODO: Find out if these endpoints need to be restricted by role
   courseRoutes(server);
 
   console.table([

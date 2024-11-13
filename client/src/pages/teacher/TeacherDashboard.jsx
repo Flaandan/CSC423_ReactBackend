@@ -5,11 +5,14 @@ import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import ChangePassword from "../../components/changePassword";
+import ViewCourses from "../../components/ViewCourses";
+import CourseManagement from "../../components/CourseManagement";
 import "../../styles/webPage.css";
 
 const TeacherDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [activeComponent, setActiveComponent] = useState("home"); // Track active view
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -45,6 +48,18 @@ const TeacherDash = () => {
     checkToken();
   }, [jwt, navigate]);
 
+  // Render different content based on the activeComponent state
+  const renderActiveComponent = () => {
+    switch (activeComponent) {
+      case "viewCourses":
+        return <ViewCourses />;
+      case "courseManagement":
+        return <CourseManagement />;
+      default:
+        return <h2>Welcome to Teacher Dashboard</h2>;
+    }
+  };
+
   return (
     <div className="dashboard-container">
       {/* Left Column */}
@@ -53,13 +68,10 @@ const TeacherDash = () => {
         
         {/* Main buttons */}
         <div className="main-buttons">
-          <button type="button">
+          <button type="button" onClick={() => setActiveComponent("viewCourses")}>
             View My Courses
           </button>
-          <button type="button">
-            Grade Students
-          </button>
-          <button type="button">
+          <button type="button" onClick={() => setActiveComponent("courseManagement")}>
             Course Management
           </button>
         </div>
@@ -77,8 +89,7 @@ const TeacherDash = () => {
 
       {/* Main Content */}
       <div className="main-content">
-        <h2>Welcome to Teacher Dashboard</h2>
-        {/* Add teacher-specific content here */}
+        {renderActiveComponent()}
       </div>
 
       {/* Change Password Dialog */}

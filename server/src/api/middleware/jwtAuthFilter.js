@@ -1,7 +1,7 @@
 import { jwt } from "hono/jwt";
 import { config } from "../../config.js";
 import { ClientError, ServerError } from "../../error.js";
-import { JWT_ALG } from "../services/jwtService.js";
+import { JWT_ALG } from "../utils/jwt/generate.js";
 
 export function jwtFilter() {
   return async (ctx, next) => {

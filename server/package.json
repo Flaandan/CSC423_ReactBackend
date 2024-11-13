@@ -2,7 +2,6 @@
   "name": "react_backend_api",
   "version": "1.0.0",
   "main": "src/main.js",
-  "author": "",
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development node --watch src/main.js",

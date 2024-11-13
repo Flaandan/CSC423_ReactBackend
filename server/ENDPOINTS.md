@@ -1,38 +1,46 @@
 # API Endpoints
 
 ## Table of Contents
-1. [Authentication](#authentication)
+1. [Health Check](#health-check)
+    - [GET /api/v1/health](#get-apiv1health)
+2. [Authentication](#authentication)
     - [POST /api/v1/auth/login](#post-apiv1authlogin)
     - [GET /api/v1/auth/check](#get-apiv1authcheck)
-    - [POST /api/v1/auth/change-password](#post-apiv1authchangepassword)
-2. [Courses](#courses)
+    - [POST /api/v1/auth/change-password](#post-apiv1authchange-password)
+3. [Courses](#courses)
     - [GET /api/v1/courses](#get-apiv1courses)
-    - [POST /api/v1/courses](#post-apiv1courses)
-    - [GET /api/v1/courses/:courseDiscipline/:courseNumber](#get-apiv1coursescoursedisciplinecourseNumber)
-    - [PATCH /api/v1/courses/:courseDiscipline/:courseNumber](#patch-apiv1coursescoursedisciplinecourseNumber)
-    - [DELETE /api/v1/courses/:courseDiscipline/:courseNumber](#delete-apiv1coursescoursedisciplinecourseNumber)
-    - [GET /api/v1/courses/:courseDiscipline/:courseNumber/users](#get-apiv1coursescoursedisciplinecourseNumberusers)
-3. [Majors](#majors)
+    - [POST /api/v1/courses/majors/:majorId](#post-apiv1coursesmajorsmajorid)
+    - [GET /api/v1/courses/:courseId](#get-apiv1coursescourseid)
+    - [PATCH /api/v1/courses/:courseId](#patch-apiv1coursescourseid)
+    - [DELETE /api/v1/courses/:courseId](#delete-apiv1coursescourseid)
+    - [GET /api/v1/courses/:courseId/users](#get-apiv1coursescourseidusers)
+4. [Majors](#majors)
     - [GET /api/v1/majors](#get-apiv1majors)
     - [POST /api/v1/majors](#post-apiv1majors)
-    - [GET /api/v1/majors/:majorName](#get-apiv1majorsmajorName)
-    - [PATCH /api/v1/majors/:majorName](#patch-apiv1majorsmajorName)
-    - [DELETE /api/v1/majors/:majorName](#delete-apiv1majorsmajorName)
-    - [POST /api/v1/majors/:majorName/courses](#post-apiv1majorsmajorNamecourses)
-    - [DELETE /api/v1/majors/:majorName/courses/:courseDiscipline/:courseNumber](#delete-apiv1majorsmajorNamecoursescourseDisciplinecourseNumber)
-    - [GET /api/v1/majors/:majorName/courses](#get-apiv1majorsmajorNamecourses)
-4. [Users](#users)
+    - [GET /api/v1/majors/:majorId](#get-apiv1majorsmajorid)
+    - [PATCH /api/v1/majors/:majorId](#patch-apiv1majorsmajorid)
+    - [DELETE /api/v1/majors/:majorId](#delete-apiv1majorsmajorid)
+    - [POST /api/v1/majors/:majorId/courses/:courseId](#post-apiv1majorsmajoridcoursescourseid)
+    - [DELETE /api/v1/majors/:majorId/courses/:courseId](#delete-apiv1majorsmajoridcoursescourseid)
+    - [GET /api/v1/majors/:majorId/courses](#get-apiv1majorsmajoridcourses)
+5. [Users](#users)
     - [GET /api/v1/users](#get-apiv1users)
     - [POST /api/v1/users](#post-apiv1users)
-    - [GET /api/v1/users/:username](#get-apiv1usersusername)
-    - [PATCH /api/v1/users/:username](#patch-apiv1usersusername)
-    - [DELETE /api/v1/users/:username](#delete-apiv1usersusername)
----
+    - [GET /api/v1/users/:userId](#get-apiv1usersuserid)
+    - [PATCH /api/v1/users/:userId](#patch-apiv1usersuserid)
+    - [DELETE /api/v1/users/:userId](#delete-apiv1usersuserid)
 
-## Authentication <a name="authentication"></a>
 
-### `POST /api/v1/auth/login` <a name="post-apiv1authlogin"></a>
-- **Description**: Log in with username and password
+## Health Check
+
+### `GET /api/v1/health`
+- **Description**: Get the availability status of the API
+
+## Authentication
+
+### `POST /api/v1/auth/login`
+- **Description**: Login with username and password
+
 - **Request Body**:
   ```json 
   {
@@ -41,11 +49,12 @@
   }
   ```
 
-### `GET /api/v1/auth/check` <a name="get-apiv1authcheck"></a>
-- **Description**: Check the validity of the provided JWT token through Authorization Header
+### `GET /api/v1/auth/check`
+- **Description**: Check the validity of JWT token provided through Authorization Header
 
-### `POST /api/v1/auth/change-password` <a name="post-apiv1authchangepassword"></a>
+### `POST /api/v1/auth/change-password`
 - **Description**: Change the password of the logged-in user
+
 - **Request Body**:
   ```json
   {  
@@ -54,65 +63,71 @@
   }
   ```
 
----
+## Courses
 
-## Courses <a name="courses"></a>
-
-### `GET /api/v1/courses` <a name="get-apiv1courses"></a>
+### `GET /api/v1/courses`
 - **Description**: Get a list of all courses
 
-### `POST /api/v1/courses` <a name="post-apiv1courses"></a>
-- **Description**: Create a new course
+### `POST /api/v1/courses/majors/:majorId`
+- **Description**: Create a new course for given major
+
+- **Path Parameters**:  
+  - `majorId`
+
 - **Request Body**:
   ```json
   {
-    "discipline": "CIS",
+    "course_discipline": "CIS",
     "course_number": 442,
     "description": "test description",
     "max_capacity": 10
   }
   ```
 
-### `GET /api/v1/courses/:courseDiscipline/:courseNumber` <a name="get-apiv1coursescoursedisciplinecourseNumber"></a>
-- **Description**: Get details of a specific course by discipline and course number
-- **Path Parameters**:  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101
+### `GET /api/v1/courses/:courseId`
+- **Description**: Get details of a specific course using course's ID
 
-### `PATCH /api/v1/courses/:courseDiscipline/:courseNumber` <a name="patch-apiv1coursescoursedisciplinecourseNumber"></a>
-- **Description**: Update the details of a specific course
 - **Path Parameters**:  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101  
+  - `courseId`
+
+### `PATCH /api/v1/courses/:courseId`
+- **Description**: Update the details of a specific course using course's ID
+
+- **Path Parameters**:  
+  - `courseId`
+
 - **Request Body**:
   ```json 
   {  
+    "course_discipline": "CIS", (optional)
+    "course_number": 442, (optional)
     "description": "Updated Intro to Computer Science", (optional)
-    "max_capacity": 150 (optional)
+    "max_capacity": 150, (optional)
+    "status": "ACTIVE" (optional)  
   }
   ```
 
-### `DELETE /api/v1/courses/:courseDiscipline/:courseNumber` <a name="delete-apiv1coursescoursedisciplinecourseNumber"></a>
-- **Description**: Delete a specific course
+### `DELETE /api/v1/courses/:courseId`
+- **Description**: Delete a specific course using course's ID
+
 - **Path Parameters**:  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101
+  - `courseId`
 
-### `GET /api/v1/courses/:courseDiscipline/:courseNumber/users` <a name="get-apiv1coursescoursedisciplinecourseNumberusers"></a>
-- **Description**: Get a list of users registered for a specific course
+### `GET /api/v1/courses/:courseId/users`
+- **Description**: Get a list of users in a specific course using course's ID
+
 - **Path Parameters**:  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101
+  - `courseId`
 
----
 
-## Majors <a name="majors"></a>
+## Majors
 
-### `GET /api/v1/majors` <a name="get-apiv1majors"></a>
+### `GET /api/v1/majors`
 - **Description**: Get a list of all majors
 
-### `POST /api/v1/majors` <a name="post-apiv1majors"></a>
+### `POST /api/v1/majors`
 - **Description**: Create a new major
+
 - **Request Body**:
   ```json
   {  
@@ -121,15 +136,18 @@
   }
   ```
 
-### `GET /api/v1/majors/:majorName` <a name="get-apiv1majorsmajorName"></a>
-- **Description**: Get details of a specific major by name
-- **Path Parameters**:  
-  - `majorName`: "Computer Science"
+### `GET /api/v1/majors/:majorId`
+- **Description**: Get details of a specific major using major's ID
 
-### `PATCH /api/v1/majors/:majorName` <a name="patch-apiv1majorsmajorName"></a>
-- **Description**: Update the details of a specific major
 - **Path Parameters**:  
-  - `majorName`: "Computer Science"  
+  - `majorId`
+
+### `PATCH /api/v1/majors/:majorId`
+- **Description**: Update the details of a specific major using major's ID
+
+- **Path Parameters**:  
+  - `majorId`
+
 - **Request Body**:
   ```json
   {  
@@ -138,50 +156,47 @@
   }
   ```
 
-### `DELETE /api/v1/majors/:majorName` <a name="delete-apiv1majorsmajorName"></a>
-- **Description**: Delete a specific major
-- **Path Parameters**:  
-  - `majorName`: "Computer%20Science"
+### `DELETE /api/v1/majors/:majorId`
+- **Description**: Delete a specific major using major's ID
 
-### `POST /api/v1/majors/:majorName/courses` <a name="post-apiv1majorsmajorNamecourses"></a>
-- **Description**: Add a course to a major
+- **Path Parameters**:  
+  - `majorId`
+
+### `POST /api/v1/majors/:majorId/courses/:courseId`
+- **Description**: Add a course to a major using major's ID and course's ID
+
 - **Path Parameters**:
-  - `majorName`: "Computer Science"  
-- **Request Body**:
-  ```json
-  {  
-    "discipline": "CS",  
-    "course_number": 101  
-  }
-  ```
+  - `majorId`
+  - `courseId`
 
-### `DELETE /api/v1/majors/:majorName/courses/:courseDiscipline/:courseNumber` <a name="delete-apiv1majorsmajorNamecoursescourseDisciplinecourseNumber"></a>
-- **Description**: Remove a course from a major
+### `DELETE /api/v1/majors/:majorId/courses/:courseId`
+- **Description**: Remove a course from a major using major's ID and course's ID
+
+- **Path Parameters**:
+  - `majorId`
+  - `courseId`
+
+### `GET /api/v1/majors/:majorId/courses`
+- **Description**: Get all courses for a specific major using major's ID
+
 - **Path Parameters**:  
-  - `majorName`: "Computer Science"  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101
+  - `majorId`
 
-### `GET /api/v1/majors/:majorName/courses` <a name="get-apiv1majorsmajorNamecourses"></a>
-- **Description**: Get all courses for a specific major
-- **Path Parameters**:  
-  - `majorName`: "Computer Science"
 
----
+## Users
 
-## Users <a name="users"></a>
-
-### `GET /api/v1/users` <a name="get-apiv1users"></a>
+### `GET /api/v1/users`
 - **Description**: Get a list of all users
 
-### `POST /api/v1/users` <a name="post-apiv1users"></a>
+### `POST /api/v1/users`
 - **Description**: Create a new user
+
 - **Request Body**:
   ```json
   {  
-    "username": "janedoe",  
     "first_name": "Jane",  
     "last_name": "Doe",  
+    "username": "janedoe",  
     "password": "janepassword",  
     "role": "STUDENT",  
     "phone_number": "123-456-7890",
@@ -189,15 +204,18 @@
   }
   ```
 
-### `GET /api/v1/users/:username` <a name="get-apiv1usersusername"></a>
-- **Description**: Get details of a specific user by username
-- **Path Parameters**:  
-  - `username`: "janedoe"
+### `GET /api/v1/users/:userId`
+- **Description**: Get details of a specific user using user's ID
 
-### `PATCH /api/v1/users/:username` <a name="patch-apiv1usersusername"></a>
-- **Description**: Update details of a specific user by username
 - **Path Parameters**:  
-  - `username`: "janedoe"  
+  - `userId`
+
+### `PATCH /api/v1/users/:userId`
+- **Description**: Update details of a specific user using user's ID
+
+- **Path Parameters**:  
+  - `userId`
+
 - **Request Body**:
   ```json 
   {  
@@ -209,62 +227,56 @@
   }
   ```
 
-### `DELETE /api/v1/users/:username` <a name="delete-apiv1usersusername"></a>
-- **Description**: Delete a specific user by username
-- **Path Parameters**:  
-  - `username`: "janedoe"
+### `DELETE /api/v1/users/:userId`
+- **Description**: Delete a specific user using user's ID
 
-### `POST /api/v1/users/:username/majors` <a name="post-apiv1usersusernamemajors"></a>
-- **Description**: Assign a major to a user
 - **Path Parameters**:  
-  - `username`: "janedoe"  
+  - `userId`
+
+### `POST /api/v1/users/:userId/majors/:majorId`
+- **Description**: Assign a major to a user using user's ID and major's ID
+
+- **Path Parameters**:  
+  - `userId`
+  - `majorId`
+
+### `DELETE /api/v1/users/:userId/majors/:majorId`
+- **Description**: Remove a major from a user using user's ID and major's ID
+
+- **Path Parameters**:  
+  - `userId`
+  - `majorId`
+
+### `GET /api/v1/users/:userId/majors`
+- **Description**: Get all majors assigned to a specific user using user's ID
+
+- **Path Parameters**:  
+  - `userId`
+
+### `POST /api/v1/users/:userId/courses/:courseId`
+- **Description**: Register a user for a course using user's ID and course's ID
+
+- **Path Parameters**:  
+  - `userId`
+  - `courseId`
+
 - **Request Body**:
-  ```json
+  ```json 
   {  
-    "major_name": "Computer Science"  
+    "semester_taken": "FALL", (optional)
+    "year_taken": 2024 (optional)
   }
   ```
 
-### `DELETE /api/v1/users/:username/majors/:majorName` <a name="delete-apiv1usersusernamemajorsmajorName"></a>
-- **Description**: Remove a major from a user
+### `DELETE /api/v1/users/:userId/courses/:courseId`
+- **Description**: Drop a user from a course using user's ID and course's ID
+
 - **Path Parameters**:  
-  - `username`: "janedoe"  
-  - `majorName`: "Computer Science"
+  - `userId`
+  - `courseId`
 
-### `GET /api/v1/users/:username/majors` <a name="get-apiv1usersusernamemajors"></a>
-- **Description**: Get all majors assigned to a specific user
+### `GET /api/v1/users/:userId/courses`
+- **Description**: Get all courses a specific user is registered for using user's ID
+
 - **Path Parameters**:  
-  - `username`: "janedoe"
-
-### `POST /api/v1/users/:username/courses` <a name="post-apiv1usersusernamecourses"></a>
-- **Description**: Register a user for a course
-- **Path Parameters**:  
-  - `username`: "janedoe"  
-- **Request Body**:
-  ```json
-  {  
-    "course_discipline": "CS",  
-    "course_number": 101,  
-    "semester_taken": "FALL",  
-    "year_taken": 2024  
-  }
-  ```
-
-### `DELETE /api/v1/users/:username/courses/:courseDiscipline/:courseNumber` <a name="delete-apiv1usersusernamecoursescourseDisciplinecourseNumber"></a>
-- **Description**: Unregister a user from a course
-- **Path Parameters**:  
-  - `username`: "janedoe"  
-  - `courseDiscipline`: "CS"  
-  - `courseNumber`: 101
-
-### `GET /api/v1/users/:username/courses` <a name="get-apiv1usersusernamecourses"></a>
-- **Description**: Get all courses a specific user is registered for
-- **Path Parameters**:  
-  - `username`: "janedoe"
-
----
-
-## Health Check <a name="health-check"></a>
-
-### `GET /api/v1/health` <a name="get-apiv1health"></a>
-- **Description**: Get the health status of the API
+  - `userId`

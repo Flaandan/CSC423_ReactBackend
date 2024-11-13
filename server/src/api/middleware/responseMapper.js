@@ -1,8 +1,7 @@
 import { ZodError } from "zod";
 import { ClientError, ServerError } from "../../error.js";
 
-// Modify responses before they are sent to the client
-// All errors from handlers are propagated here
+// Modify responses before they are sent to the client. All errors should be propagated here
 export function responseMapper(server) {
   server.onError(async (err) => {
     if (err instanceof ServerError) {
@@ -17,10 +16,35 @@ export function responseMapper(server) {
     }
 
     if (err instanceof ZodError) {
-      console.error(`ERROR: ${err.message}`);
+      const errorMessages = err.errors.map((error) => {
+        const path = error.path.join(".");
+
+        if (error.message === "Required") {
+          return `${path} required`;
+        }
+
+        if (error.message.includes("Unrecognized key(s) in object")) {
+          console.error(`Unrecognized field(s) found: ${path}`);
+          return "Invalid fields provided"; // Return a generic message for unrecognized fields
+        }
+
+        return `${error.message}`;
+      });
+
+      console.error("ERROR:", errorMessages[0]);
+
+      const hasRequiredError = err.errors.some(
+        (error) =>
+          error.message === "Required" ||
+          error.message.includes("Unrecognized key(s) in object"),
+      );
 
       return new Response(
-        JSON.stringify({ error: ClientError.INVALID_PAYLOAD }),
+        JSON.stringify({
+          error: hasRequiredError
+            ? ClientError.INVALID_PAYLOAD
+            : errorMessages[0],
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },

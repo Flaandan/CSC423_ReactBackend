@@ -1,125 +1,141 @@
-import { User } from "../models/user.js";
-import { computePasswordHash } from "../services/authService.js";
+import { computePasswordHashService } from "../services/authService.js";
 import {
-  addMajorToUser,
-  fetchMajorsForUser,
-  removeMajorFromUser,
-} from "../services/userMajorsService.js";
+  changeUserRegistrationStatusService,
+  getAllRegistrationsForUserService,
+  registerUserForCourseService,
+} from "../services/registrationService.js";
 import {
-  deleteUser,
-  fetchAllUsers,
-  fetchUserByUsername,
-  insertUser,
-  updateUser,
+  addMajorToUserService,
+  getMajorsForUserService,
+  removeMajorFromUserService,
+} from "../services/userMajorService.js";
+import {
+  createUserService,
+  getAllUsersService,
+  getUserByIdService,
+  removeUserService,
+  updateUserService,
 } from "../services/userService.js";
 import {
-  addUserMajorPayload,
+  createRegistrationPayload,
   createUserPayload,
   updateUserPayload,
-} from "../utils/schemas.js";
+} from "../utils/validationSchemas.js";
 
 export async function apiCreateUser(ctx) {
   const payload = await ctx.req.json();
-
   const parsedPayload = createUserPayload.parse(payload);
 
-  const passwordHash = await computePasswordHash(parsedPayload.password);
+  const passwordHash = await computePasswordHashService(parsedPayload.password);
 
-  const user = new User.builder()
-    .setUsername(parsedPayload.username)
-    .setFirstName(parsedPayload.first_name)
-    .setLastName(parsedPayload.last_name)
-    .setPasswordHash(passwordHash)
-    .setRole(parsedPayload.role)
-    .setPhoneNumber(parsedPayload.phone_number)
-    .setOffice(parsedPayload.office)
-    .build();
+  await createUserService(parsedPayload, passwordHash);
 
-  await insertUser(user);
-
-  return ctx.json({ success: "user created" }, 201);
+  return ctx.json({ success: "user created successfully" }, 201);
 }
 
 export async function apiDeleteUser(ctx) {
-  const username = ctx.req.param("username");
+  const userId = ctx.req.param("userId");
 
-  await deleteUser(username);
+  await removeUserService(userId);
 
-  return ctx.json({ success: "user deleted" }, 200);
+  return ctx.json({ success: "user deleted successfully" }, 200);
 }
 
 export async function apiGetAllUsers(ctx) {
-  const userDTOs = await fetchAllUsers();
+  const userDTOs = await getAllUsersService();
 
   return ctx.json({ users: userDTOs }, 200);
 }
 
-export async function apiGetUserByUsername(ctx) {
-  const username = ctx.req.param("username");
+export async function apiGetUserById(ctx) {
+  const userId = ctx.req.param("userId");
 
-  const userDTO = await fetchUserByUsername(username);
+  const userDTO = await getUserByIdService(userId);
 
   return ctx.json({ user: userDTO }, 200);
 }
 
 export async function apiUpdateUser(ctx) {
-  const username = ctx.req.param("username");
-
+  const userId = ctx.req.param("userId");
   const payload = await ctx.req.json();
-
   const parsedPayload = updateUserPayload.parse(payload);
 
-  const user = await fetchUserByUsername(username);
+  const userDTO = await getUserByIdService(userId);
 
-  if (parsedPayload.first_name) {
-    user.firstName = parsedPayload.first_name;
-  }
+  const userDetails = {
+    id: userId,
+    ...userDTO,
+  };
 
-  if (parsedPayload.last_name) {
-    user.lastName = parsedPayload.last_name;
-  }
+  await updateUserService(userDetails, parsedPayload);
 
-  if (parsedPayload.role) {
-    user.role = parsedPayload.role;
-  }
-
-  if (parsedPayload.phone_number) {
-    user.phoneNumber = parsedPayload.phone_number;
-  }
-
-  if (parsedPayload.office) {
-    user.office = parsedPayload.office;
-  }
-
-  await updateUser(user);
-
-  return ctx.json({ success: "user updated" }, 200);
+  return ctx.json({ success: "user updated successfully" }, 200);
 }
 
 export async function apiAssignMajorToUser(ctx) {
-  const { username } = ctx.req.param();
+  const { userId, majorId } = ctx.req.param();
+  const jwtPayload = ctx.get("jwtPayload");
 
-  const payload = await ctx.req.json();
+  await addMajorToUserService(userId, majorId, jwtPayload);
 
-  const parsedPayload = addUserMajorPayload.parse(payload);
-
-  await addMajorToUser(username, parsedPayload.major_name);
-
-  return ctx.json({ success: "major assigned to user" }, 200);
+  return ctx.json({ success: "major assigned to user successfully" }, 200);
 }
 
 export async function apiRemoveMajorFromUser(ctx) {
-  const { username, majorName } = ctx.req.param();
+  const { userId, majorId } = ctx.req.param();
+  const jwtPayload = ctx.get("jwtPayload");
 
-  await removeMajorFromUser(username, majorName);
+  await removeMajorFromUserService(userId, majorId, jwtPayload);
 
-  return ctx.json({ success: "major removed from user" }, 200);
+  return ctx.json({ success: "major removed from user successfully" }, 200);
 }
 
 export async function apiGetMajorsForUser(ctx) {
-  const { username } = ctx.req.param();
+  const userId = ctx.req.param("userId");
+  const jwtPayload = ctx.get("jwtPayload");
 
-  const majors = await fetchMajorsForUser(username);
+  const majors = await getMajorsForUserService(userId, jwtPayload);
 
   return ctx.json({ majors: majors }, 200);
+}
+
+export async function apiRegisterUserForCourse(ctx) {
+  const { userId, courseId } = ctx.req.param();
+  const payload = await ctx.req.json();
+  const jwtPayload = ctx.get("jwtPayload");
+  const parsedPayload = createRegistrationPayload.parse(payload);
+
+  await registerUserForCourseService(
+    userId,
+    courseId,
+    parsedPayload.semester_taken,
+    parsedPayload.year_taken,
+    jwtPayload,
+  );
+
+  return ctx.json({ success: "user registered for course successfully" }, 201);
+}
+
+export async function apiUnregisterUserFromCourse(ctx) {
+  const { userId, courseId } = ctx.req.param();
+  const jwtPayload = ctx.get("jwtPayload");
+
+  await changeUserRegistrationStatusService(userId, courseId, jwtPayload);
+
+  return ctx.json(
+    { success: "user unregistered from course successfully" },
+    200,
+  );
+}
+
+export async function apiGetRegistrationsForUser(ctx) {
+  const userId = ctx.req.param("userId");
+  const jwtPayload = ctx.get("jwtPayload");
+
+  const registrations = await getAllRegistrationsForUserService(
+    userId,
+    jwtPayload,
+  );
+
+  return ctx.json({ registrations: registrations }, 200);
 }

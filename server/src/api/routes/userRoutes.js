@@ -1,78 +1,101 @@
 import {
-  apiGetRegistrationsForUser,
-  apiRegisterUserForCourse,
-  apiUnregisterUserFromCourse,
-} from "../controllers/registrationController.js";
-import {
   apiAssignMajorToUser,
   apiCreateUser,
   apiDeleteUser,
   apiGetAllUsers,
   apiGetMajorsForUser,
-  apiGetUserByUsername,
+  apiGetRegistrationsForUser,
+  apiGetUserById,
+  apiRegisterUserForCourse,
   apiRemoveMajorFromUser,
+  apiUnregisterUserFromCourse,
   apiUpdateUser,
 } from "../controllers/userController.js";
+import { jwtFilter } from "../middleware/jwtAuthFilter.js";
+import { roleFilter } from "../middleware/roleCheckFilter.js";
 
 export function userRoutes(server) {
-  server.on("GET", "/api/v1/users", async (ctx) => await apiGetAllUsers(ctx));
+  server.on(
+    "GET",
+    "/api/v1/users",
+    roleFilter(["ADMIN"]),
+    async (ctx) => await apiGetAllUsers(ctx),
+  );
 
-  server.on("POST", "/api/v1/users", async (ctx) => await apiCreateUser(ctx));
+  server.on(
+    "POST",
+    "/api/v1/users",
+    roleFilter(["ADMIN"]),
+    async (ctx) => await apiCreateUser(ctx),
+  );
 
   // -----------------------------------------------------------------------
   server.on(
     "GET",
-    "/api/v1/users/:username",
-    async (ctx) => await apiGetUserByUsername(ctx),
+    "/api/v1/users/:userId",
+    roleFilter(["ADMIN"]),
+    async (ctx) => await apiGetUserById(ctx),
   );
 
   server.on(
     "PATCH",
-    "/api/v1/users/:username",
+    "/api/v1/users/:userId",
+    roleFilter(["ADMIN"]),
     async (ctx) => await apiUpdateUser(ctx),
   );
 
   server.on(
     "DELETE",
-    "/api/v1/users/:username",
+    "/api/v1/users/:userId",
+    roleFilter(["ADMIN"]),
     async (ctx) => await apiDeleteUser(ctx),
   );
 
   // -----------------------------------------------------------------------
+  // User id path parameter will be checked against the user id within the user's JWT.
+  // Students will only get to interact with their majors
   server.on(
     "POST",
-    "/api/v1/users/:username/majors",
+    "/api/v1/users/:userId/majors/:majorId",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiAssignMajorToUser(ctx),
   );
 
   server.on(
     "DELETE",
-    "/api/v1/users/:username/majors/:majorName",
+    "/api/v1/users/:userId/majors/:majorId",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiRemoveMajorFromUser(ctx),
   );
 
   server.on(
     "GET",
-    "/api/v1/users/:username/majors",
+    "/api/v1/users/:userId/majors",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiGetMajorsForUser(ctx),
   );
 
   // -----------------------------------------------------------------------
+  // User id path parameter will be checked against the user id within the user's JWT.
+  // Students will only get to interact with their registrations
   server.on(
     "POST",
-    "/api/v1/users/:username/courses",
+    "/api/v1/users/:userId/courses/:courseId",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiRegisterUserForCourse(ctx),
   );
 
   server.on(
     "DELETE",
-    "/api/v1/users/:username/courses/:courseDiscipline/:courseNumber",
+    "/api/v1/users/:userId/courses/:courseId",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiUnregisterUserFromCourse(ctx),
   );
 
   server.on(
     "GET",
-    "/api/v1/users/:username/courses",
+    "/api/v1/users/:userId/courses",
+    roleFilter(["STUDENT", "ADMIN"]),
     async (ctx) => await apiGetRegistrationsForUser(ctx),
   );
 }

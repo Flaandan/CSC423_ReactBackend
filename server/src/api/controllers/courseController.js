@@ -1,85 +1,71 @@
-import { Course } from "../models/course.js";
 import {
-  deleteCourse,
-  fetchAllCourses,
-  fetchCourseByDisciplineAndNumber,
-  fetchUsersInCourse,
-  insertCourse,
-  updateCourse,
+  createCourseService,
+  getAllCoursesService,
+  getCourseService,
+  getUsersInCourseService,
+  removeCourseService,
+  updateCourseService,
 } from "../services/courseService.js";
-import { createCoursePayload, updateCoursePayload } from "../utils/schemas.js";
+import {
+  createCoursePayload,
+  updateCoursePayload,
+} from "../utils/validationSchemas.js";
 
 export async function apiCreateCourse(ctx) {
+  const majorId = ctx.req.param("majorId");
+  const jwtPayload = ctx.get("jwtPayload");
   const payload = await ctx.req.json();
-
   const parsedPayload = createCoursePayload.parse(payload);
 
-  const course = new Course.builder()
-    .setDiscipline(parsedPayload.discipline)
-    .setCourseNumber(parsedPayload.course_number)
-    .setDescription(parsedPayload.description)
-    .setMaxCapacity(parsedPayload.max_capacity)
-    .build();
+  const coursePayload = {
+    id: jwtPayload.user_id,
+    ...parsedPayload,
+  };
 
-  await insertCourse(course);
+  await createCourseService(coursePayload, majorId);
 
-  return ctx.json({ success: "course created" }, 201);
+  return ctx.json({ success: "course created successfully" }, 201);
 }
 
-export async function apiDeleteCourse(ctx) {
-  const { courseDiscipline, courseNumber } = ctx.req.param();
+export async function apiRemoveCourse(ctx) {
+  const courseId = ctx.req.param("courseId");
 
-  await deleteCourse(courseDiscipline, courseNumber);
+  await removeCourseService(courseId);
 
-  return ctx.json({ success: "course deleted" }, 200);
+  return ctx.json({ success: "course removed successfully" }, 200);
 }
 
 export async function apiGetAllCourses(ctx) {
-  const courses = await fetchAllCourses();
+  const courses = await getAllCoursesService();
 
   return ctx.json({ courses: courses }, 200);
 }
 
-export async function apiGetCourseByDisciplineAndNumber(ctx) {
-  const { courseDiscipline, courseNumber } = ctx.req.param();
+export async function apiGetCourseById(ctx) {
+  const courseId = ctx.req.param("courseId");
 
-  const course = await fetchCourseByDisciplineAndNumber(
-    courseDiscipline,
-    courseNumber,
-  );
+  const course = await getCourseService(courseId);
 
   return ctx.json({ course: course }, 200);
 }
 
 export async function apiUpdateCourse(ctx) {
-  const { courseDiscipline, courseNumber } = ctx.req.param();
-
+  const courseId = ctx.req.param("courseId");
+  const jwtPayload = ctx.get("jwtPayload");
   const payload = await ctx.req.json();
-
   const parsedPayload = updateCoursePayload.parse(payload);
 
-  const course = await fetchCourseByDisciplineAndNumber(
-    courseDiscipline,
-    courseNumber,
-  );
+  const course = await getCourseService(courseId);
 
-  if (parsedPayload.description) {
-    course.description = parsedPayload.description;
-  }
+  await updateCourseService(course, parsedPayload, jwtPayload.user_id);
 
-  if (parsedPayload.max_capacity) {
-    course.max_capacity = parsedPayload.max_capacity;
-  }
-
-  await updateCourse(course);
-
-  return ctx.json({ success: "course updated" }, 200);
+  return ctx.json({ success: "course updated successfully" }, 200);
 }
 
 export async function apiGetUsersInCourse(ctx) {
-  const { courseDiscipline, courseNumber } = ctx.req.param();
+  const courseId = ctx.req.param("courseId");
 
-  const users = await fetchUsersInCourse(courseDiscipline, courseNumber);
+  const users = await getUsersInCourseService(courseId);
 
   return ctx.json({ users: users }, 200);
 }
