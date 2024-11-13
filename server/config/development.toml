@@ -7,4 +7,4 @@ PGHOST = "127.0.0.1"
 [server]
 SERVER_HOST= "127.0.0.1"
 SERVER_PORT= "8000"
-JWT_SECRET= "secret"
+JWT_SECRET= "njGxr2OrjDxhuOqe4uikwkLsnJFKTBT61cPbJIcH6e4="

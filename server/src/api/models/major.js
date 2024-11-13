@@ -1,11 +1,16 @@
 export class Major {
+  #id;
   #name;
-
   #description;
 
   constructor(builder) {
+    this.#id = builder.id;
     this.#name = builder.name;
     this.#description = builder.description;
+  }
+
+  get id() {
+    return this.#id;
   }
 
   get name() {
@@ -16,6 +21,10 @@ export class Major {
     return this.#description;
   }
 
+  set id(value) {
+    this.#id = value;
+  }
+
   set name(value) {
     this.#name = value;
   }
@@ -24,11 +33,25 @@ export class Major {
     this.#description = value;
   }
 
+  toMajorDTO() {
+    return {
+      id: this.#id,
+      name: this.#name,
+      description: this.#description,
+    };
+  }
+
   static get builder() {
     class MajorBuilder {
       constructor() {
+        this.id = "";
         this.name = "";
         this.description = "";
+      }
+
+      setId(id) {
+        this.id = id;
+        return this;
       }
 
       setName(name) {

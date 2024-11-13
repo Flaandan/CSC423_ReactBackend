@@ -1,109 +1,88 @@
-import { Major } from "../models/major.js";
 import {
-  addCourseToMajor,
-  fetchCoursesForMajor,
-  removeCourseFromMajor,
-} from "../services/majorCoursesService.js";
+  addCourseToMajorService,
+  getCoursesForMajorService,
+  removeCourseFromMajorService,
+} from "../services/majorCourseService.js";
 import {
-  deleteMajor,
-  fetchAllMajors,
-  fetchMajorByName,
-  insertMajor,
-  updateMajor,
+  createMajorService,
+  getAllMajorsService,
+  getMajorByIdService,
+  removeMajorService,
+  updateMajorService,
 } from "../services/majorService.js";
 import {
-  addMajorCoursePayload,
   createMajorPayload,
   updateMajorPayload,
-} from "../utils/schemas.js";
+} from "../utils/validationSchemas.js";
 
 export async function apiCreateMajor(ctx) {
   const payload = await ctx.req.json();
-
   const parsedPayload = createMajorPayload.parse(payload);
 
-  const major = new Major.builder()
-    .setName(parsedPayload.name)
-    .setDescription(parsedPayload.description)
-    .build();
+  await createMajorService(parsedPayload);
 
-  await insertMajor(major);
-
-  return ctx.json({ success: "major created" }, 201);
+  return ctx.json({ success: "major created successfully" }, 201);
 }
 
 export async function apiDeleteMajor(ctx) {
-  const majorName = ctx.req.param("majorName");
+  const majorId = ctx.req.param("majorId");
 
-  await deleteMajor(majorName);
+  await removeMajorService(majorId);
 
-  return ctx.json({ success: "major deleted" }, 200);
+  return ctx.json({ success: "major deleted successfully" }, 200);
 }
 
 export async function apiGetAllMajors(ctx) {
-  const majors = await fetchAllMajors();
+  const majors = await getAllMajorsService();
 
   return ctx.json({ majors: majors }, 200);
 }
 
-export async function apiGetMajorByName(ctx) {
-  const majorName = ctx.req.param("majorName");
+export async function apiGetMajorById(ctx) {
+  const majorId = ctx.req.param("majorId");
 
-  const major = await fetchMajorByName(majorName);
+  const major = await getMajorByIdService(majorId);
 
   return ctx.json({ major: major }, 200);
 }
 
 export async function apiUpdateMajor(ctx) {
-  const majorName = ctx.req.param("majorName");
-
+  const majorId = ctx.req.param("majorId");
   const payload = await ctx.req.json();
-
   const parsedPayload = updateMajorPayload.parse(payload);
 
-  const major = await fetchMajorByName(majorName);
+  const major = await getMajorByIdService(majorId);
 
-  if (parsedPayload.name) {
-    major.name = parsedPayload.name;
-  }
+  const majorDetails = {
+    id: majorId,
+    ...major,
+  };
 
-  if (parsedPayload.description) {
-    major.description = parsedPayload.description;
-  }
+  await updateMajorService(majorDetails, parsedPayload);
 
-  await updateMajor(major);
-
-  return ctx.json({ success: "major updated" }, 200);
+  return ctx.json({ success: "major updated successfully" }, 200);
 }
 
 export async function apiAddCourseToMajor(ctx) {
-  const { majorName } = ctx.req.param();
+  const { majorId, courseId } = ctx.req.param();
 
-  const payload = await ctx.req.json();
+  await addCourseToMajorService(majorId, courseId);
 
-  const parsedPayload = addMajorCoursePayload.parse(payload);
-
-  await addCourseToMajor(
-    majorName,
-    parsedPayload.discipline,
-    parsedPayload.course_number,
-  );
-
-  return ctx.json({ success: "course added to major" }, 200);
+  return ctx.json({ success: "course added to major successfully" }, 200);
 }
 
 export async function apiRemoveCourseFromMajor(ctx) {
-  const { majorName, courseDiscipline, courseNumber } = ctx.req.param();
+  const { majorId, courseId } = ctx.req.param();
 
-  await removeCourseFromMajor(majorName, courseDiscipline, courseNumber);
+  await removeCourseFromMajorService(majorId, courseId);
 
-  return ctx.json({ success: "course removed from major" }, 200);
+  return ctx.json({ success: "course removed from major successfully" }, 200);
 }
 
 export async function apiGetCoursesForMajor(ctx) {
-  const { majorName } = ctx.req.param();
+  const majorId = ctx.req.param("majorId");
 
-  const courses = await fetchCoursesForMajor(majorName);
+  const courses = await getCoursesForMajorService(majorId);
 
   return ctx.json({ courses: courses }, 200);
 }

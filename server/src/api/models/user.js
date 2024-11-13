@@ -1,124 +1,134 @@
+import { userRoles } from "../utils/validationSchemas.js";
+
 export class User {
+  #id;
+  #first_name;
+  #last_name;
   #username;
-
-  #firstName;
-
-  #lastName;
-
-  #passwordHash;
-
+  #password_hash;
   #role;
-
-  #phoneNumber;
-
+  #phone_number;
   #office;
-
-  #lastLogin;
+  #last_login;
 
   constructor(builder) {
+    this.#id = builder.id;
+    this.#first_name = builder.first_name;
+    this.#last_name = builder.last_name;
     this.#username = builder.username;
-    this.#firstName = builder.firstName;
-    this.#lastName = builder.lastName;
-    this.#passwordHash = builder.passwordHash || null;
-    this.#role = builder.role;
-    this.#phoneNumber = builder.phoneNumber;
+    this.#password_hash = builder.password_hash || "";
+    this.#role = builder.role || "STUDENT";
+    this.#phone_number = builder.phone_number;
     this.#office = builder.office || "Student Lounge";
-    this.#lastLogin = builder.lastLogin;
+    this.#last_login = builder.last_login;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get first_name() {
+    return this.#first_name;
+  }
+
+  get last_name() {
+    return this.#last_name;
   }
 
   get username() {
     return this.#username;
   }
 
-  get firstName() {
-    return this.#firstName;
-  }
-
-  get lastName() {
-    return this.#lastName;
-  }
-
-  get passwordHash() {
-    return this.#passwordHash;
+  get password_hash() {
+    return this.#password_hash;
   }
 
   get role() {
     return this.#role;
   }
 
-  get phoneNumber() {
-    return this.#phoneNumber;
+  get phone_number() {
+    return this.#phone_number;
   }
 
   get office() {
     return this.#office;
   }
 
-  get lastLogin() {
-    return this.#lastLogin;
+  get last_login() {
+    return this.#last_login;
+  }
+
+  set id(value) {
+    this.#id = value;
+  }
+
+  set first_name(value) {
+    this.#first_name = value;
+  }
+
+  set last_name(value) {
+    this.#last_name = value;
   }
 
   set username(value) {
     this.#username = value;
   }
 
-  set firstName(value) {
-    this.#firstName = value;
-  }
-
-  set lastName(value) {
-    this.#lastName = value;
-  }
-
-  set passwordHash(value) {
-    this.#passwordHash = value;
+  set password_hash(value) {
+    this.#password_hash = value;
   }
 
   set role(value) {
-    if (["STUDENT", "ADMIN", "INSTRUCTOR"].includes(value)) {
+    if (userRoles.includes(value)) {
       this.#role = value;
     } else {
       throw new Error(
-        "Invaild role set for user. Must be either 'STUDENT', 'ADMIN', or 'INSTRUCTOR'",
+        "Invalid role set for user. Must be either 'STUDENT', 'ADMIN', or 'TEACHER'",
       );
     }
   }
 
-  set phoneNumber(value) {
-    this.#phoneNumber = value;
+  set phone_number(value) {
+    this.#phone_number = value;
   }
 
   set office(value) {
     this.#office = value;
   }
 
-  set lastLogin(value) {
-    this.#lastLogin = value;
+  set last_login(value) {
+    this.#last_login = value;
   }
 
   toUserDTO() {
     return {
+      id: this.#id,
+      first_name: this.#first_name,
+      last_name: this.#last_name,
       username: this.#username,
-      firstName: this.#firstName,
-      lastName: this.#lastName,
       role: this.#role,
-      phoneNumber: this.#phoneNumber,
-      office: this.#office,
-      lastLogin: this.#lastLogin,
+      last_login: this.#last_login,
     };
   }
 
   static get builder() {
     class UserBuilder {
       constructor() {
+        this.id = "";
         this.username = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.passwordHash = "";
+        this.first_name = "";
+        this.last_name = "";
+        this.password_hash = "";
         this.role = "STUDENT";
-        this.phoneNumber = "";
+        this.phone_number = "";
         this.office = "Student Lounge";
-        this.lastLogin = "";
+        this.last_login = "";
+      }
+
+      setId(id) {
+        this.id = id;
+        return this;
       }
 
       setUsername(username) {
@@ -126,34 +136,34 @@ export class User {
         return this;
       }
 
-      setFirstName(firstName) {
-        this.firstName = firstName;
+      setFirstName(first_name) {
+        this.first_name = first_name;
         return this;
       }
 
-      setLastName(lastName) {
-        this.lastName = lastName;
+      setLastName(last_name) {
+        this.last_name = last_name;
         return this;
       }
 
-      setPasswordHash(passwordHash) {
-        this.passwordHash = passwordHash;
+      setPasswordHash(password_hash) {
+        this.password_hash = password_hash;
         return this;
       }
 
       setRole(role) {
-        if (["STUDENT", "ADMIN", "INSTRUCTOR"].includes(role)) {
+        if (userRoles.includes(role)) {
           this.role = role;
         } else {
           throw new Error(
-            "Invaild role set for user. Must be either 'STUDENT', 'ADMIN', or 'INSTRUCTOR'",
+            "Invalid role set for user. Must be either 'STUDENT', 'ADMIN', or 'TEACHER'",
           );
         }
         return this;
       }
 
-      setPhoneNumber(phoneNumber) {
-        this.phoneNumber = phoneNumber;
+      setPhoneNumber(phone_number) {
+        this.phone_number = phone_number;
         return this;
       }
 
@@ -162,21 +172,20 @@ export class User {
         return this;
       }
 
-      setLastLogin(lastLogin) {
-        this.lastLogin = lastLogin;
+      setLastLogin(last_login) {
+        this.last_login = last_login;
         return this;
       }
 
       build() {
         if (
+          !this.first_name ||
+          !this.last_name ||
           !this.username ||
-          !this.firstName ||
-          !this.lastName ||
-          !this.role ||
-          !this.phoneNumber
+          !this.role
         ) {
           throw new Error(
-            "username, firstName, lastName, role, and phoneNumber are required",
+            "first_name, last_name, username, and role are required",
           );
         }
 

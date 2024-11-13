@@ -1,201 +1,100 @@
-import pg from "pg";
-import { pgPool } from "../../db.js";
-import { ClientError, ServerError } from "../../error.js";
-import { formatDate } from "../utils/formatDate.js";
+import { ServerError } from "../../error.js";
+import { Course } from "../models/course.js";
+import {
+  fetchAllCoursesDB,
+  fetchCourseByIdDB,
+  fetchUsersInCourseByIdDB,
+  insertCourseDB,
+  softDeleteCourseDB,
+  updateCourseDB,
+} from "../repositories/courseRepository.js";
 
-export async function insertCourse(course) {
-  try {
-    await pgPool.query(
-      `
-      INSERT INTO course (discipline, course_number, description, max_capacity)
-      VALUES ($1, $2, $3, $4)
-      `,
-      [
-        course.discipline,
-        course.courseNumber,
-        course.description,
-        course.maxCapacity,
-      ],
-    );
-  } catch (err) {
-    if (err instanceof pg.DatabaseError) {
-      // Duplicate key violation
-      if (err.code === "23505") {
-        throw new ServerError(
-          `Course '${course.discipline} ${course.courseNumber}' already exists`,
-          409,
-          ClientError.CONFLICT,
-        );
-      }
-    }
+export async function createCourseService(coursePayload, majorId) {
+  const course = new Course.builder()
+    .setTeacherId(coursePayload.id)
+    .setCourseDiscipline(coursePayload.course_discipline)
+    .setCourseNumber(coursePayload.course_number)
+    .setDescription(coursePayload.description)
+    .setMaxCapacity(coursePayload.max_capacity)
+    .build();
 
-    throw new ServerError(
-      `Failed to insert course '${course.discipline} ${course.courseNumber}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
+  await insertCourseDB(course, majorId);
 }
 
-export async function updateCourse(course) {
-  // `course` is being fetched from the function `fetchCourseByDisciplineAndNumber`
-  try {
-    const row = await pgPool.query(
-      `
-      UPDATE course
-      SET description = $1, max_capacity = $2, last_updated = NOW()
-      WHERE discipline = $3 AND course_number = $4
-      RETURNING discipline, course_number
-      `,
-      [
-        course.description,
-        course.max_capacity,
-        course.discipline,
-        course.course_number,
-      ],
-    );
+export async function updateCourseService(course, parsedPayload, teacher_id) {
+  if (parsedPayload.teacher_id) {
+    course.teacher_id = parsedPayload.teacher_id;
+  } else {
+    course.teacher_id = teacher_id;
+  }
 
-    // Null if course not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
+  if (parsedPayload.course_discipline) {
+    course.course_discipline = parsedPayload.course_discipline;
+  }
 
-    if (!record) {
-      throw new ServerError(
-        `No course found with discipline: '${course.discipline}' and course number: ${course.course_number}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
+  if (parsedPayload.course_number) {
+    course.course_number = parsedPayload.course_number;
+  }
 
+  if (parsedPayload.description) {
+    course.description = parsedPayload.description;
+  }
+
+  if (parsedPayload.max_capacity) {
+    course.max_capacity = parsedPayload.max_capacity;
+  }
+
+  if (parsedPayload.status) {
+    course.status = parsedPayload.status;
+  }
+
+  const updatedCourse = await updateCourseDB(course);
+
+  if (!updatedCourse) {
     throw new ServerError(
-      `Failed to update course '${course.discipline} ${course.course_number}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Course '${course.courseDiscipline} ${course.courseNumber}' not found for update`,
+      404,
+      "Course could not be found",
     );
   }
+
+  return updatedCourse;
 }
 
-export async function deleteCourse(discipline, courseNumber) {
-  try {
-    const row = await pgPool.query(
-      `
-      DELETE FROM course
-      WHERE discipline = $1 AND course_number = $2
-      RETURNING discipline, course_number
-      `,
-      [discipline, courseNumber],
-    );
+export async function removeCourseService(id) {
+  const deletedCourse = await softDeleteCourseDB(id);
 
-    // Null if course not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
-      throw new ServerError(
-        `No course found with discipline: '${discipline}' and course number: ${courseNumber}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!deletedCourse) {
     throw new ServerError(
-      `Failed to delete course '${discipline} ${courseNumber}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Course with ID '${id}' not found for soft delete`,
+      404,
+      "Course could not be found",
     );
   }
+
+  return deletedCourse;
 }
 
-export async function fetchCourseByDisciplineAndNumber(
-  discipline,
-  courseNumber,
-) {
-  try {
-    const row = await pgPool.query(
-      `
-      SELECT discipline, course_number, description, max_capacity, last_updated
-      FROM course
-      WHERE discipline = $1 AND course_number = $2
-      `,
-      [discipline, courseNumber],
-    );
+export async function getCourseService(id) {
+  const course = await fetchCourseByIdDB(id);
 
-    // Null if course not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
-      throw new ServerError(
-        `No course found with discipline: '${discipline}' and course number: ${courseNumber}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-
-    record.last_updated = formatDate(record.last_updated);
-
-    return record;
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!course) {
     throw new ServerError(
-      `Failed to fetch course '${discipline} ${courseNumber}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Course with ID '${id}' not found`,
+      404,
+      "Course could not be found",
     );
   }
+
+  return course;
 }
 
-export async function fetchAllCourses() {
-  try {
-    const rows = await pgPool.query(
-      `
-      SELECT discipline, course_number, description, max_capacity, last_updated
-      FROM course
-      `,
-    );
-
-    const mutatedRows = rows.rows.map((course) => {
-      course.last_updated = formatDate(course.last_updated);
-
-      return course;
-    });
-
-    return mutatedRows;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to fetch all courses: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
+export async function getAllCoursesService() {
+  return await fetchAllCoursesDB();
 }
 
-export async function fetchUsersInCourse(courseDiscipline, courseNumber) {
-  try {
-    const rows = await pgPool.query(
-      `
-      SELECT u.username, u.first_name, u.last_name
-      FROM users u
-      JOIN registration r ON u.username = r.username
-      WHERE r.course_discipline = $1 AND r.course_number = $2 AND r.status = 'ENROLLED'
-      `,
-      [courseDiscipline, courseNumber],
-    );
+export async function getUsersInCourseService(id) {
+  const users = await fetchUsersInCourseByIdDB(id);
 
-    return rows.rows;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to fetch users in course ${courseDiscipline} ${courseNumber}: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
+  return users;
 }

@@ -1,156 +1,68 @@
-import pg from "pg";
-import { pgPool } from "../../db.js";
-import { ClientError, ServerError } from "../../error.js";
+import { ServerError } from "../../error.js";
+import { Major } from "../models/major.js";
+import {
+  deleteMajorDB,
+  fetchAllMajorsDB,
+  fetchMajorByIdDB,
+  insertMajorDB,
+  updateMajorDB,
+} from "../repositories/majorRepository.js";
 
-export async function insertMajor(major) {
-  try {
-    await pgPool.query(
-      `
-      INSERT INTO major (name, description)
-      VALUES ($1, $2)
-      `,
-      [major.name, major.description],
-    );
-  } catch (err) {
-    if (err instanceof pg.DatabaseError) {
-      // Duplicate key violation
-      if (err.code === "23505") {
-        throw new ServerError(
-          `Major with name '${major.name}' already exists.`,
-          409,
-          ClientError.CONFLICT,
-        );
-      }
-    }
+export async function createMajorService(parsedPayload) {
+  const major = new Major.builder()
+    .setName(parsedPayload.name)
+    .setDescription(parsedPayload.description)
+    .build();
 
+  await insertMajorDB(major);
+}
+
+export async function updateMajorService(majorDetails, parsedPayload) {
+  if (parsedPayload.name) {
+    majorDetails.name = parsedPayload.name;
+  }
+
+  if (parsedPayload.description) {
+    majorDetails.description = parsedPayload.description;
+  }
+
+  const result = await updateMajorDB(majorDetails);
+
+  if (!result) {
     throw new ServerError(
-      `Failed to insert major '${major.name}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `Major '${majorDetails.name}' not found`,
+      404,
+      "Major could not be found",
     );
   }
 }
 
-export async function updateMajor(major) {
-  try {
-    const row = await pgPool.query(
-      `
-      UPDATE major
-      SET description = $1
-      WHERE name = $2
-      RETURNING name
-      `,
-      [major.description, major.name],
-    );
+export async function removeMajorService(majorId) {
+  const result = await deleteMajorDB(majorId);
 
-    // Null if major not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
-      throw new ServerError(
-        `No major found with name: ${major.name}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!result) {
     throw new ServerError(
-      `Failed to update major '${major.name}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `No major found with id '${majorId}'`,
+      404,
+      "Major could not be found",
     );
   }
 }
 
-export async function deleteMajor(majorName) {
-  try {
-    const row = await pgPool.query(
-      `
-      DELETE FROM major
-      WHERE name = $1
-      RETURNING name
-      `,
-      [majorName],
-    );
+export async function getMajorByIdService(majorId) {
+  const major = await fetchMajorByIdDB(majorId);
 
-    // Null if major not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
-      throw new ServerError(
-        `No major found with name: ${majorName}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
+  if (!major) {
     throw new ServerError(
-      `Failed to delete major '${majorName}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
+      `No major found with id '${majorId}'`,
+      404,
+      "Major could not be found",
     );
   }
+
+  return major;
 }
 
-export async function fetchMajorByName(majorName) {
-  try {
-    const row = await pgPool.query(
-      `
-      SELECT name, description
-      FROM major
-      WHERE name = $1
-      `,
-      [majorName],
-    );
-
-    // Null if major not found
-    const record = row.rows.length > 0 ? row.rows[0] : null;
-
-    if (!record) {
-      throw new ServerError(
-        `No major found with name: ${majorName}`,
-        404,
-        ClientError.NOT_FOUND,
-      );
-    }
-
-    return record;
-  } catch (err) {
-    if (err instanceof ServerError) {
-      throw err;
-    }
-
-    throw new ServerError(
-      `Failed to fetch major '${majorName}': ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
-}
-
-export async function fetchAllMajors() {
-  try {
-    const rows = await pgPool.query(
-      `
-      SELECT name, description
-      FROM major
-      `,
-    );
-
-    return rows.rows;
-  } catch (err) {
-    throw new ServerError(
-      `Failed to fetch all majors: ${String(err)}`,
-      500,
-      ClientError.SERVICE_ERROR,
-    );
-  }
+export async function getAllMajorsService() {
+  return await fetchAllMajorsDB();
 }
