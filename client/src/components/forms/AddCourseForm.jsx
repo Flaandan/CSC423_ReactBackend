@@ -36,8 +36,21 @@ const AddCourse = ({ jwt, setIsOpen }) => {
     setSelectedMajor(event.target.value);
   };
 
+  const resetFields = () => {
+    setCourseDiscipline("");
+    setCourseNumber("");
+    setDescription("");
+    setMaxCapacity("");
+    setSelectedMajor("");
+  };
+
   const handleAddCourse = async (event) => {
     event.preventDefault();
+
+    if (selectedMajor === "") {
+      alert("You must select a major");
+      return;
+    }
 
     const params = {
       url: `http://localhost:8000/api/v1/courses/majors/${selectedMajor}`,
@@ -144,9 +157,9 @@ const AddCourse = ({ jwt, setIsOpen }) => {
           <button
             className="form-button"
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={() => resetFields()}
           >
-            Cancel
+            Clear
           </button>
 
           <button
