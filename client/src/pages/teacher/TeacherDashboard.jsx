@@ -1,18 +1,23 @@
-import { Dialog, DialogPanel, DialogTitle, Description } from "@headlessui/react";
+import {
+  Description,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CourseManagement from "../../components/CourseManagement";
+import ViewCourses from "../../components/ViewCourses";
+import ChangePassword from "../../components/changePassword";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
-import ChangePassword from "../../components/changePassword";
-import ViewCourses from "../../components/ViewCourses";
-import CourseManagement from "../../components/CourseManagement";
 import "../../styles/webPage.css";
 
 const TeacherDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
-  const [activeComponent, setActiveComponent] = useState("home"); // Track active view
+  const [activeComponent, setActiveComponent] = useState("viewCourses"); // Track active view
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -27,18 +32,6 @@ const TeacherDash = () => {
 
         if (response.error) {
           navigate("/");
-        }
-
-        const decodedRole = decodeJWT(jwt).role;
-
-        if (decodedRole !== "INSTRUCTOR") {
-          navigate(
-            decodedRole === "ADMIN"
-              ? "/admin"
-              : decodedRole === "STUDENT"
-                ? "/student"
-                : "/",
-          );
         }
       } else {
         navigate("/");
@@ -65,13 +58,19 @@ const TeacherDash = () => {
       {/* Left Column */}
       <div className="left-column">
         <h1>Teacher Dashboard</h1>
-        
+
         {/* Main buttons */}
         <div className="main-buttons">
-          <button type="button" onClick={() => setActiveComponent("viewCourses")}>
+          <button
+            type="button"
+            onClick={() => setActiveComponent("viewCourses")}
+          >
             View My Courses
           </button>
-          <button type="button" onClick={() => setActiveComponent("courseManagement")}>
+          <button
+            type="button"
+            onClick={() => setActiveComponent("courseManagement")}
+          >
             Course Management
           </button>
         </div>
@@ -81,19 +80,25 @@ const TeacherDash = () => {
           <button onClick={() => setIsPasswordOpen(true)} type="button">
             Change Password
           </button>
-          <button onClick={handleLogout} className="logout-button" type="button">
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+            type="button"
+          >
             Logout
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
-        {renderActiveComponent()}
-      </div>
+      <div className="main-content">{renderActiveComponent()}</div>
 
       {/* Change Password Dialog */}
-      <Dialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} className="dialog-pop">
+      <Dialog
+        open={isPasswordOpen}
+        onClose={() => setIsPasswordOpen(false)}
+        className="dialog-pop"
+      >
         <div className="dialog-pop-back">
           <div className="pop-panel">
             <DialogPanel>
