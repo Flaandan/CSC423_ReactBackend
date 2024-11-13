@@ -4,6 +4,7 @@ import { customFetch } from "../utils/customFetch";
 
 const CourseCard = ({ course, jwt }) => {
   const [isRemoveCourseOpen, setIsRemoveCourseOpen] = useState(false);
+  const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
 
   const handleRemove = async (id) => {
     const params = {
@@ -80,6 +81,36 @@ const CourseCard = ({ course, jwt }) => {
           </Button>
         )}
       </div>
+
+      <Dialog
+        open={isRemoveCourseOpen}
+        onClose={() => setIsRemoveCourseOpen(false)}
+        className="dialog-pop"
+      >
+        <div className="dialog-pop-back">
+          <div className="pop-panel">
+            <DialogPanel>
+              <DialogTitle className="font-bold">
+                Are you sure you want to remove this Course?
+              </DialogTitle>
+              <div className="button-group">
+                <Button
+                  style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
+                  onClick={() => handleRemove(course.id)}
+                >
+                  Yes
+                </Button>
+                <Button
+                  style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
+                  onClick={() => setIsRemoveCourseOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
 
       <Dialog
         open={isRemoveCourseOpen}
