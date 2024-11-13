@@ -1,4 +1,5 @@
 import { ServerError } from "../../error.js";
+import { fetchCoursesByTeacherIdDB } from "../repositories/courseRepository.js";
 import {
   fetchRegistrationsForUserDB,
   insertRegistrationForUserDB,
@@ -76,6 +77,20 @@ export async function getAllRegistrationsForUserService(studentId, token) {
         "INVALID_ROLE",
       );
     }
+  }
+
+  if (token.user_role === "TEACHER") {
+    const courses = await fetchCoursesByTeacherIdDB(token.user_id);
+
+    if (!courses) {
+      throw new ServerError(
+        `Failed to fetch courses taught by teacher with ID ${token.user_id}`,
+        404,
+        "Teacher could not be found",
+      );
+    }
+
+    return courses;
   }
 
   const registrations = await fetchRegistrationsForUserDB(studentId);

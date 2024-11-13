@@ -132,10 +132,7 @@ export async function apiGetRegistrationsForUser(ctx) {
   const userId = ctx.req.param("userId");
   const jwtPayload = ctx.get("jwtPayload");
 
-  const registrations = await getAllRegistrationsForUserService(
-    userId,
-    jwtPayload,
-  );
+  const courses = await getAllRegistrationsForUserService(userId, jwtPayload);
 
-  return ctx.json({ registrations: registrations }, 200);
+  return ctx.json({ courses: courses }, 200);
 }
