@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import CourseManagement from "../../components/CourseManagement";
 import ViewCourses from "../../components/ViewCourses";
 import ChangePassword from "../../components/changePassword";
+import AddCourse from "../../components/forms/AddCourseForm";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
@@ -47,7 +48,7 @@ const TeacherDash = () => {
       case "viewCourses":
         return <ViewCourses />;
       case "courseManagement":
-        return <CourseManagement />;
+        return <AddCourse jwt={jwt} />;
       default:
         return <h2>Welcome to Teacher Dashboard</h2>;
     }
@@ -69,9 +70,11 @@ const TeacherDash = () => {
           </button>
           <button
             type="button"
-            onClick={() => setActiveComponent("courseManagement")}
+            onClick={() => {
+              setActiveComponent("courseManagement");
+            }}
           >
-            Course Management
+            Add Course
           </button>
         </div>
 

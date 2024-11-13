@@ -1,54 +1,30 @@
-import { Listbox } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { customFetch } from "../../utils/customFetch";
 
-const RemoveCourse = ({ jwt, setIsOpen }) => {
-  const [courseDiscipline, setCourseDiscipline] = useState("");
-  const [courseNumber, setCourseNumber] = useState("");
-  const [description, setDescription] = useState("");
-  const [maxCapacity, setMaxCapacity] = useState("");
-  const [majors, setMajors] = useState([]);
-  const [selectedMajor, setSelectedMajor] = useState("");
+const EditCourse = ({ jwt, setIsOpen, course }) => {
+  const [courseDiscipline, setCourseDiscipline] = useState(
+    course.course_discipline,
+  );
+  const [courseNumber, setCourseNumber] = useState(course.course_number);
+  const [description, setDescription] = useState(course.description);
+  const [maxCapacity, setMaxCapacity] = useState(course.max_capacity);
+  const [courseStatus, setCourseStatus] = useState(course.status);
 
-  useEffect(() => {
-    if (jwt) {
-      const getMajors = async () => {
-        const params = {
-          url: "http://localhost:8000/api/v1/majors",
-          method: "GET",
-          jwt: jwt,
-        };
+  const intialStatus = course.status;
 
-        const response = await customFetch(params);
-
-        if (response.error) {
-          alert(`${response.error}`);
-          return;
-        }
-
-        setMajors(response.majors);
-      };
-
-      getMajors();
-    }
-  }, [jwt]);
-
-  const handleMajorChange = (event) => {
-    setSelectedMajor(event.target.value);
-  };
-
-  const handleAddCourse = async (event) => {
+  const handleEditCourse = async (event) => {
     event.preventDefault();
 
     const params = {
-      url: `http://localhost:8000/api/v1/courses/majors/${selectedMajor}`,
-      method: "POST",
+      url: `http://localhost:8000/api/v1/courses/${course.id}`,
+      method: "PATCH",
       jwt: jwt,
       requestBody: {
         course_discipline: courseDiscipline,
         course_number: Number(courseNumber),
         description,
         max_capacity: Number(maxCapacity),
+        status: courseStatus,
       },
     };
 
@@ -58,45 +34,20 @@ const RemoveCourse = ({ jwt, setIsOpen }) => {
       alert(`${response.error}`);
       return;
     }
+
     setCourseDiscipline("");
     setCourseNumber("");
     setDescription("");
     setMaxCapacity("");
-    setSelectedMajor("");
+    setCourseStatus("");
     setIsOpen(false);
 
     alert(`${response.success}`);
+    location.reload();
   };
 
   return (
-    <form onSubmit={handleAddCourse} className="course-form">
-      <div className="form-group">
-        <label htmlFor="major">Major</label>
-        <select
-          name="major"
-          id="major"
-          value={selectedMajor}
-          onChange={handleMajorChange}
-          style={{
-            padding: "8px",
-            marginBottom: "15px",
-            fontSize: "16px",
-            width: "100%",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-          }}
-        >
-          <option value="" disabled>
-            Select a Major
-          </option>
-          {majors.map((major) => (
-            <option key={major.id} value={major.id}>
-              {major.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
+    <form onSubmit={handleEditCourse} className="course-form">
       <div className="form-group">
         <label htmlFor="courseDiscipline">Course Discipline</label>
         <input
@@ -139,6 +90,32 @@ const RemoveCourse = ({ jwt, setIsOpen }) => {
           required
         />
       </div>
+      {intialStatus === "INACTIVE" ? (
+        <div className="form-group">
+          <label htmlFor="status">Status</label>
+          <select
+            name="status"
+            id="status"
+            value={courseStatus}
+            onChange={(e) => setCourseStatus(e.target.value)}
+            style={{
+              padding: "8px",
+              marginBottom: "15px",
+              fontSize: "16px",
+              width: "100%",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+            }}
+          >
+            <option value={courseStatus}>{courseStatus}</option>
+            <option value={courseStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"}>
+              {courseStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"}
+            </option>
+          </select>
+        </div>
+      ) : (
+        <></>
+      )}
 
       <div className="form-actions">
         <button
@@ -150,11 +127,11 @@ const RemoveCourse = ({ jwt, setIsOpen }) => {
         </button>
 
         <button className="form-button" type="submit">
-          Add Course
+          Submit
         </button>
       </div>
     </form>
   );
 };
 
-export default AddCourse;
+export default EditCourse;

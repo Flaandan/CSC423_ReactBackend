@@ -1,6 +1,13 @@
-import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import {
+  Button,
+  Description,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import React, { useState } from "react";
 import { customFetch } from "../utils/customFetch";
+import EditCourse from "./forms/EditCourseForm";
 
 const CourseCard = ({ course, jwt }) => {
   const [isRemoveCourseOpen, setIsRemoveCourseOpen] = useState(false);
@@ -61,7 +68,7 @@ const CourseCard = ({ course, jwt }) => {
             </Button>
             <Button
               style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-              onClick={() => handleEdit(course.id)}
+              onClick={() => setIsEditCourseOpen(true)}
             >
               Edit
             </Button>
@@ -75,7 +82,7 @@ const CourseCard = ({ course, jwt }) => {
         ) : (
           <Button
             style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-            onClick={() => handleEdit(course.id)}
+            onClick={() => setIsEditCourseOpen(true)}
           >
             Edit
           </Button>
@@ -113,30 +120,23 @@ const CourseCard = ({ course, jwt }) => {
       </Dialog>
 
       <Dialog
-        open={isRemoveCourseOpen}
-        onClose={() => setIsRemoveCourseOpen(false)}
+        open={isEditCourseOpen}
+        onClose={() => setIsEditCourseOpen(false)}
         className="dialog-pop"
       >
         <div className="dialog-pop-back">
           <div className="pop-panel">
             <DialogPanel>
-              <DialogTitle className="font-bold">
-                Are you sure you want to remove this Course?
-              </DialogTitle>
-              <div className="button-group">
-                <Button
-                  style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-                  onClick={() => handleRemove(course.id)}
-                >
-                  Yes
-                </Button>
-                <Button
-                  style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
-                  onClick={() => setIsRemoveCourseOpen(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
+              <DialogTitle className="font-bold">Edit Course</DialogTitle>
+              <Description>
+                This will edit the details of this course. Not all fields are
+                required to be changed
+              </Description>
+              <EditCourse
+                jwt={jwt}
+                setIsOpen={setIsEditCourseOpen}
+                course={course}
+              />
             </DialogPanel>
           </div>
         </div>
