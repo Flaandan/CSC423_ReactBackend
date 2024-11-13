@@ -45,16 +45,16 @@ export async function insertRegistrationForUserDB(
       );
     }
 
-    const currentEnrollmentResult = await pgPool.query(
+    const courseDetails = await pgPool.query(
       `
-      SELECT current_enrollment, max_capacity
+      SELECT current_enrollment, max_capacity, status
       FROM courses
       WHERE id = $1
       `,
       [courseId],
     );
 
-    if (currentEnrollmentResult.rows.length === 0) {
+    if (courseDetails.rows.length === 0) {
       throw new ServerError(
         `Course with ID ${courseId} does not exist`,
         404,
@@ -62,9 +62,22 @@ export async function insertRegistrationForUserDB(
       );
     }
 
-    const { current_enrollment, max_capacity } =
-      currentEnrollmentResult.rows[0];
+    const {
+      current_enrollment,
+      max_capacity,
+      status: courseStatus,
+    } = courseDetails.rows[0];
 
+    // Check if the course status is INACTIVE
+    if (courseStatus === "INACTIVE") {
+      throw new ServerError(
+        `Student ${studentId} could not register. Course with ID ${courseId} is inactive`,
+        400,
+        "Course is inactive",
+      );
+    }
+
+    // Check if the course has reached its maximum capacity
     if (current_enrollment >= max_capacity) {
       throw new ServerError(
         `Student ${studentId} could not register. Course with ID ${courseId} has reached its maximum capacity`,
@@ -98,7 +111,7 @@ export async function insertRegistrationForUserDB(
           `,
           [semesterTaken, yearTaken, studentId, courseId],
         );
-        return; // Return early after successful update
+        return; // Return early after successful update. Returns undefined
       }
 
       // Return null when user is already registered for course and previous status was not 'UNENROLLED'
@@ -209,13 +222,12 @@ export async function fetchRegistrationsForUserDB(studentId) {
       SELECT 
         c.course_discipline, 
         c.course_number, 
-        c.description AS course_description, 
-        r.status AS registration_status, 
+        c.description, 
+        r.status, 
         r.semester_taken, 
         r.year_taken, 
         u.first_name AS teacher_first_name, 
-        u.last_name AS teacher_last_name, 
-        u.username AS teacher_username
+        u.last_name AS teacher_last_name
       FROM registrations r
       JOIN courses c ON r.course_id = c.id
       JOIN users u ON c.teacher_id = u.id

@@ -115,8 +115,7 @@ export async function fetchCoursesForMajorDB(majorId) {
         c.current_enrollment,
         c.status, 
         u.first_name AS teacher_first_name,
-        u.last_name AS teacher_last_name,
-        u.username AS teacher_username
+        u.last_name AS teacher_last_name
       FROM courses c
       JOIN major_courses mc ON c.id = mc.course_id
       JOIN users u ON c.teacher_id = u.id

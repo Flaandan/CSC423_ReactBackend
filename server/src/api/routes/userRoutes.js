@@ -52,7 +52,8 @@ export function userRoutes(server) {
   );
 
   // -----------------------------------------------------------------------
-  // User id path parameter will be checked against the user id within the user's JWT
+  // User id path parameter will be checked against the user id within the user's JWT.
+  // Students will only get to interact with their majors
   server.on(
     "POST",
     "/api/v1/users/:userId/majors/:majorId",
@@ -75,7 +76,8 @@ export function userRoutes(server) {
   );
 
   // -----------------------------------------------------------------------
-  // User id path parameter will be checked against the user id within the user's JWT
+  // User id path parameter will be checked against the user id within the user's JWT.
+  // Students will only get to interact with their registrations
   server.on(
     "POST",
     "/api/v1/users/:userId/courses/:courseId",

@@ -61,8 +61,8 @@ export async function changeUserRegistrationStatusService(
   if (!updatedRegistration) {
     throw new ServerError(
       `Failed to update registration status for student with ID ${studentId}`,
-      404,
-      "User could not be found",
+      400,
+      "User is not registered for this course",
     );
   }
 }

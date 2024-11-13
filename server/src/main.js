@@ -13,6 +13,7 @@ import { majorRoutes } from "./api/routes/majorRoutes.js";
 import { userRoutes } from "./api/routes/userRoutes.js";
 import { config } from "./config.js";
 
+// TODO: Double check ServerError status codes
 function main() {
   const port = config.serverPort;
   const host = config.serverHost;
@@ -39,8 +40,12 @@ function main() {
       origin: "http://localhost:5173",
       allowHeaders: ["Accept", "Authorization", "Content-Type"],
       allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-      maxAge: 600,
+      maxAge: 600, // Cache preflight responses for 600 seconds (10 minutes)
     }),
+    // ^ A preflight request is an OPTIONS request sent by the browser to the server to check
+    // if cross-origin requests with specific methods or headers are allowed.
+    // The server responds with the allowed methods, headers, and cache time for the preflight
+    // response to determine if the actual request can proceed
   );
   // -- MIDDLEWARE end
 

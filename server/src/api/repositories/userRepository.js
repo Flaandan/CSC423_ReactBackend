@@ -2,37 +2,37 @@ import pg from "pg";
 import { pgPool } from "../../db.js";
 import { ServerError } from "../../error.js";
 
-export async function fetchUserRoleByIdDB(id) {
-  try {
-    const row = await pgPool.query(
-      `
-        SELECT role
-        FROM users
-        WHERE id = $1
-      `,
-      [id],
-    );
-
-    return row.rows.length > 0 ? row.rows[0] : null;
-  } catch (err) {
-    if (err instanceof pg.DatabaseError) {
-      if (err.code === "22P02") {
-        // Syntax error (invalid UUID)
-        throw new ServerError(
-          `Invaild UUID provided: ${String(err)}`,
-          404,
-          "User could not be found",
-        );
-      }
-    }
-
-    throw new ServerError(
-      `Failed to fetch role for user with ID ${id}: ${String(err)}`,
-      500,
-      "SERVICE_ERROR",
-    );
-  }
-}
+// export async function fetchUserRoleByIdDB(id) {
+//   try {
+//     const row = await pgPool.query(
+//       `
+//         SELECT role
+//         FROM users
+//         WHERE id = $1
+//       `,
+//       [id],
+//     );
+//
+//     return row.rows.length > 0 ? row.rows[0] : null;
+//   } catch (err) {
+//     if (err instanceof pg.DatabaseError) {
+//       if (err.code === "22P02") {
+//         // Syntax error (invalid UUID)
+//         throw new ServerError(
+//           `Invaild UUID provided: ${String(err)}`,
+//           404,
+//           "User could not be found",
+//         );
+//       }
+//     }
+//
+//     throw new ServerError(
+//       `Failed to fetch role for user with ID ${id}: ${String(err)}`,
+//       500,
+//       "SERVICE_ERROR",
+//     );
+//   }
+// }
 
 export async function updateUserLastLoginDB(id) {
   try {

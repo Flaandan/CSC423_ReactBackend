@@ -153,21 +153,40 @@ export async function softDeleteCourseDB(id) {
     const row = await pgPool.query(
       `
       UPDATE courses
-      SET status = 'INACTIVE'
+      SET status = 'INACTIVE', current_enrollment = 0
       WHERE id = $1
       RETURNING id
       `,
       [id],
     );
 
-    // Null if course not found
+    if (row.rows.length === 0) return null;
+
+    const rows = await pgPool.query(
+      `
+      DELETE FROM registrations
+      WHERE course_id = $1
+      `,
+      [id],
+    );
+
+    // TODO: Remove from table or change status for students when soft deleting course?
+    //    const rows = await pgPool.query(
+    //      `
+    //      UPDATE registrations
+    //      SET status = 'UNENROLLED'
+    //      WHERE course_id = $1
+    //      `,
+    //      [id],
+    //    );
+
     return row.rows.length > 0 ? row.rows[0] : null;
   } catch (err) {
     if (err instanceof pg.DatabaseError) {
       if (err.code === "22P02") {
         // Syntax error (invalid UUID)
         throw new ServerError(
-          `Invaild UUID provided: ${String(err)}`,
+          `Invalid UUID provided: ${String(err)}`,
           404,
           "Course could not be found",
         );
@@ -195,8 +214,7 @@ export async function fetchCourseByIdDB(id) {
         c.current_enrollment,
         c.status,
         u.first_name AS teacher_first_name,
-        u.last_name AS teacher_last_name,
-        u.username AS teacher_username
+        u.last_name AS teacher_last_name
       FROM 
         courses c
       JOIN 
@@ -237,13 +255,12 @@ export async function fetchAllCoursesDB() {
         c.id,
         c.course_discipline,
         c.course_number,
-        c.description AS course_description,
+        c.description,
         c.max_capacity,
         c.current_enrollment,
-        c.status AS course_status,
+        c.status,
         u.first_name AS teacher_first_name,
-        u.last_name AS teacher_last_name,
-        u.username AS teacher_username
+        u.last_name AS teacher_last_name
       FROM 
         courses c
       JOIN 
@@ -269,14 +286,13 @@ export async function fetchUsersInCourseByIdDB(id) {
         u.username, 
         u.first_name, 
         u.last_name,
+        r.status
       FROM 
         users u
       JOIN 
         registrations r ON u.id = r.student_id
       WHERE 
         r.course_id = $1
-      GROUP BY
-        u.username, u.first_name, u.last_name
       `,
       [id],
     );
@@ -287,7 +303,7 @@ export async function fetchUsersInCourseByIdDB(id) {
       if (err.code === "22P02") {
         // Syntax error (invalid UUID)
         throw new ServerError(
-          `Invaild UUID provided: ${String(err)}`,
+          `Invalid UUID provided: ${String(err)}`,
           404,
           "Course could not be found",
         );
