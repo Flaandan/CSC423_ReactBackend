@@ -34,17 +34,17 @@ const AdminDash = () => {
       if (jwt) {
         const response = await apiCheckToken(jwt);
 
-        if (response.error) {
+        if (response?.error) {
           navigate("/");
         }
 
-        const decodedRole = decodeJWT(jwt).role;
+        const decodedRole = decodeJWT(jwt).user_role;
 
         if (decodedRole !== "ADMIN") {
           navigate(
             decodedRole === "STUDENT"
               ? "/student"
-              : decodedRole === "INSTRUCTOR"
+              : decodedRole === "TEACHER"
                 ? "/teacher"
                 : "/",
           );
@@ -63,24 +63,24 @@ const AdminDash = () => {
         <h1>Admin Dashboard</h1>
 
         <div className="main-buttons">
-        <div className="manage-major-section">
-          <button
-            type="button"
-            href="#majors"
-            onClick={() => setCurrentSection("manageMajors")}
-          >
-            Manage Majors
-          </button>
-        </div>
-        <div className="manage-users-section">
-          <button
-            type="button"
-            href="#users"
-            onClick={() => setCurrentSection("manageUsers")}
-          >
-            Manage Users
-          </button>
-        </div>
+          <div className="manage-major-section">
+            <button
+              type="button"
+              href="#majors"
+              onClick={() => setCurrentSection("manageMajors")}
+            >
+              Manage Majors
+            </button>
+          </div>
+          <div className="manage-users-section">
+            <button
+              type="button"
+              href="#users"
+              onClick={() => setCurrentSection("manageUsers")}
+            >
+              Manage Users
+            </button>
+          </div>
         </div>
 
         <div className="bottom-buttons">

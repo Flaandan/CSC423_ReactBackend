@@ -92,10 +92,12 @@ export function userRoutes(server) {
     async (ctx) => await apiUnregisterUserFromCourse(ctx),
   );
 
+  // Any user with TEACHER role hitting this endpoint will get the courses
+  // they are the instructor for
   server.on(
     "GET",
     "/api/v1/users/:userId/courses",
-    roleFilter(["STUDENT", "ADMIN"]),
+    roleFilter(["STUDENT", "ADMIN", "TEACHER"]),
     async (ctx) => await apiGetRegistrationsForUser(ctx),
   );
 }

@@ -317,3 +317,48 @@ export async function fetchUsersInCourseByIdDB(id) {
     );
   }
 }
+
+export async function fetchCoursesByTeacherIdDB(teacherId) {
+  try {
+    const rows = await pgPool.query(
+      `
+      SELECT 
+        c.id,
+        c.course_discipline,
+        c.course_number,
+        c.description,
+        c.max_capacity,
+        c.current_enrollment,
+        c.status,
+        u.first_name AS teacher_first_name,
+        u.last_name AS teacher_last_name
+      FROM 
+        courses c
+      JOIN 
+        users u ON c.teacher_id = u.id
+      WHERE 
+        c.teacher_id = $1
+      `,
+      [teacherId],
+    );
+
+    return rows.rows.length > 0 ? rows.rows : null;
+  } catch (err) {
+    if (err instanceof pg.DatabaseError) {
+      if (err.code === "22P02") {
+        // Syntax error (invalid UUID)
+        throw new ServerError(
+          `Invalid UUID provided: ${String(err)}`,
+          404,
+          "Courses could not be found",
+        );
+      }
+    }
+
+    throw new ServerError(
+      `Failed to fetch courses for teacher ID '${teacherId}': ${String(err)}`,
+      500,
+      "SERVICE_ERROR",
+    );
+  }
+}
