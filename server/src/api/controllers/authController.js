@@ -40,5 +40,5 @@ export async function apiChangePassword(ctx) {
 
 // This handler is behind a middleware checking the validity of JWT token provided
 export async function apiCheckToken(ctx) {
-  return ctx.text("", 200);
+  return ctx.json("", 200);
 }

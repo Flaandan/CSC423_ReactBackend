@@ -40,17 +40,17 @@ const StudentDash = () => {
       if (jwt) {
         const response = await apiCheckToken(jwt);
 
-        if (response.error) {
+        if (response?.error) {
           navigate("/");
         }
 
-        const decodedRole = decodeJWT(jwt).role;
+        const decodedRole = decodeJWT(jwt).user_role;
 
         if (decodedRole !== "STUDENT") {
           navigate(
             decodedRole === "ADMIN"
               ? "/admin"
-              : decodedRole === "INSTRUCTOR"
+              : decodedRole === "TEACHER"
                 ? "/teacher"
                 : "/",
           );
@@ -160,7 +160,6 @@ const StudentDash = () => {
             View Dropped Courses
           </button>
 
-          
           <button
             onClick={handleChooseMajor}
             className="choose-major-button"

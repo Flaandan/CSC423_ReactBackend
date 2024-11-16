@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
 import BrockportLogo from "/BrockportLogo.jpg";
-import Button from "../components/button";
 import { JWT_KEY, useLocalState } from "../hooks/useLocalStorage";
 import { apiLogin } from "../lib/api";
 import { decodeJWT } from "../utils/decodeJWT";
@@ -23,8 +22,6 @@ function LoginPage() {
 
     const response = await apiLogin(username, password);
 
-    console.log(response);
-
     if (response.error) {
       alert(`${response.error}`);
     } else {
@@ -34,7 +31,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (jwt) {
-      const decodedRole = decodeJWT(jwt).role;
+      const decodedRole = decodeJWT(jwt).user_role;
 
       navigate(
         decodedRole === "ADMIN"
@@ -65,9 +62,9 @@ function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="input"
         />
-        <Button type="submit" className="loginButton">
+        <button type="submit" className="loginButton">
           Login
-        </Button>
+        </button>
       </form>
     </div>
   );

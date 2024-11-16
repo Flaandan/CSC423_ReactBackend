@@ -282,33 +282,33 @@ if [[ "$SEED_DATA" == "yes" || "$SEED_DATA" == "y" ]]; then
 
     echo ">> successfully seeded major_courses"
 
-#    echo "assigning students to majors..."
-#
-#    student_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM users WHERE role = 'STUDENT';")
-#
-#    major_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM majors;")
-#
-#    student_array=($student_ids)
-#    major_array=($major_ids)
-#
-#    for i in $(seq 0 $((${#student_array[@]} - 1))); do
-#        student_id="${student_array[$i]}"
-#        major_id="${major_array[$i]}"
-#
-#        # Remove leading or trailing spaces
-#        student_id=$(echo "$student_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-#
-#        # Remove leading or trailing spaces
-#        major_id=$(echo "$major_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-#
-#        INSERT_QUERY="
-#            INSERT INTO user_majors (student_id, major_id)
-#            VALUES ('$student_id', '$major_id');"
-#
-#        docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "$INSERT_QUERY"
-#    done
-#
-#    echo ">> successfully assigned students to majors"
+    echo "assigning students to majors..."
+ 
+    student_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM users WHERE role = 'STUDENT';")
+ 
+    major_ids=$(docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -t -c "SELECT id FROM majors;")
+ 
+    student_array=($student_ids)
+    major_array=($major_ids)
+ 
+    for i in $(seq 0 $((${#student_array[@]} - 1))); do
+        student_id="${student_array[$i]}"
+        major_id="${major_array[$i]}"
+ 
+        # Remove leading or trailing spaces
+        student_id=$(echo "$student_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+ 
+        # Remove leading or trailing spaces
+        major_id=$(echo "$major_id" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+ 
+        INSERT_QUERY="
+            INSERT INTO user_majors (student_id, major_id)
+            VALUES ('$student_id', '$major_id');"
+ 
+        docker exec ${CONTAINER_NAME} psql -U "$PGUSER" -h "$PGHOST" -d "$PGDATABASE" -c "$INSERT_QUERY"
+    done
+ 
+    echo ">> successfully assigned students to majors"
 
 else
     echo "skipping test data seeding"
