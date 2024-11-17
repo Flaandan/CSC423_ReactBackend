@@ -6,16 +6,16 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import React, { useState } from "react";
-import { customFetch } from "../utils/customFetch";
-import EditCourse from "./forms/EditCourseForm";
+import { customFetch } from "../../utils/customFetch";
+import EditMajor from "./../forms/EditMajorForm";
 
-const CourseCard = ({ course, jwt }) => {
-  const [isRemoveCourseOpen, setIsRemoveCourseOpen] = useState(false);
-  const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
+const MajorCard = ({ major, jwt }) => {
+  const [isRemoveMajorOpen, setIsRemoveMajorOpen] = useState(false);
+  const [isEditMajorOpen, setIsEditMajorOpen] = useState(false);
 
   const handleRemove = async (id) => {
     const params = {
-      url: `http://localhost:8000/api/v1/courses/${id}`,
+      url: `http://localhost:8000/api/v1/majors/${id}`,
       method: "DELETE",
       jwt,
     };
@@ -32,7 +32,11 @@ const CourseCard = ({ course, jwt }) => {
   };
 
   const handleEdit = async (id) => {
-    console.log(`Editing course with id: ${id}`);
+    console.log(`Editing majors with id: ${id}`);
+  };
+
+  const handleListCourses = (id) => {
+    console.log(`Listing courses for major with id: ${id}`);
   };
 
   const handleListStudents = (id) => {
@@ -41,75 +45,53 @@ const CourseCard = ({ course, jwt }) => {
 
   return (
     <div style={cardStyle}>
-      <h3 style={titleStyle}>
-        {course.course_discipline} - {course.course_number}
-      </h3>
+      <h3 style={titleStyle}>{major.name}</h3>
       <p>
-        <strong>Description:</strong> {course.description}
-      </p>
-      <p>
-        <strong>Max Capacity:</strong> {course.max_capacity}
-      </p>
-      <p>
-        <strong>Current Enrollment:</strong> {course.current_enrollment}
-      </p>
-      <p>
-        <strong>Status:</strong> {course.status}
+        <strong>Description:</strong> {major.description}
       </p>
 
       <div style={buttonContainerStyle}>
-        {course.status === "ACTIVE" ? (
-          <>
-            <Button
-              style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
-              onClick={() => setIsRemoveCourseOpen(true)}
-            >
-              Remove
-            </Button>
-            <Button
-              style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-              onClick={() => setIsEditCourseOpen(true)}
-            >
-              Edit
-            </Button>
-            <Button
-              style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-              onClick={() => handleListStudents(course.id)}
-            >
-              List Students
-            </Button>
-          </>
-        ) : (
-          <Button
-            style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-            onClick={() => setIsEditCourseOpen(true)}
-          >
-            Edit
-          </Button>
-        )}
+        <Button
+          style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
+          onClick={() => setIsRemoveMajorOpen(true)}
+        >
+          Remove
+        </Button>
+        <Button
+          style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
+          onClick={() => setIsEditMajorOpen(true)}
+        >
+          Edit
+        </Button>
+        <Button
+          style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
+          onClick={() => handleListCourses(course.id)}
+        >
+          List Courses
+        </Button>
       </div>
 
       <Dialog
-        open={isRemoveCourseOpen}
-        onClose={() => setIsRemoveCourseOpen(false)}
+        open={isRemoveMajorOpen}
+        onClose={() => setIsRemoveMajorOpen(false)}
         className="dialog-pop"
       >
         <div className="dialog-pop-back">
           <div className="pop-panel">
             <DialogPanel>
               <DialogTitle className="font-bold">
-                Are you sure you want to remove this Course?
+                Are you sure you want to remove this Major?
               </DialogTitle>
               <div className="button-group">
                 <Button
                   style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-                  onClick={() => handleRemove(course.id)}
+                  onClick={() => handleRemove(major.id)}
                 >
                   Yes
                 </Button>
                 <Button
                   style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
-                  onClick={() => setIsRemoveCourseOpen(false)}
+                  onClick={() => setIsRemoveMajorOpen(false)}
                 >
                   Cancel
                 </Button>
@@ -120,22 +102,22 @@ const CourseCard = ({ course, jwt }) => {
       </Dialog>
 
       <Dialog
-        open={isEditCourseOpen}
-        onClose={() => setIsEditCourseOpen(false)}
+        open={isEditMajorOpen}
+        onClose={() => setIsEditMajorOpen(false)}
         className="dialog-pop"
       >
         <div className="dialog-pop-back">
           <div className="pop-panel">
             <DialogPanel>
-              <DialogTitle className="font-bold">Edit Course</DialogTitle>
+              <DialogTitle className="font-bold">Edit Major</DialogTitle>
               <Description>
-                This will edit the details of this course. Not all fields are
+                This will edit the details of this Major. Not all fields are
                 required to be changed
               </Description>
-              <EditCourse
+              <EditMajor
                 jwt={jwt}
-                setIsOpen={setIsEditCourseOpen}
-                course={course}
+                setIsOpen={setIsEditMajorOpen}
+                major={major}
               />
             </DialogPanel>
           </div>
@@ -176,4 +158,4 @@ const titleStyle = {
   fontWeight: "bold",
 };
 
-export default CourseCard;
+export default MajorCard;
