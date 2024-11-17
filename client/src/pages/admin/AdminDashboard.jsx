@@ -7,18 +7,17 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePassword from "../../components/changePassword";
+import ViewMajors from "../../components/ViewMajors";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
-// import ManageMajorsSection from "../../components/manageMajors";
-// import ManageUsersSection from "../../components/manageUsers";
 import "../../styles/webPage.css";
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentSection, setCurrentSection] = useState("dashboard");
+  const [activeComponent, setActiveComponent] = useState("ViewMajors"); // Track active view
 
   const navigate = useNavigate();
 
@@ -57,30 +56,51 @@ const AdminDash = () => {
     checkToken();
   }, [jwt, navigate]);
 
+  // Render different content based on the activeComponent state
+  const renderActiveComponent = () => {
+    switch (activeComponent) {
+      case "viewUser":
+        return <ViewUser />;
+      case "addUser":
+        return <AddUser />;
+      case "addMajor":
+        return <AddMajor />;
+      default:
+        return <ViewMajors />;
+    }
+  };
   return (
     <div className="admin-dashboard">
       <div className="left-column">
         <h1>Admin Dashboard</h1>
 
+        {/* Main buttons */}
         <div className="main-buttons">
-          <div className="manage-major-section">
-            <button
-              type="button"
-              href="#majors"
-              onClick={() => setCurrentSection("manageMajors")}
-            >
-              Manage Majors
-            </button>
-          </div>
-          <div className="manage-users-section">
-            <button
-              type="button"
-              href="#users"
-              onClick={() => setCurrentSection("manageUsers")}
-            >
-              Manage Users
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveComponent("viewMajors")}
+          >
+            View Majors
+          </button>
+          <button type="button" onClick={() => setActiveComponent("addMajor")}>
+            Add Majors
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveComponent("viewUser");
+            }}
+          >
+            View Users
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveComponent("addUser");
+            }}
+          >
+            Add Users
+          </button>
         </div>
 
         <div className="bottom-buttons">
@@ -97,13 +117,10 @@ const AdminDash = () => {
         </div>
       </div>
 
-      <div className="main-content">
-        <h2>Welcome to Admin Dashboard</h2>
-        {currentSection === "dashboard" && <div>Admin Dash Placeholder</div>}
-        {/* {currentSection === "manageMajors" && <ManageMajorsSection />} */}
-        {/* {currentSection === "manageUsers" && <ManageUsersSection />} */}
-      </div>
+      {/* Main Content */}
+      <div className="main-content">{renderActiveComponent()}</div>
 
+      {/* Change Password Dialog */}
       <Dialog
         open={isPasswordOpen}
         onClose={() => setIsPasswordOpen(false)}

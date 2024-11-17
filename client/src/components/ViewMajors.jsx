@@ -3,12 +3,12 @@ import { useLocalState } from "../hooks/useLocalStorage";
 import { JWT_KEY } from "../hooks/useLocalStorage";
 import { customFetch } from "../utils/customFetch";
 import { decodeJWT } from "../utils/decodeJWT";
-import CourseCard from "./cards/CourseCard";
+import MajorCard from "./cards/MajorCard";
 
-const ViewCourses = () => {
+const ViewMajors = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
   const [errorMessage, setErrorMessage] = useState("");
-  const [courses, setCourses] = useState([]);
+  const [majors, setMajors] = useState([]);
 
   useEffect(() => {
     if (jwt) {
@@ -17,9 +17,9 @@ const ViewCourses = () => {
 
       setErrorMessage("");
 
-      const getCourses = async () => {
+      const getMajors = async () => {
         const params = {
-          url: `http://localhost:8000/api/v1/users/${userId}/courses`,
+          url: `http://localhost:8000/api/v1/majors`,
           method: "GET",
           jwt,
         };
@@ -31,21 +31,20 @@ const ViewCourses = () => {
           return;
         }
 
-        setCourses(response.courses);
+        console.log("Fetched majors:", response.majors);
+        setMajors(response.majors || []);
       };
 
-      getCourses();
+      getMajors();
     }
   }, [jwt]);
 
-  const activeCourses = courses.filter((course) => course.status === "ACTIVE");
-  const inactiveCourses = courses.filter(
-    (course) => course.status === "INACTIVE",
-  );
+  const activeMajors = Array.isArray(majors) ? majors : [];
+  console.log("Active major to render:", activeMajors);
 
   return (
     <div>
-      <h1>My Courses</h1>
+      <h1>Admin Details</h1>
       {errorMessage && <p>{errorMessage}</p>}
       <div
         style={{
@@ -55,24 +54,13 @@ const ViewCourses = () => {
         }}
       >
         <div style={{ width: "48%" }}>
-          <h2>Active Courses</h2>
-          {activeCourses.length > 0 ? (
-            activeCourses.map((course) => (
-              <CourseCard key={course.id} course={course} jwt={jwt} />
+          <h2>Majors</h2>
+          {activeMajors.length > 0 ? (
+            activeMajors.map((major) => (
+              <MajorCard key={major.id} major={major} jwt={jwt} />
             ))
           ) : (
-            <p>No active courses available</p>
-          )}
-        </div>
-
-        <div style={{ width: "48%" }}>
-          <h2>Inactive Courses</h2>
-          {inactiveCourses.length > 0 ? (
-            inactiveCourses.map((course) => (
-              <CourseCard key={course.id} course={course} jwt={jwt} />
-            ))
-          ) : (
-            <p>No inactive courses available</p>
+            <p>No active majors available</p>
           )}
         </div>
       </div>
@@ -80,4 +68,4 @@ const ViewCourses = () => {
   );
 };
 
-export default ViewCourses;
+export default ViewMajors;
