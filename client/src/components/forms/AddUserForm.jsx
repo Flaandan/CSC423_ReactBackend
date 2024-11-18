@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { customFetch } from "../../utils/customFetch";
 
-const AddUser = ({ jwt, setIsOpen }) => {
+const AddUser = ({ jwt }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState([]);
+  const [role, setRole] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [office, setOffice] = useState("");
 
   const resetFields = () => {
     setFirstName("");
@@ -14,6 +16,8 @@ const AddUser = ({ jwt, setIsOpen }) => {
     setUsername("");
     setPassword("");
     setRole("");
+    setPhoneNumber("");
+    setOffice("");
   };
 
   const handleAddUser = async (event) => {
@@ -29,6 +33,8 @@ const AddUser = ({ jwt, setIsOpen }) => {
         username: username,
         password: password,
         role: role,
+        phone_number: phoneNumber,
+        office: office,
       },
     };
 
@@ -43,6 +49,8 @@ const AddUser = ({ jwt, setIsOpen }) => {
     setUsername("");
     setPassword("");
     setRole("");
+    setPhoneNumber("");
+    setOffice("");
 
     alert(`${response.success}`);
   };
@@ -101,6 +109,25 @@ const AddUser = ({ jwt, setIsOpen }) => {
             value={role}
             onChange={(e) => setRole(e.target.value)}
             required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="phoneNumber">Phone Number</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="office">Office (Optional)</label>
+          <input
+            type="text"
+            id="office"
+            value={office}
+            onChange={(e) => setOffice(e.target.value)}
           />
         </div>
 

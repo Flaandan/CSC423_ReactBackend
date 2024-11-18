@@ -37,7 +37,7 @@ export async function customFetch(params) {
     };
     fetchOptions.body = JSON.stringify(requestBody);
   }
-
+  console.log(fetchOptions);
   try {
     const response = await fetch(url, {
       ...fetchOptions,

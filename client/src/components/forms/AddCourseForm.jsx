@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { customFetch } from "../../utils/customFetch";
 
-const AddCourse = ({ jwt, setIsOpen }) => {
+const AddCourse = ({ jwt }) => {
   const [courseDiscipline, setCourseDiscipline] = useState("");
   const [courseNumber, setCourseNumber] = useState("");
   const [description, setDescription] = useState("");

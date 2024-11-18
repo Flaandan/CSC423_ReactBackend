@@ -68,9 +68,9 @@ const AdminDash = () => {
       case "viewUser":
         return <ViewUser />;
       case "addUser":
-        return <AddUser />;
+        return <AddUser jwt={jwt} />;
       case "addMajor":
-        return <AddMajor />;
+        return <AddMajor jwt={jwt} />;
       default:
         return <ViewMajors />;
     }
