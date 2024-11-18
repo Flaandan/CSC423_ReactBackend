@@ -51,6 +51,12 @@ const UserCard = ({ users, jwt }) => {
         <strong>Role:</strong> {users.role}
       </p>
       <p>
+        <strong>Phone Number:</strong> {users.phone_number}
+      </p>
+      <p>
+        <strong>Office:</strong> {users.office}
+      </p>
+      <p>
         <strong>Last Login:</strong> {users.last_login}
       </p>
 

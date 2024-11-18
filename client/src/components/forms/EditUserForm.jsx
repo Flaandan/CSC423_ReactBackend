@@ -4,8 +4,6 @@ import { customFetch } from "../../utils/customFetch";
 const EditUser = ({ jwt, setIsOpen, users }) => {
   const [firstName, setFirstName] = useState(users.first_name);
   const [lastName, setLastName] = useState(users.last_name);
-  const [username, setUsername] = useState(users.username);
-  const [role, setRole] = useState(users.role);
   const [phoneNumber, setPhoneNumber] = useState(users.phone_number);
   const [office, setOffice] = useState(users.office);
 
@@ -19,8 +17,6 @@ const EditUser = ({ jwt, setIsOpen, users }) => {
       requestBody: {
         first_name: firstName,
         last_name: lastName,
-        username: username,
-        role: role,
         phone_number: phoneNumber,
         office: office,
       },
@@ -35,8 +31,6 @@ const EditUser = ({ jwt, setIsOpen, users }) => {
 
     setFirstName("");
     setLastName("");
-    setUsername("");
-    setRole("");
     setPhoneNumber("");
     setOffice("");
 
@@ -63,26 +57,6 @@ const EditUser = ({ jwt, setIsOpen, users }) => {
           id="lastName"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="username">User Name</label>
-        <input
-          text="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="role">Role</label>
-        <input
-          id="role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
           required
         />
       </div>

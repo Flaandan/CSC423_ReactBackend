@@ -16,6 +16,7 @@ export function responseMapper(server) {
     }
 
     if (err instanceof ZodError) {
+      console.log(err.message);
       const errorMessages = err.errors.map((error) => {
         const path = error.path.join(".");
 
@@ -24,8 +25,7 @@ export function responseMapper(server) {
         }
 
         if (error.message.includes("Unrecognized key(s) in object")) {
-          console.error(`Unrecognized field(s) found: ${path}`);
-          return "Invalid fields provided"; // Return a generic message for unrecognized fields
+          return "Invalid fields provided";
         }
 
         return `${error.message}`;

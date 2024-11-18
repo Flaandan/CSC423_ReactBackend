@@ -108,6 +108,8 @@ export class User {
       last_name: this.#last_name,
       username: this.#username,
       role: this.#role,
+      phone_number: this.#phone_number,
+      office: this.#office,
       last_login: this.#last_login,
     };
   }
