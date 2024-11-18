@@ -8,10 +8,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePassword from "../../components/changePassword";
 import ViewMajors from "../../components/ViewMajors";
+import ViewUser from "../../components/ViewUsers";
+import AddMajor from "../../components/forms/AddMajorForm";
+import AddUser from "../../components/forms/AddUserForm";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import "../../styles/webPage.css";
+
+// Todo:
+// Split users by Role within the viewUsers tab
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
