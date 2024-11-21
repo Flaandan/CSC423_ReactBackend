@@ -1,26 +1,108 @@
-import React from 'react';
+import { useEffect, useState } from "react";
+// Import your API functions as needed
+import { customFetch } from "../utils/customFetch";
+import { decodeJWT } from "../utils/decodeJWT";
 
-const DroppedCourses = ({ courses }) => {
-  if (!courses || courses.length === 0) {
-    return (
-      <div className="dropped-courses-container">
-        <h2>Dropped Courses</h2>
-        <p>No dropped courses to display.</p>
-      </div>
-    );
-  }
+const DroppedCourses = ({ jwt }) => {
+  const [courses, setCourses] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const fetchDroppedCourses = async () => {
+        if (jwt) {
+          const userId = decodeJWT(jwt).user_id;
+          setErrorMessage("");
+  
+          const params = {
+            url: `http://localhost:8000/api/v1/users/${userId}/courses`,
+            method: "GET",
+            jwt,
+          };
+  
+          const response = await customFetch(params);
+  
+          if (response.error) {
+            setErrorMessage(response.error);
+            return;
+          }
+
+          console.log(response.courses);
+          
+  
+          // Filter out inactive courses
+          const activeEnrolledCourses = response.courses.filter(
+            (course) => course.registration_status === "UNENROLLED"
+          );
+  
+
+          console.log(activeEnrolledCourses);
+
+          setCourses(activeEnrolledCourses);
+        }
+    };
+
+    fetchDroppedCourses();
+  }, [jwt]);
+
+  const handleRegister = async (course) => {
+    try {
+      const userId = decodeJWT(jwt).user_id;
+
+      const params = {
+        url: `http://localhost:8000/api/v1/users/${userId}/courses/${course.id}`,
+        method: "POST",
+        jwt,
+        requestBody: {
+          semester_taken: "FALL",
+          year_taken: new Date().getFullYear()
+        }
+      };
+
+      const response = await customFetch(params);
+
+      if (response.error) {
+        setErrorMessage(response.error);
+        return;
+      }
+
+      alert("Successfully registered for course!");
+      
+      location.reload();
+      
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrorMessage("Error registering for course");
+    }
+  };
 
   return (
-    <div className="dropped-courses-container">
+    <div>
       <h2>Dropped Courses</h2>
-      <div className="courses-list">
-        {courses.map((course) => (
-          <div key={course.id} className="course-item">
-            <h3>{course.courseName}</h3>
-            <p>Course Code: {course.courseCode}</p>
-            <p>Dropped Date: {new Date(course.droppedDate).toLocaleDateString()}</p>
-          </div>
-        ))}
+      <div className="courses-grid">
+        {courses.length === 0 ? (
+          <p>No dropped courses found.</p>
+        ) : (
+          courses.map((course) => (
+            <div key={course.id} className="course-card">
+              <h3 className="course-title">
+                {course.course_discipline} {course.course_number}
+              </h3>
+              <div className="course-content">
+                <p className="course-description">{course.description}</p>
+                <p className="course-capacity">
+                  <strong>Capacity:</strong> {course.current_enrollment || 0}/{course.max_capacity}
+                </p>
+              </div>
+              <button
+                onClick={() => handleRegister(course)}
+                className="form-button"
+                disabled={course.current_enrollment >= course.max_capacity}
+              >
+                Re-enroll in Course
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
