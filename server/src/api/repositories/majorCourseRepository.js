@@ -108,6 +108,7 @@ export async function fetchCoursesForMajorDB(majorId) {
     const rows = await pgPool.query(
       `
       SELECT 
+        c.id,
         c.course_discipline, 
         c.course_number, 
         c.description, 
