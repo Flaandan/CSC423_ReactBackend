@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useLocalState } from "../hooks/useLocalStorage";
-import { JWT_KEY } from "../hooks/useLocalStorage";
-import { customFetch } from "../utils/customFetch";
-import { decodeJWT } from "../utils/decodeJWT";
-import CourseCard from "./cards/CourseCard";
+import { useLocalState } from "../../hooks/useLocalStorage";
+import { JWT_KEY } from "../../hooks/useLocalStorage";
+import { customFetch } from "../../utils/customFetch";
+import { decodeJWT } from "../../utils/decodeJWT";
+import CourseCard from "./../cards/CourseCard";
 
 const ViewCourses = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);

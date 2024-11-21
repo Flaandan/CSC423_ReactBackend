@@ -35,10 +35,6 @@ const UserCard = ({ users, jwt }) => {
     console.log(`Editing users with id: ${id}`);
   };
 
-  const handleListCourses = (id) => {
-    console.log(`Listing courses user with id: ${id} is taking`);
-  };
-
   return (
     <div style={cardStyle}>
       <h3 style={titleStyle}>
@@ -72,12 +68,6 @@ const UserCard = ({ users, jwt }) => {
           onClick={() => setIsEditUserOpen(true)}
         >
           Edit
-        </Button>
-        <Button
-          style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-          onClick={() => handleListCourses(users.id)}
-        >
-          List Courses
         </Button>
       </div>
 

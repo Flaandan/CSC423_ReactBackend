@@ -6,7 +6,7 @@ import {
 } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ViewCourses from "../../components/ViewCourses";
+import ViewCourses from "../../components/views/ViewCourses";
 import EnrolledCourses from "../../components/EnrolledCourses";
 import ChangePassword from "../../components/changePassword";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";

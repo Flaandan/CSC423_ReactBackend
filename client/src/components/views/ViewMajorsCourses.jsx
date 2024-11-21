@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useLocalState } from "../hooks/useLocalStorage";
-import { JWT_KEY } from "../hooks/useLocalStorage";
-import { customFetch } from "../utils/customFetch";
-import CourseCard from "./cards/CourseCard";
+import { useLocalState } from "../../hooks/useLocalStorage";
+import { JWT_KEY } from "../../hooks/useLocalStorage";
+import { customFetch } from "../../utils/customFetch";
+import MajorCourseCard from "./../cards/MajorCourseCard";
 
 const ViewMajorsCourses = () => {
   const [jwt] = useLocalState("", JWT_KEY);
@@ -100,21 +100,10 @@ const ViewMajorsCourses = () => {
             <h2>Active Courses</h2>
             {activeCourses.length > 0 ? (
               activeCourses.map((course) => (
-                <CourseCard key={course.id} course={course} jwt={jwt} />
+                <MajorCourseCard key={course.id} course={course} jwt={jwt} />
               ))
             ) : (
               <p>No active courses available</p>
-            )}
-          </div>
-
-          <div style={{ width: "48%" }}>
-            <h2>Inactive Courses</h2>
-            {inactiveCourses.length > 0 ? (
-              inactiveCourses.map((course) => (
-                <CourseCard key={course.id} course={course} jwt={jwt} />
-              ))
-            ) : (
-              <p>No inactive courses available</p>
             )}
           </div>
         </div>

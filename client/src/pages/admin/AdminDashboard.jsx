@@ -7,11 +7,11 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePassword from "../../components/changePassword";
-import ViewMajors from "../../components/ViewMajors";
-import ViewUser from "../../components/ViewUsers";
+import ViewMajors from "../../components/views/ViewMajors";
+import ViewUser from "../../components/views/ViewUsers";
 import AddMajor from "../../components/addForms/AddMajorForm";
 import AddUser from "../../components/addForms/AddUserForm";
-import ViewMajorsCourses from "../../components/ViewMajorsCourses";
+import ViewMajorsCourses from "../../components/views/ViewMajorsCourses";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
