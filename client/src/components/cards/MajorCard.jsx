@@ -7,11 +7,21 @@ import {
 } from "@headlessui/react";
 import React, { useState } from "react";
 import { customFetch } from "../../utils/customFetch";
-import EditMajor from "./../forms/EditMajorForm";
+import EditMajor from "./../editForms/EditMajorForm";
 
 const MajorCard = ({ major, jwt }) => {
   const [isRemoveMajorOpen, setIsRemoveMajorOpen] = useState(false);
   const [isEditMajorOpen, setIsEditMajorOpen] = useState(false);
+  const [isListCourses, setIsListCoursesOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [activeComponent, setActiveComponent] = useState("viewListCourses"); // Track active view
+
+  const renderActiveComponent = () => {
+    switch (activeComponent) {
+      default:
+        return <ViewListCourses id={major.id} />;
+    }
+  };
 
   const handleRemove = async (id) => {
     const params = {
@@ -31,17 +41,7 @@ const MajorCard = ({ major, jwt }) => {
     location.reload();
   };
 
-  const handleEdit = async (id) => {
-    console.log(`Editing majors with id: ${id}`);
-  };
-
-  const handleListCourses = (id) => {
-    console.log(`Listing courses for major with id: ${id}`);
-  };
-
-  const handleListStudents = (id) => {
-    console.log(`Listing students for course with id: ${id}`);
-  };
+  const handleListCourses = async (id) => {};
 
   return (
     <div style={cardStyle}>
@@ -65,7 +65,7 @@ const MajorCard = ({ major, jwt }) => {
         </Button>
         <Button
           style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-          onClick={() => handleListCourses(course.id)}
+          onClick={() => renderActiveComponent()}
         >
           List Courses
         </Button>
@@ -119,6 +119,33 @@ const MajorCard = ({ major, jwt }) => {
                 setIsOpen={setIsEditMajorOpen}
                 major={major}
               />
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        open={isListCourses}
+        onClose={() => setIsListCoursesOpen(false)}
+        className="dialog-pop"
+      >
+        <div className="dialog-pop-back">
+          <div className="pop-panel">
+            <DialogPanel>
+              <DialogTitle className="font-bold">List Courses</DialogTitle>
+              <Description>
+                This will give you a list of all the courses associated with the
+                major.
+              </Description>
+              {courses.length > 0 ? (
+                <ul>
+                  {courses.map((course) => (
+                    <li key={course.id}>{course.name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No courses found for this major.</p>
+              )}
             </DialogPanel>
           </div>
         </div>

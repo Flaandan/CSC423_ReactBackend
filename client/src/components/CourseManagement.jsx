@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { JWT_KEY, useLocalState } from "../hooks/useLocalStorage";
 import ChangePassword from "./changePassword";
 import "../styles/webPage.css";
-import AddCourse from "./forms/AddCourseForm";
+import AddCourse from "./addForms/AddCourseForm";
 
 const CourseManagement = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);

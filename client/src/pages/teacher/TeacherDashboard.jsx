@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import CourseManagement from "../../components/CourseManagement";
 import ViewCourses from "../../components/ViewCourses";
 import ChangePassword from "../../components/changePassword";
-import AddCourse from "../../components/forms/AddCourseForm";
+import AddCourse from "../../components/addForms/AddCourseForm";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";

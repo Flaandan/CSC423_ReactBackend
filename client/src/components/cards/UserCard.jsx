@@ -7,7 +7,7 @@ import {
 } from "@headlessui/react";
 import React, { useState } from "react";
 import { customFetch } from "../../utils/customFetch";
-import EditUser from "./../forms/EditUserForm";
+import EditUser from "./../editForms/EditUserForm";
 
 const UserCard = ({ users, jwt }) => {
   const [isRemoveUserOpen, setIsRemoveUserOpen] = useState(false);

@@ -9,15 +9,13 @@ import { useNavigate } from "react-router-dom";
 import ChangePassword from "../../components/changePassword";
 import ViewMajors from "../../components/ViewMajors";
 import ViewUser from "../../components/ViewUsers";
-import AddMajor from "../../components/forms/AddMajorForm";
-import AddUser from "../../components/forms/AddUserForm";
+import AddMajor from "../../components/addForms/AddMajorForm";
+import AddUser from "../../components/addForms/AddUserForm";
+import ViewMajorsCourses from "../../components/ViewMajorsCourses";
 import { JWT_KEY, useLocalState } from "../../hooks/useLocalStorage";
 import { apiCheckToken } from "../../lib/api";
 import { decodeJWT } from "../../utils/decodeJWT";
 import "../../styles/webPage.css";
-
-// Todo:
-// Split users by Role within the viewUsers tab
 
 const AdminDash = () => {
   const [jwt, setJwt] = useLocalState("", JWT_KEY);
@@ -71,6 +69,8 @@ const AdminDash = () => {
         return <AddUser jwt={jwt} />;
       case "addMajor":
         return <AddMajor jwt={jwt} />;
+      case "viewMajorsCourses":
+        return <ViewMajorsCourses />;
       default:
         return <ViewMajors />;
     }
@@ -87,6 +87,14 @@ const AdminDash = () => {
             onClick={() => setActiveComponent("viewMajors")}
           >
             View Majors
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveComponent("viewMajorsCourses");
+            }}
+          >
+            View Courses
           </button>
           <button type="button" onClick={() => setActiveComponent("addMajor")}>
             Add Majors
