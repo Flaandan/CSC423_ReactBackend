@@ -37,13 +37,13 @@ export async function insertRegistrationForUserDB(
       [studentMajorId, courseId],
     );
 
-    if (isCourseInMajor.rows.length === 0) {
+    /**if (isCourseInMajor.rows.length === 0) {
       throw new ServerError(
         `Course with ID ${courseId} is not part of the student's major with ID ${studentId}`,
         400,
         "Course you are registering for is not part of the major",
       );
-    }
+    }*/
 
     const courseDetails = await pgPool.query(
       `
@@ -220,10 +220,14 @@ export async function fetchRegistrationsForUserDB(studentId) {
     const rows = await pgPool.query(
       `
       SELECT 
+        c.id,
         c.course_discipline, 
         c.course_number, 
         c.description, 
-        r.status, 
+        c.status,
+        c.current_enrollment,
+        c.max_capacity,
+        r.status AS registration_status,
         r.semester_taken, 
         r.year_taken, 
         u.first_name AS teacher_first_name, 
@@ -231,7 +235,7 @@ export async function fetchRegistrationsForUserDB(studentId) {
       FROM registrations r
       JOIN courses c ON r.course_id = c.id
       JOIN users u ON c.teacher_id = u.id
-      WHERE r.student_id = $1 AND r.status = 'ENROLLED'
+      WHERE r.student_id = $1
       `,
       [studentId],
     );

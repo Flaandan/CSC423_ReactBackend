@@ -31,6 +31,8 @@ const ViewCourses = () => {
           return;
         }
 
+        console.log("API Response:", response.courses); // Debug log
+
         setCourses(response.courses);
       };
 
