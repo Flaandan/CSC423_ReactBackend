@@ -5,13 +5,16 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { customFetch } from "../../utils/customFetch";
-import EditCourse from "./../forms/EditCourseForm";
+import EditCourse from "./../editForms/EditCourseForm";
 
 const CourseCard = ({ course, jwt }) => {
   const [isRemoveCourseOpen, setIsRemoveCourseOpen] = useState(false);
   const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
+  const [isListStudentsOpen, setIsListStudentsOpen] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleRemove = async (id) => {
     const params = {
@@ -35,8 +38,22 @@ const CourseCard = ({ course, jwt }) => {
     console.log(`Editing course with id: ${id}`);
   };
 
-  const handleListStudents = (id) => {
-    console.log(`Listing students for course with id: ${id}`);
+  const handleListStudents = async (id) => {
+    const params = {
+      url: `http://localhost:8000/api/v1/courses/${id}/users`,
+      method: "GET",
+      jwt,
+    };
+
+    const response = await customFetch(params);
+
+    if (response.error) {
+      setErrorMessage(response.error);
+      return;
+    }
+
+    setStudents(response.users || []);
+    setIsListStudentsOpen(true);
   };
 
   return (
@@ -73,7 +90,7 @@ const CourseCard = ({ course, jwt }) => {
               Edit
             </Button>
             <Button
-              style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
+              style={{ ...buttonStyle, backgroundColor: "#3498db" }}
               onClick={() => handleListStudents(course.id)}
             >
               List Students
@@ -137,6 +154,40 @@ const CourseCard = ({ course, jwt }) => {
                 setIsOpen={setIsEditCourseOpen}
                 course={course}
               />
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* List Students Dialog */}
+      <Dialog
+        open={isListStudentsOpen}
+        onClose={() => setIsListStudentsOpen(false)}
+        className="dialog-pop"
+      >
+        <div className="dialog-pop-back">
+          <div className="pop-panel">
+            <DialogPanel>
+              <DialogTitle className="font-bold">Active Students</DialogTitle>
+              {errorMessage ? (
+                <p style={{ color: "red" }}>{errorMessage}</p>
+              ) : students.length > 0 ? (
+                <ul>
+                  {students.map((student) => (
+                    <li key={student.id}>
+                      {student.first_name} {student.last_name} - {student.email}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No active students found.</p>
+              )}
+              <Button
+                style={{ ...buttonStyle, backgroundColor: "#e74c3c" }}
+                onClick={() => setIsListStudentsOpen(false)}
+              >
+                Close
+              </Button>
             </DialogPanel>
           </div>
         </div>
