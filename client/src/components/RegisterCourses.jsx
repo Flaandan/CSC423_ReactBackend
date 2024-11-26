@@ -18,52 +18,64 @@ const RegisterCourses = () => {
         const userId = decodeJWT(jwt).user_id;
 
         // Get user's majors
-        const params1 = {
+        const usersMajors = {
           url: `http://localhost:8000/api/v1/users/${userId}/majors`,
           method: "GET",
           jwt,
         };
 
-        const response1 = await customFetch(params1);
-        console.log("User's majors:", response1.majors);
+        const response1 = await customFetch(usersMajors);
+        const majors = response1.majors;
 
-        // Fetch courses for all majors
-        let allCourses = [];
+        console.log("majors", majors);
+
+        // Get all courses the user is registered in
+        const getRegisteredCourses = {
+          url: `http://localhost:8000/api/v1/users/${userId}/courses`,
+          method: "GET",
+          jwt,
+        };
+
+        const response2 = await customFetch(getRegisteredCourses);
+        const registeredCourses = response2.courses;
         
-        // Use Promise.all to fetch courses for all majors simultaneously
-        const coursesPromises = response1.majors.map(async (major) => {
-          const params = {
-            url: `http://localhost:8000/api/v1/majors/${major.id}/courses`,
-            method: "GET",
-            jwt,
-          };
-          const response = await customFetch(params);
-          return response.courses;
-        });
 
+        console.log("registeredCourses", registeredCourses);
+
+
+        // Use Promise.all to fetch courses for all majors simultaneously and filter in one step
+        const allCourses = (await Promise.all(
+          response1.majors.flatMap(async (major) => {
+            const params = {
+              url: `http://localhost:8000/api/v1/majors/${major.id}/courses`,
+              method: "GET",
+              jwt,
+            };
+            const response = await customFetch(params);
+            // Return the courses if they are not already registered
+            return response.courses.filter(course => !registeredCourses.some(c => c.id === course.id));
+          })
+        )).flat();
+
+
+        // Filter out the courses that are INACTIVE
+        const filteredCourses = allCourses.filter(course => course.status !== "INACTIVE");
+
+
+        console.log("filteredCourses", filteredCourses);
+
+      
         try {
-          const coursesArrays = await Promise.all(coursesPromises);
-          // Combine all courses and remove duplicates based on course ID
-          allCourses = [...new Map(
-            coursesArrays.flat().map(course => [course.id, course])
-          ).values()];
-
-          console.log("All available courses:", allCourses);
           
-          if (Array.isArray(allCourses)) {
-            setAvailableCourses(allCourses);
-          } else {
-            console.error("Unexpected response format:", allCourses);
-            setErrorMessage("Invalid data format received from server");
-            setAvailableCourses([]);
-          }
+          setAvailableCourses(filteredCourses);
+
+
         } catch (error) {
           console.error("Error fetching courses:", error);
           setErrorMessage("Error fetching available courses");
           setAvailableCourses([]);
         }
       };
-
       fetchAvailableCourses();
     }
   }, [jwt]);
@@ -90,7 +102,8 @@ const RegisterCourses = () => {
       }
 
       alert("Successfully registered for course!");
-      
+
+      location.reload();
       
     } catch (error) {
       console.error("Registration error:", error);
