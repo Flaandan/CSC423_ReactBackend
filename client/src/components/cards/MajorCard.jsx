@@ -14,14 +14,6 @@ const MajorCard = ({ major, jwt }) => {
   const [isEditMajorOpen, setIsEditMajorOpen] = useState(false);
   const [isListCourses, setIsListCoursesOpen] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [activeComponent, setActiveComponent] = useState("viewListCourses"); // Track active view
-
-  const renderActiveComponent = () => {
-    switch (activeComponent) {
-      default:
-        return <ViewListCourses id={major.id} />;
-    }
-  };
 
   const handleRemove = async (id) => {
     const params = {
@@ -62,12 +54,6 @@ const MajorCard = ({ major, jwt }) => {
           onClick={() => setIsEditMajorOpen(true)}
         >
           Edit
-        </Button>
-        <Button
-          style={{ ...buttonStyle, backgroundColor: "#7f8c8d" }}
-          onClick={() => renderActiveComponent()}
-        >
-          List Courses
         </Button>
       </div>
 
