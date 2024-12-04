@@ -13,6 +13,14 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
+  const [slideshowIndex, setSlideshowIndex] = useState(0);
+  const images = [
+    "/download.webp",
+    "/download (1).webp",
+    "/download (2).webp",
+    // Add more image paths as needed
+  ];
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -43,29 +51,52 @@ function LoginPage() {
     }
   }, [jwt, navigate]);
 
+  // Handle new image slideshow
+  useEffect(() => {
+    const slideshowIntervalId = setInterval(() => {
+      setSlideshowIndex((prev) => (prev + 1) % images.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(slideshowIntervalId);
+  }, [images.length]);
+
   return (
-    <div className="container">
-      <form onSubmit={handleLogin} className="form">
-        <img src={BrockportLogo} alt="Brockport Logo" />
-        <h2 className="DarkBlue-text">Sign In:</h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="input"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input"
-        />
-        <button type="submit" className="loginButton">
-          Login
-        </button>
-      </form>
+    <div className="login-page-container">
+      <div className="container">
+        {/* New image slideshow container */}
+        <div className="image-slideshow-container">
+          {images.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Slideshow ${index}`}
+              className={`slideshow-image ${index === slideshowIndex ? 'active' : ''}`}
+            />
+          ))}
+        </div>
+
+        <form onSubmit={handleLogin} className="form">
+          <img src={BrockportLogo} alt="Brockport Logo" />
+          <h2 className="DarkBlue-text">Sign In:</h2>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="input"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input"
+          />
+          <button type="submit" className="loginButton">
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

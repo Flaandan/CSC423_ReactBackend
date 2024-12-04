@@ -1,40 +1,47 @@
 .container {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
   background-color: #303655;
+  height: 100vh;
+  gap: 40px;
 }
 
 .form {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   background-color: #84a7ba;
-  box-sizing: border-box;
-  height: 100vh;
+  max-width: 400px;
+  width: 100%;
 }
 
 .input {
-  padding: 10px;
+  padding: 12px;
   margin: 10px 0;
-  width: 250px;
+  width: 100%;
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
 
 .loginButton {
-  padding: 10px;
+  padding: 12px;
   background-color: green;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .buttonContainer {
@@ -59,4 +66,35 @@
 
 .DarkBlue-text {
   color: #272343;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.image-slideshow-container {
+  flex: 1;
+  position: relative;
+  height: 80%;
+  max-width: 500px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.slideshow-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  border-radius: 10px;
+}
+
+.slideshow-image.active {
+  opacity: 1;
+}
+
+.login-page-container {
+  display: flex;
+  flex-direction: column;
 }
