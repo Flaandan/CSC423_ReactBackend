@@ -24,27 +24,27 @@ School Project
 
 
 ## Roles:
-- Admin
--- View Majors
--- View Courses
--- View Users
--- Add Major
--- Add Users
+### Admin
+- View Majors
+- View Courses
+- View Users
+- Add Major
+- Add Users
 
-- Student
--- Register for course
--- View Courses
--- Choose Major
+### Student
+- Register for course
+- View Courses
+- Choose Major
 
-- Professor
--- View Courses
--- Add Courses
--- Remove Courses
--- Edit Courses
+### Professor
+- View Courses
+- Add Courses
+- Remove Courses
+- Edit Courses
 
 ## Implementation
 
-[Implementation guide](CSC423_ReactBackend/server/README.md)
+[Implementation guide](server/README.md)
 
 ## Frameworks
 - React
